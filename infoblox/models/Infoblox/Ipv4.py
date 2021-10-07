@@ -82,7 +82,6 @@ class Ipv4:
                     }
 
             data["ipv4addr"] = self.address
-            data["mac"] = "00:00:00:00:00:00"
 
             Ipv4.reserve(self.assetId, data)
 

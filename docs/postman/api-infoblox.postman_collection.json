@@ -994,7 +994,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"ipv4addr\": \"10.8.1.100\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"name\": \"LumIT\",\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server Direct Creation\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"ipv4addr\": \"10.8.1.100\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server Direct Creation\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1320,7 +1320,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"name\": \"LumIT (modified)\",\n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server (modified)\"\n            }\n        }\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"mac\": \"00:00:f0:00:11:00\",\n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server (modified)\"\n            }\n        }\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
