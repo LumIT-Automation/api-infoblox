@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+printf "\n* Container preinst...\n"
+printf "\n* Cleanup...\n"
+if podman ps | awk '{print $2}' | grep -q ^localhost/infoblox$; then
+    podman stop api-infoblox
+fi
+
+if podman images | awk '{print $1}' | grep -q ^localhost/api-infoblox$; then
+    podman rmi -f api-infoblox
+fi
+
+exit 0

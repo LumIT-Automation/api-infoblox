@@ -1,0 +1,12 @@
+[Unit]
+Description=Set mta entry in /etc/hosts
+After=syslog-ng.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mta-target.sh
+RemainAfterExit=true
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

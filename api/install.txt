@@ -1,0 +1,7 @@
+- Configure the CISCO_SPARK_TOKEN setting in settings.py.
+
+- Using the web or the API interface, add all the Infoblox devices in the asset table.
+- Using the web or the API interface, grant permissions to the authentication groups (the model is role to group on Infoblox asset/network, where a role is a collection of privileges).
+
+- If an Infoblox device is accessible only via https using a CA-signed certificate:
+  in order to add the ca-chain just save the files with the .crt extension in /var/lib/containers/storage/volumes/api-infoblox-cacerts/_data/.

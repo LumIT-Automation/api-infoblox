@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" == "purge" ]; then
+    if podman volume ls | awk '{print $2}' | grep -q ^api-infoblox$; then
+        printf "\n* Clean up api-infoblox volume...\n"
+        podman volume rm api-infoblox
+        podman volume rm api-infoblox-db
+        podman volume rm api-infoblox-cacerts
+    fi
+fi
+
+# Force debconf cleanup.
+echo PURGE | debconf-communicate automation-interface-api-infoblox-container
+
+exit 0
