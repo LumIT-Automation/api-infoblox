@@ -994,7 +994,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"ipv4addr\": \"10.8.1.100\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"name\": \"LumIT\",\n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server Direct Creation\"\n            },\n            \"Reference\": {\n                \"value\": \"LumIT S.p.A.\"\n            }\n        }\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"ipv4addr\": \"10.8.1.100\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"name\": \"LumIT\",\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server Direct Creation\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1048,7 +1048,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.0.0\",\n        \"object_type\": \"Server\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server\"\n            },\n            \"Reference\": {\n                \"value\": \"LumIT S.p.A.\"\n            }\n        }\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.0.0\",\n        \"object_type\": \"Database\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1108,7 +1108,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.128.0\",\n        \"number\": 1,\n        \"mac\": [\"00:00:00:00:00:00\"],        \n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server\"\n            },\n            \"Reference\": {\n                \"value\": \"LumIT S.p.A.\"\n            }\n        }\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.128.0\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1168,7 +1168,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.10.0\",\n        \"object_type\": \"Heartbeat\",\n        \"number\": 2,\n        \"mac\": [\n            \"00:00:00:01:00:01\",\n            \"00:00:00:01:00:02\"\n        ],        \n        \"extattrs\": {\n            \"Name Server\": {\n                \"value\": \"Server\"\n            },\n            \"Reference\": {\n                \"value\": \"LumIT S.p.A.\"\n            }\n        }\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.10.0\",\n        \"object_type\": \"Heartbeat\",\n        \"number\": 2,\n        \"mac\": [\n            \"00:00:01:01:00:01\",\n            \"00:00:01:01:00:02\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A. // 1\"\n                }\n            },\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A. // 2\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"

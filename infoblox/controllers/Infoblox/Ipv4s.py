@@ -118,7 +118,12 @@ class InfobloxIpv4sController(CustomController):
             except Exception:
                 mac = "00:00:00:00:00:00"
 
-            response.append(Ipv4.reserveNextAvailable(assetId, address, data, mac))
+            try:
+                extattrs = data["extattrs"][j]
+            except Exception:
+                extattrs = data["extattrs"][0]
+
+            response.append(Ipv4.reserveNextAvailable(assetId, address, extattrs, mac))
             j += 1
 
         return response, actualNetwork
@@ -132,6 +137,9 @@ class InfobloxIpv4sController(CustomController):
         if "number" in data:
             del (data["number"])
         data["mac"] = "00:00:00:00:00:00"
+
+        if "extattrs" in data:
+            data["extattrs"] = data["extattrs"][0]
 
         response.append(Ipv4.reserve(assetId, data))
 

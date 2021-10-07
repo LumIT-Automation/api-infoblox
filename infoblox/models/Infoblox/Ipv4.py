@@ -193,7 +193,7 @@ class Ipv4:
 
 
     @staticmethod
-    def reserveNextAvailable(assetId: int, address: str, data: dict, mac: str) -> object:
+    def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> object:
         try:
             # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
             # Delete the address' information regarding the fixedaddress value, if available.
@@ -209,7 +209,7 @@ class Ipv4:
             return Ipv4.reserve(assetId, {
                 "ipv4addr": address,
                 "mac": mac,
-                "extattrs": data["extattrs"]
+                "extattrs": extattrs
             })
 
         except Exception as e:

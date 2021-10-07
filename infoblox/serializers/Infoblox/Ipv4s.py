@@ -33,7 +33,7 @@ class InfobloxIpv4sSerializer(serializers.Serializer):
                 child=serializers.RegexField(regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', required=True)
             )
             name = serializers.CharField(max_length=255, required=False)
-            extattrs = InfobloxIpv4sExtattrsInnerSerializer(required=False)
+            extattrs = InfobloxIpv4sExtattrsInnerSerializer(required=False, many=True)
             number = serializers.IntegerField(required=False)
 
         # Build son serializer dynamically, passing the plType parameter.
