@@ -10,6 +10,7 @@ class InfobloxNetworkExtattrsInnerSerializer(serializers.Serializer):
 
         # A trick to allow spaces in names.
         self.fields["Real Network"] = InfobloxNetworkExtattrsValueSerializer(required=False)
+        self.fields["Object Type"] = InfobloxNetworkExtattrsValueSerializer(required=False)
 
 class InfobloxNetworksSerializer(serializers.Serializer):
     class InfobloxNetworksInnerSerializer(serializers.Serializer):

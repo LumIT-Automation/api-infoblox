@@ -299,7 +299,7 @@ class Network:
             raise CustomException(status=400, payload={"message": "No network found."})
 
         if not allSubnetworks:
-            raise CustomException(status=400, payload={"message": "No network found: make sure that object_type is valid, if required."})
+            raise CustomException(status=400, payload={"message": "No network found: make sure that Object Type is valid, if required."})
         else:
             Log.log("All subnetworks: " + str(allSubnetworks))
 
