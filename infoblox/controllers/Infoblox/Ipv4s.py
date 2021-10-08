@@ -1,8 +1,6 @@
 import re
 from ipaddress import IPv4Network
-from importlib import import_module
 
-from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -66,13 +64,7 @@ class InfobloxIpv4sController(CustomController):
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
 
-                        # Run plugins.
-                        for plugin in settings.PLUGINS:
-                            try:
-                                p = import_module(plugin)
-                                p.run(locals())
-                            except Exception:
-                                pass
+                        CustomController.plugins("ipv4s_post", locals())
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                         Log.actionLog("Ipv4 locked: "+str(lock), user)

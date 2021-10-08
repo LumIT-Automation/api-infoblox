@@ -42,7 +42,7 @@ class Log:
         log = logging.getLogger("django")
         try:
             if "username" in user:
-                log.debug("["+user['username']+"]"+o)
+                log.debug("["+user['username']+"] "+o)
             else:
                 log.debug(o)
         except Exception:

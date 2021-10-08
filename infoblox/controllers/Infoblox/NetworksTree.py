@@ -41,6 +41,8 @@ class InfobloxNetworksTreeController(CustomController):
                         httpStatus = status.HTTP_200_OK
 
                     lock.release()
+
+                    CustomController.plugins("network_containers_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED

@@ -1,7 +1,5 @@
 import json
-from importlib import import_module
 
-from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -71,6 +69,8 @@ class InfobloxIpv4Controller(CustomController):
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
                     lock.release()
+
+                    CustomController.plugins("ipv4_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED
@@ -120,13 +120,7 @@ class InfobloxIpv4Controller(CustomController):
                     InfobloxIpv4Controller.__logChangedObjects(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
                     Mail.send(user, "[Automation, Infoblox] IPv4 address deletion", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+".") # @todo: move away.
 
-                    # Run plugins.
-                    for plugin in settings.PLUGINS:
-                        try:
-                            p = import_module(plugin)
-                            p.run(locals())
-                        except Exception:
-                            pass
+                    CustomController.plugins("ipv4_delete", locals())
                 else:
                     httpStatus = status.HTTP_423_LOCKED
                     Log.actionLog("Ipv4 locked: "+str(lock), user)
@@ -178,14 +172,7 @@ class InfobloxIpv4Controller(CustomController):
                         lock.release()
 
                         InfobloxIpv4Controller.__logChangedObjects(assetId, user["username"], "ipv4_patch: "+json.dumps(data), "modified", ipv4address)
-
-                        # Run plugins.
-                        for plugin in settings.PLUGINS:
-                            try:
-                                p = import_module(plugin)
-                                p.run(locals())
-                            except Exception:
-                                pass
+                        CustomController.plugins("ipv4_patch", locals())
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:

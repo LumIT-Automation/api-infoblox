@@ -54,6 +54,8 @@ class InfobloxNetworkContainerController(CustomController):
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
                     lock.release()
+
+                    CustomController.plugins("network_container_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED

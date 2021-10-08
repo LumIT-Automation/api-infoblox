@@ -55,62 +55,65 @@ class CiscoSpark:
 
 
 
-def run(o: dict):
+def run(controller: str, o: dict):
     action = ""
     data = dict()
 
-    if "POST" in str(o["request"]):
-        action = "created"
-    if "PATCH" in str(o["request"]):
-        action = "modified"
-    if "DELETE" in str(o["request"]):
-        action = "deleted"
+    if controller in ["ipv4s_post", "ipv4_delete", "ipv4_patch"]:
+        Log.log("Running CiscoSpark plugin")
 
-    if "data" in o:
-        data = o["data"]
+        if "POST" in str(o["request"]):
+            action = "created"
+        if "PATCH" in str(o["request"]):
+            action = "modified"
+        if "DELETE" in str(o["request"]):
+            action = "deleted"
 
-    if action == "modified" or action == "deleted":
-        message = "IPv4 address "+o["ipv4address"]+" has been "+action+" by "+o["user"]["username"]+".\n"
+        if "data" in o:
+            data = o["data"]
 
-        if "mac" in data:
-            mac = data["mac"]
-            message += "MAC: "+mac+"\n"
-        if "extattrs" in data:
-            if "Mask" in data["extattrs"]:
-                mask = data["extattrs"]["Mask"]["value"]
-                message += "Mask: "+mask+"\n"
-            if "Gateway" in data["extattrs"]:
-                gw = data["extattrs"]["Gateway"]["value"]
-                message += "Gateway: "+gw+"\n"
-            if "Reference" in data["extattrs"]:
-                ref = data["extattrs"]["Reference"]["value"]
-                message += "Reference: "+ref+"\n"
-            if "Name Server" in data["extattrs"]:
-                ns = data["extattrs"]["Name Server"]["value"]
-                message += "Name Server: "+ns+"\n"
+        if action == "modified" or action == "deleted":
+            message = "IPv4 address "+o["ipv4address"]+" has been "+action+" by "+o["user"]["username"]+".\n"
 
-        CiscoSpark.send(o["user"], message)
+            if "mac" in data:
+                mac = data["mac"]
+                message += "MAC: "+mac+"\n"
+            if "extattrs" in data:
+                if "Mask" in data["extattrs"]:
+                    mask = data["extattrs"]["Mask"]["value"]
+                    message += "Mask: "+mask+"\n"
+                if "Gateway" in data["extattrs"]:
+                    gw = data["extattrs"]["Gateway"]["value"]
+                    message += "Gateway: "+gw+"\n"
+                if "Reference" in data["extattrs"]:
+                    ref = data["extattrs"]["Reference"]["value"]
+                    message += "Reference: "+ref+"\n"
+                if "Name Server" in data["extattrs"]:
+                    ns = data["extattrs"]["Name Server"]["value"]
+                    message += "Name Server: "+ns+"\n"
 
-    if action == "created":
-        if o["reqType"] == "next-available":
-            j = 0
-            for createdObject in o["response"]["data"]:
-                ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
-                message = "IPv4 address "+ip+" has been "+action+" by "+o["user"]["username"]+".\n"
+            CiscoSpark.send(o["user"], message)
 
-                if "mac" in o["validatedData"]:
-                    message += "MAC: "+o["validatedData"]["mac"][j]+"\n"
-                if o["actualNetwork"]:
-                    message += "Network: "+o["actualNetwork"]+"\n"
-                if o["gateway"]:
-                    message += "Gateway: "+o["gateway"]+"\n"
-                if o["mask"]:
-                    message += "Mask: "+o["mask"]+"\n"
-                if "extattrs" in o["validatedData"]:
-                    if "Reference" in o["validatedData"]["extattrs"]:
-                        message += "Reference: "+o["validatedData"]["extattrs"]["Reference"]["value"]+"\n"
-                    if "Name Server" in o["validatedData"]["extattrs"]:
-                        message += "Name Server: "+o["validatedData"]["extattrs"]["Name Server"]["value"]+"\n"
-                j += 1
+        if action == "created":
+            if o["reqType"] == "next-available":
+                j = 0
+                for createdObject in o["response"]["data"]:
+                    ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
+                    message = "IPv4 address "+ip+" has been "+action+" by "+o["user"]["username"]+".\n"
 
-                CiscoSpark.send(o["user"], message)
+                    if "mac" in o["validatedData"]:
+                        message += "MAC: "+o["validatedData"]["mac"][j]+"\n"
+                    if o["actualNetwork"]:
+                        message += "Network: "+o["actualNetwork"]+"\n"
+                    if o["gateway"]:
+                        message += "Gateway: "+o["gateway"]+"\n"
+                    if o["mask"]:
+                        message += "Mask: "+o["mask"]+"\n"
+                    if "extattrs" in o["validatedData"]:
+                        if "Reference" in o["validatedData"]["extattrs"]:
+                            message += "Reference: "+o["validatedData"]["extattrs"]["Reference"]["value"]+"\n"
+                        if "Name Server" in o["validatedData"]["extattrs"]:
+                            message += "Name Server: "+o["validatedData"]["extattrs"]["Name Server"]["value"]+"\n"
+                    j += 1
+
+                    CiscoSpark.send(o["user"], message)

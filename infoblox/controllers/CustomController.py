@@ -1,7 +1,7 @@
 import jwt
+from importlib import import_module
 
 from django.conf import settings
-
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework import status
@@ -37,6 +37,17 @@ class CustomController(APIView):
             user["authDisabled"] = False
 
         return user
+
+
+
+    @staticmethod
+    def plugins(what: str, o: dict) -> None:
+        for plugin in settings.PLUGINS:
+            try:
+                p = import_module(plugin)
+                p.run(what, o)
+            except Exception:
+                pass
 
 
 
