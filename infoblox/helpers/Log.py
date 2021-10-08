@@ -9,7 +9,7 @@ from django.db import connection
 class Log:
     @staticmethod
     def log(o: any, title: str = "") -> None:
-        # Sends input logs to the "infoblox" logger (settings).
+        # Sends input logs to the configured logger (settings).
         log = logging.getLogger("django")
         if title:
             if title == "_":
@@ -38,7 +38,7 @@ class Log:
 
     @staticmethod
     def actionLog(o: any, user: dict = {}) -> None:
-        # Sends input logs to the "infoblox" logger (settings).
+        # Sends input logs to the configured logger (settings).
         log = logging.getLogger("django")
         try:
             if "username" in user:
