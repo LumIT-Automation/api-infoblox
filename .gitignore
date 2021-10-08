@@ -2,4 +2,4 @@
 *.pyc
 *.swp
 */__pycache__
-api/settings_spark.py
+api/plugins_conf/ciscospark.py

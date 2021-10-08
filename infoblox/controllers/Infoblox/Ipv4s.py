@@ -1,6 +1,8 @@
 import re
 from ipaddress import IPv4Network
+from importlib import import_module
 
+from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,7 +17,6 @@ from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer as Seria
 from infoblox.controllers.CustomController import CustomController
 
 from infoblox.helpers.Lock import Lock
-from infoblox.helpers.CiscoSpark import CiscoSpark
 from infoblox.helpers.Log import Log
 
 
@@ -58,13 +59,20 @@ class InfobloxIpv4sController(CustomController):
                         if reqType == "next-available":
                             response["data"], actualNetwork = InfobloxIpv4sController.__reserveNextAvail(assetId, validatedData, networkLogic, targetNetwork, networkContainer)
                             InfobloxIpv4sController.__log(assetId, user["username"], "next-available", response, network=actualNetwork, gateway=gateway, mask=mask)
-                            InfobloxIpv4sController.__sparkNotify(user, validatedData, response, network=actualNetwork, gateway=gateway, mask=mask)
                         else:
                             response["data"] = InfobloxIpv4sController.__reserveProvided(assetId, validatedData)
                             InfobloxIpv4sController.__log(assetId, user["username"], "user-specified", response, network=targetNetwork, gateway=gateway, mask=mask)
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
+
+                        # Run plugins.
+                        for plugin in settings.PLUGINS:
+                            try:
+                                p = import_module(plugin)
+                                p.run(locals())
+                            except Exception:
+                                pass
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                         Log.actionLog("Ipv4 locked: "+str(lock), user)
@@ -221,29 +229,3 @@ class InfobloxIpv4sController(CustomController):
 
         except Exception:
             pass
-
-
-
-    @staticmethod
-    def __sparkNotify(user, userData, response, network: str = "", gateway: str = "", mask: str = ""):
-        j = 0
-        for createdObject in response["data"]:
-            ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
-            message = "IPv4 address "+ip+" has been created by "+user["username"]+".\n"
-
-            if "mac" in userData:
-                message += "MAC: "+userData["mac"][j]+"\n"
-            if network:
-                message += "Network: "+network+"\n"
-            if gateway:
-                message += "Gateway: "+gateway+"\n"
-            if mask:
-                message += "Mask: "+mask+"\n"
-            if "extattrs" in userData:
-                if "Reference" in userData["extattrs"]:
-                    message += "Reference: "+userData["extattrs"]["Reference"]["value"]+"\n"
-                if "Name Server" in userData["extattrs"]:
-                    message += "Name Server: "+userData["extattrs"]["Name Server"]["value"]+"\n"
-            j += 1
-
-            CiscoSpark.send(user, message)

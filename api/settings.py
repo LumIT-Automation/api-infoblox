@@ -1,16 +1,9 @@
 import os
 from datetime import timedelta
-import logging
-import logging.handlers
 
 # JWT settings.
 from api.settings_jwt import *
 
-# Cisco Spark.
-try:
-    from api.settings_spark import *
-except Exception:
-    pass
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -232,3 +225,13 @@ API_SUPPLICANT_HTTP_PROXY = ""
 API_SUPPLICANT_NETWORK_TIMEOUT = 30 # seconds.
 
 LOCK_MAX_VALIDITY = 30 # seconds.
+
+# Plugins and configuration.
+PLUGINS = [
+    'infoblox.plugins.CiscoSpark'
+]
+
+try:
+    from api.plugins_conf.ciscospark import *
+except Exception:
+    pass
