@@ -118,7 +118,9 @@ function System_codeCollect()
     cp ../license.txt $workingFolderPath/var/www/api
 
     # Remove development data.
-    rm -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.initialData.sql
+    if [ -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.initialData.sql ]; then
+        rm -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.initialData.sql
+    fi
 
     # Remove __pycache__ folders and not-required ones.
     rm -fR $workingFolderPath/var/www/api/infoblox/tests

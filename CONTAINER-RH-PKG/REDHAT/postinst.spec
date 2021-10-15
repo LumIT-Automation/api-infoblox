@@ -68,7 +68,7 @@ function containerSetup()
         if [ "$(podman exec api-infoblox mysql --vertical -e "SHOW DATABASES LIKE 'api';" | tail -1 | awk -F': ' '{print $2}')" == "" ]; then
             podman exec api-infoblox mysql -e 'CREATE DATABASE api DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;' # create database.
             podman exec api-infoblox mysql api -e "source /var/www/api/infoblox/sql/infoblox.schema.sql" # restore database schema.
-            podman exec api-infoblox mysql api -e "source /var/www/api/infoblox/sql/infoblox.initialDataProduction.sql" # restore database data.
+            podman exec api-infoblox mysql api -e "source /var/www/api/infoblox/sql/infoblox.data.sql" # restore database data.
         fi
 
         # Database update via diff.sql (migrations).

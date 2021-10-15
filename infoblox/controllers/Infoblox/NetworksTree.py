@@ -59,4 +59,3 @@ class InfobloxNetworksTreeController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
-
