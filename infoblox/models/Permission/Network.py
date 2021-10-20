@@ -1,11 +1,12 @@
 from django.db import connection
 
 from infoblox.models.Infoblox.Network import Network as InfobloxNetwork
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as InfobloxNetworkContainer
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
 
-
+from infoblox.helpers.Log import Log
 
 class Network:
     def __init__(self, assetId: int, networkId: int = 0, networkName: str = "", *args, **kwargs):
@@ -79,6 +80,8 @@ class Network:
     def add(assetId, networkName) -> int:
         c = connection.cursor()
 
+        Log.log(assetId, '_')
+        Log.log(networkName, '_')
         if networkName == "any":
             try:
                 c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
@@ -95,10 +98,12 @@ class Network:
 
         else:
             # Check if assetId/networkName is a valid Infoblox network (at the time of the insertion).
-            infobloxNetworks = InfobloxNetwork.list(assetId)["data"]
+            infobloxNetworks = InfobloxNetwork.list(assetId)["data"] + InfobloxNetworkContainer.list(assetId)["data"]
 
             for v in infobloxNetworks:
+
                 if v["network"] == networkName:
+                    Log.log(v, '_')
                     try:
                         c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
                             assetId,
