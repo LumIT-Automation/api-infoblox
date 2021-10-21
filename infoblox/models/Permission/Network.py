@@ -80,8 +80,6 @@ class Network:
     def add(assetId, networkName) -> int:
         c = connection.cursor()
 
-        Log.log(assetId, '_')
-        Log.log(networkName, '_')
         if networkName == "any":
             try:
                 c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
@@ -103,7 +101,6 @@ class Network:
             for v in infobloxNetworks:
 
                 if v["network"] == networkName:
-                    Log.log(v, '_')
                     try:
                         c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
                             assetId,
