@@ -18,6 +18,9 @@ class InfobloxNetworkContainersController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int) -> Response:
         data = dict()
+        allowedData = {
+            "data": []
+        }
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
@@ -29,8 +32,15 @@ class InfobloxNetworkContainersController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = NetworkContainer.list(assetId, returnFields=["network_container,extattrs"] )
-                    serializer = Serializer(data=itemData)
+                    itemData = NetworkContainer.list(assetId, returnFields=["network_container,extattrs"])
+
+                    # Filter network containers' list basing on permissions.
+                    # For any result, check if the user has got at least an ipv4_get permission on the container.
+                    for p in itemData["data"]:
+                        if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=str(p["network"])) or user["authDisabled"]:
+                            allowedData["data"].append(p)
+
+                    serializer = Serializer(data=allowedData)
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data["data"]
                         data["href"] = request.get_full_path()

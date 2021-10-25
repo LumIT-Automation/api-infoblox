@@ -31,7 +31,7 @@ INSERT INTO `privilege` (`id`, `privilege`, `propagate_to_all_asset_networks`, `
 (3, 'assets_get', 1, 1, NULL),
 (4, 'assets_post', 1, 1, NULL),
 (5, 'network_containers_get', 1, 0, NULL),
-(6, 'network_container_get', 1, 0, NULL),
+(6, 'network_container_get', 0, 0, NULL),
 (7, 'network_get', 0, 0, NULL),
 (8, 'network_post', 0, 0, NULL),
 (9, 'network_delete', 0, 0, NULL),
