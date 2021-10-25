@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Creato il: Ago 02, 2021 alle 08:22
--- Versione del server: 10.3.27-MariaDB-0+deb10u1-log
--- Versione PHP: 7.3.27-1~deb10u1
+-- Creato il: Ott 25, 2021 alle 08:14
+-- Versione del server: 10.3.31-MariaDB-0+deb10u1-log
+-- Versione PHP: 7.3.29-1~deb10u1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -76,25 +76,24 @@ CREATE TABLE `log` (
   `username` varchar(255) NOT NULL,
   `action` varchar(2048) NOT NULL,
   `asset_id` int(11) NOT NULL,
-  `config_object_type` varchar(255) NOT NULL,
-  `status` varchar(32) NOT NULL,
+  `object_id` int(11) NOT NULL,
+  `status` enum('created','modified','deleted') NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `ipv4`
+-- Struttura della tabella `log_object`
 --
 
-CREATE TABLE `ipv4` (
+CREATE TABLE `log_object` (
   `id` int(11) NOT NULL,
+  `type` enum('ipv4','') DEFAULT NULL,
   `address` varchar(15) DEFAULT NULL,
   `network` varchar(18) DEFAULT NULL,
   `mask` varchar(15) DEFAULT NULL,
-  `gateway` varchar(15) DEFAULT NULL,
-  `status` enum('created','deleted','modified','') DEFAULT NULL,
-  `log_id` int(11) NOT NULL
+  `gateway` varchar(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -192,14 +191,14 @@ ALTER TABLE `identity_group`
 --
 ALTER TABLE `log`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `username` (`username`);
+  ADD KEY `username` (`username`),
+  ADD KEY `object` (`object_id`);
 
 --
--- Indici per le tabelle `ipv4`
+-- Indici per le tabelle `log_object`
 --
-ALTER TABLE `ipv4`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `log_id` (`log_id`);
+ALTER TABLE `log_object`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indici per le tabelle `migrations`
@@ -265,9 +264,9 @@ ALTER TABLE `log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT per la tabella `ipv4`
+-- AUTO_INCREMENT per la tabella `log_object`
 --
-ALTER TABLE `ipv4`
+ALTER TABLE `log_object`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -307,6 +306,12 @@ ALTER TABLE `group_role_network`
   ADD CONSTRAINT `grp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Limiti per la tabella `log`
+--
+ALTER TABLE `log`
+  ADD CONSTRAINT `object` FOREIGN KEY (`object_id`) REFERENCES `log_object` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Limiti per la tabella `network`
 --
 ALTER TABLE `network`
@@ -318,13 +323,6 @@ ALTER TABLE `network`
 ALTER TABLE `role_privilege`
   ADD CONSTRAINT `rp_privilege` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `rp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Limiti per la tabella `ipv4`
---
-ALTER TABLE `ipv4`
-  ADD CONSTRAINT `log` FOREIGN KEY (`log_id`) REFERENCES `log` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

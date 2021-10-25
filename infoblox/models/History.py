@@ -21,9 +21,9 @@ class History:
 
         try:
             if allUsersHistory:
-                c.execute("SELECT username, action, asset_id, config_object_type, status, date FROM log")
+                c.execute("SELECT username, action, asset_id, object_type, status, date FROM log")
             else:
-                c.execute("SELECT username, action, asset_id, config_object_type, status, date FROM log WHERE username = %s", [
+                c.execute("SELECT username, action, asset_id, object_type, status, date FROM log WHERE username = %s", [
                     username
                 ])
 

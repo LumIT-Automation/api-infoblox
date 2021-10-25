@@ -202,22 +202,21 @@ class InfobloxIpv4sController(CustomController):
             for createdObject in response["data"]:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
 
-                logId = History.add({
-                    "username": user,
-                    "action": action,
-                    "asset_id": assetId,
-                    "config_object_type": "IPv4",
-                    "status": "created"
-                }, "log")
-
-                History.add({
+                oId = History.add({
+                    "type": "ipv4",
                     "address": ipv4,
                     "network": network,
                     "mask": mask,
-                    "gateway": gateway,
-                    "status": "created",
-                    "log_id": logId
-                }, "ipv4")
+                    "gateway": gateway
+                }, "log_object")
+
+                History.add({
+                    "username": user,
+                    "action": action,
+                    "asset_id": assetId,
+                    "object_id": oId,
+                    "status": "created"
+                }, "log")
 
         except Exception:
             pass

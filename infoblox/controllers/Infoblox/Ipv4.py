@@ -205,22 +205,21 @@ class InfobloxIpv4Controller(CustomController):
     @staticmethod
     def __logChangedObjects(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> None:
         try:
-            logId = History.add({
-                "username": user,
-                "action": action,
-                "asset_id": assetId,
-                "config_object_type": "IPv4",
-                "status": s
-            }, "log")
-
-            History.add({
+            oId = History.add({
+                "type": "ipv4",
                 "address": ipv4,
                 "network": network,
                 "mask": mask,
-                "gateway": gateway,
-                "status": s,
-                "log_id": logId
-            }, "ipv4")
+                "gateway": gateway
+            }, "log_object")
+
+            History.add({
+                "username": user,
+                "action": action,
+                "asset_id": assetId,
+                "object_id": oId,
+                "status": s
+            }, "log")
 
         except Exception:
             pass

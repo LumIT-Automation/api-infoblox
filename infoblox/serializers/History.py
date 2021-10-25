@@ -7,7 +7,7 @@ class HistorySerializer(serializers.Serializer):
             username = serializers.CharField(max_length=255, required=True)
             action = serializers.CharField(max_length=255, required=True)
             asset_id = serializers.IntegerField(required=True)
-            config_object_type = serializers.CharField(max_length=255, required=True)
+            object_type = serializers.CharField(max_length=255, required=True)
             status = serializers.CharField(max_length=255, required=True)
             date = serializers.CharField(max_length=255, required=True)
 
