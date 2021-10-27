@@ -26,16 +26,16 @@ SET time_zone = "+00:00";
 --
 
 INSERT INTO `privilege` (`id`, `privilege`, `propagate_to_all_asset_networks`, `propagate_to_all_assets`, `description`) VALUES
-(1, 'asset_patch', 1, 1, NULL),
-(2, 'asset_delete', 1, 1, NULL),
-(3, 'assets_get', 1, 1, NULL),
-(4, 'assets_post', 1, 1, NULL),
-(5, 'network_containers_get', 1, 0, NULL),
+(1, 'asset_patch', 1, 0, NULL),
+(2, 'asset_delete', 1, 0, NULL),
+(3, 'assets_get', 1, 0, NULL),
+(4, 'assets_post', 1, 0, NULL),
+(5, 'network_containers_get', 0, 0, NULL),
 (6, 'network_container_get', 0, 0, NULL),
 (7, 'network_get', 0, 0, NULL),
 (8, 'network_post', 0, 0, NULL),
 (9, 'network_delete', 0, 0, NULL),
-(10, 'networks_get', 1, 0, NULL),
+(10, 'networks_get', 0, 0, NULL),
 (11, 'ipv4_get', 0, 0, NULL),
 (12, 'ipv4s_post', 0, 0, NULL),
 (13, 'ipv4_delete', 0, 0, NULL),
@@ -61,10 +61,7 @@ INSERT INTO `role` (`id`, `role`, `description`) VALUES
 --
 
 INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
-(1, 1),
-(1, 2),
 (1, 3),
-(1, 4),
 (1, 5),
 (1, 6),
 (1, 7),

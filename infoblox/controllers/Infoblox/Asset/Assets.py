@@ -16,6 +16,11 @@ class InfobloxAssetsController(CustomController):
     @staticmethod
     def get(request: Request) -> Response:
         data = dict()
+        allowedData = {
+            "data": {
+                "items": []
+            }
+        }
         user = CustomController.loggedUser(request)
 
         try:
@@ -23,8 +28,13 @@ class InfobloxAssetsController(CustomController):
                 Log.actionLog("Asset list", user)
 
                 itemData = Asset.list()
-                serializer = AssetsSerializer(data=itemData)
 
+                # Filter assets' list basing on actual permissions.
+                for p in itemData["data"]["items"]:
+                    if Permission.hasUserPermission(groups=user["groups"], action="assets_get", assetId=p["id"]) or user["authDisabled"]:
+                        allowedData["data"]["items"].append(p)
+
+                serializer = AssetsSerializer(data=allowedData)
                 if serializer.is_valid():
                     data["data"] = serializer.validated_data["data"]
                     data["href"] = request.get_full_path()
