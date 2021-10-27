@@ -24,14 +24,16 @@ class History:
                 c.execute("SELECT "
                     "username, action, asset_id, status, date, type, network, address, gateway "
                     "FROM log "
-                    "LEFT JOIN log_object ON log.object_id = log_object.id"
+                    "LEFT JOIN log_object ON log.object_id = log_object.id "
+                    "ORDER BY date DESC"
                 )
             else:
                 c.execute("SELECT "
                     "username, action, asset_id, status, date, type, network, address, gateway "
                     "FROM log "
-                    "LEFT JOIN log_object ON log.object_id = log_object.id"
-                    "WHERE username = %s", [
+                    "LEFT JOIN log_object ON log.object_id = log_object.id "                    
+                    "WHERE username = %s "
+                    "ORDER BY date DESC", [
                         username
                     ]
                 )
