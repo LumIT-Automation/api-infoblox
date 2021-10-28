@@ -1,3 +1,5 @@
+import hashlib
+
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -27,7 +29,7 @@ class InfobloxNetworksTreeController(CustomController):
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
-        def __allowedTree(el: dict, father: str, tree: dict) -> None:  # -> el.
+        def __allowedTree(el: dict, father: str, tree: dict) -> None: # -> el.
             if not el["children"]:
                 if father not in tree:
                     tree[father] = list()
@@ -38,8 +40,12 @@ class InfobloxNetworksTreeController(CustomController):
                 else:
                     action = "network_get"
 
-                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]:
-                    el["auth"] = True
+                if not (Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]):
+                    el["key"] = hashlib.md5(el["_ref"].encode('utf-8')).hexdigest()
+                    el["title"] = ""
+
+                del(el["_ref"])
+                del(el["network"])
 
                 el["children"] = []
                 tree[father].append(el)
@@ -55,17 +61,15 @@ class InfobloxNetworksTreeController(CustomController):
 
                     if father:
                         nc = {
-                            "_ref": el["_ref"],
-                            "network": el["network"],
                             "title": el["network"],
-                            "key": el["_ref"],
+                            "key": hashlib.md5(el["_ref"].encode('utf-8')).hexdigest(),
                             "type": "container",
                             "extattrs": el["extattrs"],
                             "children": tree[el["network"]]
                         }
 
-                        if Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/":
-                            nc["auth"] = True
+                        if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/"):
+                            nc["title"] = ""
 
                         if nc not in tree[father]:
                             tree[father].append(nc)

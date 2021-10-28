@@ -213,6 +213,12 @@ class NetworkContainer:
 
             del (network["network_view"])
             del (network["network_container"])
+
+            # Just remove some useless info here.
+            for ck, cv in network["extattrs"].items():
+                if "inheritance_source" in cv:
+                    del network["extattrs"][ck]["inheritance_source"]
+
             network["type"] = "network"
             network["title"] = network["network"]
             network["key"] = network["_ref"]
