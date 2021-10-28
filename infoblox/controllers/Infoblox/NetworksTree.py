@@ -40,15 +40,15 @@ class InfobloxNetworksTreeController(CustomController):
                 else:
                     action = "network_get"
 
-                if not (Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]):
+                # Add only allowed leaves to the tree data structure.
+                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]:
                     el["key"] = hashlib.md5(el["_ref"].encode('utf-8')).hexdigest()
-                    el["title"] = ""
+                    el["children"] = []
 
-                del(el["_ref"])
-                del(el["network"])
+                    del(el["_ref"])
+                    del(el["network"])
 
-                el["children"] = []
-                tree[father].append(el)
+                    tree[father].append(el)
 
             else:
                 # Branch, container.
@@ -68,6 +68,7 @@ class InfobloxNetworksTreeController(CustomController):
                             "children": tree[el["network"]]
                         }
 
+                        # If not allowed, clear information but maintain structure.
                         if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/"):
                             nc["title"] = ""
 
@@ -88,6 +89,13 @@ class InfobloxNetworksTreeController(CustomController):
 
                     o["/"]["children"] = tree["/"]
                     o["/"]["network"] = "/"
+
+                    # Cleanup. @todo. 
+                    j = 0
+                    for ch in o["/"]["children"]:
+                        if ch["title"] == "" and not ch["children"]:
+                            del o["/"]["children"][j]
+                        j += 1
 
                     data["data"] = o
                     data["href"] = request.get_full_path()
