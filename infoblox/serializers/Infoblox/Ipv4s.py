@@ -11,7 +11,7 @@ class InfobloxIpv4sExtattrsInnerSerializer(serializers.Serializer):
         # A trick to allow spaces in names.
         self.fields["Name Server"] = InfobloxIpv4sExtattrsValueSerializer(required=False)
 
-    Reference = InfobloxIpv4sExtattrsValueSerializer(required=False)
+    Reference = InfobloxIpv4sExtattrsValueSerializer(required=False, allow_null=True)
 
 class InfobloxIpv4sSerializer(serializers.Serializer):
     def __init__(self, reqType, *args, **kwargs):

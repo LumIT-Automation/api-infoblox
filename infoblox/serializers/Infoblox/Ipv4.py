@@ -16,7 +16,7 @@ class InfobloxIpv4Serializer(serializers.Serializer):
 
             Gateway = InfobloxIpv4ExtattrsValueSerializer(required=False)
             Mask = InfobloxIpv4ExtattrsValueSerializer(required=False)
-            Reference = InfobloxIpv4ExtattrsValueSerializer(required=False)
+            Reference = InfobloxIpv4ExtattrsValueSerializer(required=False, allow_null=True)
 
         class InfobloxIpv4NamesInnerSerializer(serializers.ListField):
             name = serializers.CharField(max_length=255)
