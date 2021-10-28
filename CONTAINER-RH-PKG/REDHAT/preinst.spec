@@ -9,8 +9,10 @@ fi
 printf "\n* Container preinst...\n"
 printf "\n* Cleanup...\n"
 
-if podman ps | awk '{print $2}' | grep -q ^localhost/infoblox$; then
-    podman stop api-infoblox
+# If there is a api-infoblox container already, stop it in 5 seconds.
+if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/api-infoblox(:|\b)'; then
+    podman stop -t 5 api-infoblox &
+    wait $! # Wait for the shutdown process of the container.
 fi
 
 if podman images | awk '{print $1}' | grep -q ^localhost/api-infoblox$; then
@@ -18,8 +20,8 @@ if podman images | awk '{print $1}' | grep -q ^localhost/api-infoblox$; then
 fi
 
 # Be sure there is not rubbish around.
-if podman ps --all | awk '{print $2}' | grep -q ^localhost/api-infoblox$; then
-    cIds=$( podman ps --all | awk '$2 == "localhost/api-infoblox" { print $1 }' )
+if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/api-infoblox(:|\b)'; then
+    cIds=$( podman ps --all | awk '$2 ~ /^localhost\/api-infoblox/ { print $1 }' )
     for id in $cIds; do
         podman rm -f $id
     done
