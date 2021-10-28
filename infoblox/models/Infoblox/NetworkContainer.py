@@ -228,6 +228,8 @@ class NetworkContainer:
         NetworkContainer.__treeSort(containers, { "network": "/" }, "", tree)
 
         o["/"]["children"] = tree["/"]
+        o["/"]["network"] = "/"
+
         containersTree = o
 
         # "/": {
@@ -288,7 +290,7 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def __treeSort(containers: dict, el: dict, father: str, tree: dict) -> None:
+    def __treeSort(containers: dict, el: dict, father: str, tree: dict) -> None: # -> tree.
         if el["network"] not in containers: # not a dict key: leaf.
             if father not in tree:
                 tree[father] = list()

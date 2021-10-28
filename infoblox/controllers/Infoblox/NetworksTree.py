@@ -16,19 +16,76 @@ class InfobloxNetworksTreeController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int) -> Response:
         data = dict()
+        tree = dict()
+        o = {
+            "/": {
+                "title": "/",
+                "key": "networkcontainer/",
+                "children": list()
+            }
+        }
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
+        def __allowedTree(el: dict, father: str, tree: dict) -> None:  # -> el.
+            if not el["children"]:
+                if father not in tree:
+                    tree[father] = list()
+
+                # Leaf, container or network.
+                if "networkcontainer" in el["_ref"]:
+                    action = "network_container_get"
+                else:
+                    action = "network_get"
+
+                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]:
+                    el["auth"] = True
+
+                el["children"] = []
+                tree[father].append(el)
+
+            else:
+                # Branch, container.
+                if father:
+                    if father not in tree:
+                        tree[father] = list()
+
+                for son in el["children"]:
+                    __allowedTree(son, el["network"], tree) # recurse.
+
+                    if father:
+                        nc = {
+                            "_ref": el["_ref"],
+                            "network": el["network"],
+                            "title": el["network"],
+                            "key": el["_ref"],
+                            "type": "container",
+                            "extattrs": el["extattrs"],
+                            "children": tree[el["network"]]
+                        }
+
+                        if Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/":
+                            nc["auth"] = True
+
+                        if nc not in tree[father]:
+                            tree[father].append(nc)
+
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) or user["authDisabled"]:
+            if (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) and Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId)) or user["authDisabled"]:
                 Log.actionLog("NetworkContainers list", user)
 
                 lock = Lock("networkContainer", locals())
                 if lock.isUnlocked():
                     lock.lock()
 
+                    # Get the tree and check here user's permissions.
                     itemData = NetworkContainer.tree(assetId)
-                    data["data"] = itemData
+                    __allowedTree(itemData["/"], "", tree) # tree modified: by reference.
+
+                    o["/"]["children"] = tree["/"]
+                    o["/"]["network"] = "/"
+
+                    data["data"] = o
                     data["href"] = request.get_full_path()
 
                     # Check the response's ETag validity (against client request).
