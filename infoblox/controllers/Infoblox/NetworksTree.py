@@ -79,6 +79,8 @@ class InfobloxNetworksTreeController(CustomController):
                 if el["title"]:
                     el["children"] = []
                     tree[father].append(el)
+                else:
+                    tree["clean"] = False
             else:
                 # Branch, container.
                 if str(el["key"]) not in tree:
@@ -115,6 +117,25 @@ class InfobloxNetworksTreeController(CustomController):
                     __allowedTree(itemData["/"], "", tree) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]
+
+                    # Cleanup tree: remove empty leaves, one level per run.
+                    while True:
+                        tree = {
+                            "clean": True
+                        }
+                        __cleanupTree(o["/"], "", tree)
+
+                        o = {
+                            "/": {
+                                "title": "/",
+                                "key": "networkcontainer/",
+                                "children": list()
+                            }
+                        }
+                        o["/"]["children"] = tree["networkcontainer/"]
+
+                        if tree["clean"]:
+                            break
 
                     data["data"] = o
                     data["href"] = request.get_full_path()
