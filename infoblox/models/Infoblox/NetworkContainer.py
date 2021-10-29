@@ -298,12 +298,12 @@ class NetworkContainer:
     @staticmethod
     def __treeSort(containers: dict, el: dict, father: str, tree: dict) -> None: # -> tree.
         if el["network"] not in containers: # not a dict key: leaf.
-            if father not in tree:
-                tree[father] = list()
-
             el["children"] = []
             tree[father].append(el)
         else:
+            if str(el["network"]) not in tree:
+                tree[el["network"]] = list()
+
             for son in containers[el["network"]]:
                 if father:
                     if father not in tree:

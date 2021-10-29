@@ -31,9 +31,6 @@ class InfobloxNetworksTreeController(CustomController):
 
         def __allowedTree(el: dict, father: str, tree: dict) -> None: # -> el.
             if not el["children"]:
-                if father not in tree:
-                    tree[father] = list()
-
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
                     action = "network_container_get"
@@ -49,31 +46,34 @@ class InfobloxNetworksTreeController(CustomController):
                     del(el["network"])
 
                     tree[father].append(el)
-
             else:
                 # Branch, container.
-                if father:
-                    if father not in tree:
-                        tree[father] = list()
+                if str(el["network"]) not in tree:
+                    tree[el["network"]] = list()
 
                 for son in el["children"]:
                     __allowedTree(son, el["network"], tree) # recurse.
 
-                    if father:
-                        nc = {
-                            "title": el["network"],
-                            "key": hashlib.md5(el["_ref"].encode('utf-8')).hexdigest(),
-                            "type": "container",
-                            "extattrs": el["extattrs"],
-                            "children": tree[el["network"]]
-                        }
+                    try:
+                        if father:
+                            nc = {
+                                "title": el["network"],
+                                "key": hashlib.md5(el["_ref"].encode('utf-8')).hexdigest(),
+                                "type": "container",
+                                "extattrs": el["extattrs"],
+                                "children": tree[el["network"]]
+                            }
 
-                        # If not allowed, clear information but maintain structure.
-                        if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/"):
-                            nc["title"] = ""
+                            # If not branch allowed, clear information but maintain structure.
+                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/"):
+                                nc["title"] = ""
 
-                        if nc not in tree[father]:
-                            tree[father].append(nc)
+                            if nc not in tree[father]:
+                                tree[father].append(nc)
+                    except Exception:
+                        pass
+
+                    Log.log(tree, "_")
 
         try:
             if (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) and Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId)) or user["authDisabled"]:
@@ -88,7 +88,6 @@ class InfobloxNetworksTreeController(CustomController):
                     __allowedTree(itemData["/"], "", tree) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]
-                    o["/"]["network"] = "/"
 
                     # Cleanup. @todo. 
                     j = 0
