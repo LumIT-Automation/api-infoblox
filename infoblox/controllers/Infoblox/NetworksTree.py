@@ -29,7 +29,7 @@ class InfobloxNetworksTreeController(CustomController):
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
-        def __allowedTree(el: dict, father: str, tree: dict) -> None: # -> el.
+        def __allowedTree(el: dict, father: str, tree: dict) -> None: # -> tree.
             if not el["children"]:
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
@@ -68,6 +68,34 @@ class InfobloxNetworksTreeController(CustomController):
                             if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"]) or user["authDisabled"] or el["network"] == "/"):
                                 nc["title"] = ""
                                 nc["extattrs"] = dict()
+
+                            if nc not in tree[father]:
+                                tree[father].append(nc)
+                    except Exception:
+                        pass
+
+        def __cleanupTree(el: dict, father: str, tree: dict) -> None: # -> tree.
+            if not el["children"]:
+                if el["title"]:
+                    el["children"] = []
+                    tree[father].append(el)
+            else:
+                # Branch, container.
+                if str(el["key"]) not in tree:
+                    tree[el["key"]] = list()
+
+                for son in el["children"]:
+                    __cleanupTree(son, el["key"], tree) # recurse.
+
+                    try:
+                        if father:
+                            nc = {
+                                "title": el["title"],
+                                "key": el["key"],
+                                "type": "container",
+                                "extattrs": el["extattrs"],
+                                "children": tree[el["key"]]
+                            }
 
                             if nc not in tree[father]:
                                 tree[father].append(nc)
