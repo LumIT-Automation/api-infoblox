@@ -21,7 +21,7 @@ fi
 
 # Be sure there is not rubbish around.
 if podman ps --all | awk '{print $2}' | grep -E '\blocalhost/api-infoblox(:|$)'; then
-    cIds=$( podman ps --all | awk '$2 ~ /^localhost\/api-infoblox/(:|$) { print $1 }' )
+    cIds=$( podman ps --all | awk '$2 ~ /^localhost\/api-infoblox(:|$)/ { print $1 }' )
     for id in $cIds; do
         podman rm -f $id
     done
