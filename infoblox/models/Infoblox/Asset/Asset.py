@@ -22,7 +22,7 @@ class Asset:
     ####################################################################################################################
 
     def info(self) -> dict:
-        if not cache.get("ASSETS"):
+        if not cache.get("ASSET"+str(self.assetId)):
             c = connection.cursor()
 
             try:
@@ -41,7 +41,7 @@ class Asset:
                     a["password"]
                 )
 
-                cache.set("ASSETS", a, 10)
+                cache.set("ASSET"+str(self.assetId), a, 10)
                 return a
 
             except Exception as e:
@@ -50,7 +50,7 @@ class Asset:
                 c.close()
         else:
             # Fetching from cache instead of MySQL for when massive threaded calls result in too many sql connections.
-            return cache.get("ASSETS")
+            return cache.get("ASSET"+str(self.assetId))
 
 
 
