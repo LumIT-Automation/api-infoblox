@@ -112,7 +112,7 @@ class InfobloxIpv4Controller(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    Ipv4(assetId, ipv4address).release()
+                    Ipv4(assetId, ipv4address).release(fixedaddressOnly=True)
                     httpStatus = status.HTTP_200_OK
 
                     lock.release()
