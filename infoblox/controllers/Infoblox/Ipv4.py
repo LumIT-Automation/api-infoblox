@@ -117,7 +117,7 @@ class InfobloxIpv4Controller(CustomController):
 
                     lock.release()
 
-                    InfobloxIpv4Controller.__logChangedObjects(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
+                    historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
                     Mail.send(user, "[Automation, Infoblox] IPv4 address deletion", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+".") # @todo: move away.
 
                     CustomController.plugins("ipv4_delete", locals())
@@ -171,7 +171,7 @@ class InfobloxIpv4Controller(CustomController):
                         httpStatus = status.HTTP_200_OK
                         lock.release()
 
-                        InfobloxIpv4Controller.__logChangedObjects(assetId, user["username"], "ipv4_patch: "+json.dumps(data), "modified", ipv4address)
+                        historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
                         CustomController.plugins("ipv4_patch", locals())
                     else:
                         httpStatus = status.HTTP_423_LOCKED
@@ -203,7 +203,9 @@ class InfobloxIpv4Controller(CustomController):
     ####################################################################################################################
 
     @staticmethod
-    def __logChangedObjects(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> None:
+    def __historyLog(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
+        hId = 0
+
         try:
             oId = History.add({
                 "type": "ipv4",
@@ -213,7 +215,7 @@ class InfobloxIpv4Controller(CustomController):
                 "gateway": gateway
             }, "log_object")
 
-            History.add({
+            hId = History.add({
                 "username": user,
                 "action": action,
                 "asset_id": assetId,
@@ -223,3 +225,5 @@ class InfobloxIpv4Controller(CustomController):
 
         except Exception:
             pass
+
+        return hId

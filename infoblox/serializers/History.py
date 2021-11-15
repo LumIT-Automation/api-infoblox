@@ -4,6 +4,7 @@ from rest_framework import serializers
 class HistorySerializer(serializers.Serializer):
     class HistoryInnerSerializer(serializers.Serializer):
         class HistoryItemsSerializer(serializers.Serializer):
+            id = serializers.IntegerField(required=True)
             username = serializers.CharField(max_length=255, required=True)
             action = serializers.CharField(max_length=255, required=True)
             asset_id = serializers.IntegerField(required=True)

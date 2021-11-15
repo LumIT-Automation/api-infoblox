@@ -56,10 +56,10 @@ class InfobloxIpv4sController(CustomController):
 
                         if reqType == "next-available":
                             response["data"], actualNetwork = InfobloxIpv4sController.__reserveNextAvail(assetId, validatedData, networkLogic, targetNetwork, networkContainer)
-                            InfobloxIpv4sController.__log(assetId, user["username"], "next-available", response, network=actualNetwork, gateway=gateway, mask=mask)
+                            historyId = InfobloxIpv4sController.__historyLog(assetId, user["username"], "next-available", response, network=actualNetwork, gateway=gateway, mask=mask)
                         else:
                             response["data"] = InfobloxIpv4sController.__reserveProvided(assetId, validatedData)
-                            InfobloxIpv4sController.__log(assetId, user["username"], "user-specified", response, network=targetNetwork, gateway=gateway, mask=mask)
+                            historyId = InfobloxIpv4sController.__historyLog(assetId, user["username"], "user-specified", response, network=targetNetwork, gateway=gateway, mask=mask)
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
@@ -197,7 +197,9 @@ class InfobloxIpv4sController(CustomController):
 
 
     @staticmethod
-    def __log(assetId, user, action, response, network: str = "", gateway: str = "", mask: str = "") -> None:
+    def __historyLog(assetId, user, action, response, network: str = "", gateway: str = "", mask: str = "") -> int:
+        hId = 0
+
         try:
             for createdObject in response["data"]:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
@@ -210,7 +212,7 @@ class InfobloxIpv4sController(CustomController):
                     "gateway": gateway
                 }, "log_object")
 
-                History.add({
+                hId = History.add({
                     "username": user,
                     "action": action,
                     "asset_id": assetId,
@@ -220,3 +222,5 @@ class InfobloxIpv4sController(CustomController):
 
         except Exception:
             pass
+
+        return hId

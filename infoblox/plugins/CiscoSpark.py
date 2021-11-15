@@ -38,7 +38,7 @@ class CiscoSpark:
                 params=None,
                 data=json.dumps({
                     "roomId": settings.CISCO_SPARK_ROOM_ID,
-                    "text": "[Automation, Infoblox]\n"+str(message)
+                    "text": "[Concerto Orchestration, Infoblox]\n"+str(message)
                 })
             )
 
@@ -85,12 +85,14 @@ def run(controller: str, o: dict):
                 if "Gateway" in data["extattrs"]:
                     gw = data["extattrs"]["Gateway"]["value"]
                     message += "Gateway: "+gw+"\n"
+                if "Name Server" in data["extattrs"]:
+                    ns = data["extattrs"]["Name Server"]["value"]
+                    message += "Hostname: "+ns+"\n"
                 if "Reference" in data["extattrs"]:
                     ref = data["extattrs"]["Reference"]["value"]
                     message += "Reference: "+ref+"\n"
-                if "Name Server" in data["extattrs"]:
-                    ns = data["extattrs"]["Name Server"]["value"]
-                    message += "Name Server: "+ns+"\n"
+            if "historyId" in o:
+                message += "Unique operation ID: "+str(o["historyId"])+"\n"
 
             CiscoSpark.send(o["user"], message)
 
@@ -109,11 +111,16 @@ def run(controller: str, o: dict):
                         message += "Gateway: "+o["gateway"]+"\n"
                     if o["mask"]:
                         message += "Mask: "+o["mask"]+"\n"
+                    if "object_type" in o["validatedData"]:
+                        if o["validatedData"]["object_type"] != "undefined":
+                            message += "Type: "+o["validatedData"]["object_type"]+"\n"
                     if "extattrs" in o["validatedData"]:
-                        if "Reference" in o["validatedData"]["extattrs"]:
-                            message += "Reference: "+o["validatedData"]["extattrs"]["Reference"]["value"]+"\n"
-                        if "Name Server" in o["validatedData"]["extattrs"]:
-                            message += "Name Server: "+o["validatedData"]["extattrs"]["Name Server"]["value"]+"\n"
+                        if "Name Server" in o["validatedData"]["extattrs"][j]:
+                            message += "Hostname: "+o["validatedData"]["extattrs"][j]["Name Server"]["value"]+"\n"
+                        if "Reference" in o["validatedData"]["extattrs"][j]:
+                            message += "Reference: "+o["validatedData"]["extattrs"][j]["Reference"]["value"]+"\n"
+                    if "historyId" in o:
+                        message += "Unique operation ID: "+str(o["historyId"])+"\n"
                     j += 1
 
                     CiscoSpark.send(o["user"], message)

@@ -22,14 +22,14 @@ class History:
         try:
             if allUsersHistory:
                 c.execute("SELECT "
-                    "username, action, asset_id, status, date, type, network, address, gateway "
+                    "log.id, username, action, asset_id, status, date, type, network, address, gateway "
                     "FROM log "
                     "LEFT JOIN log_object ON log.object_id = log_object.id "
                     "ORDER BY date DESC"
                 )
             else:
                 c.execute("SELECT "
-                    "username, action, asset_id, status, date, type, network, address, gateway "
+                    "log.id, username, action, asset_id, status, date, type, network, address, gateway "
                     "FROM log "
                     "LEFT JOIN log_object ON log.object_id = log_object.id "                    
                     "WHERE username = %s "
