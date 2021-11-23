@@ -213,7 +213,7 @@ class InfobloxIpv4Controller(CustomController):
                 "network": network,
                 "mask": mask,
                 "gateway": gateway
-            }, "log_object")
+            }, "object")
 
             hId = History.add({
                 "username": user,
