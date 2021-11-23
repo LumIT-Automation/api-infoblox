@@ -144,7 +144,7 @@ class IdentityGroup:
                 "), '') AS roles_network, "
 
                 "IFNULL(GROUP_CONCAT( "
-                    "DISTINCT CONCAT(privilege.privilege,'::',network.id_asset,'::',network.network,'::',privilege.propagate_to_all_asset_networks,'::',privilege.propagate_to_all_assets) " 
+                    "DISTINCT CONCAT(privilege.privilege,'::',network.id_asset,'::',network.network,'::',privilege.privilege_type) " 
                     "ORDER BY privilege.id "
                     "SEPARATOR ',' "
                 "), '') AS privileges_network "
@@ -244,17 +244,23 @@ class IdentityGroup:
                                 if not str(pList[0]) in ppStructure:
                                     ppStructure[pList[0]] = list()
 
-                                # If propagate_to_all_asset_networks is set, set "any" for networks value.
-                                # It means that a privilege does not require the networks to be specified <--> it's valid for all networks within the asset.
-                                if pList[3]:
-                                    if int(pList[3]):
-                                        pList[2] = "any"
+                                # Differentiate permission type:
+                                # global:
+                                #     a privilege does not require the asset to be specified <--> it's valid for all assets;
+                                #     set "any" for assets value.
 
-                                # If propagate_to_all_assets is set, set "any" for assets value.
-                                # It means that a privilege does not require the asset to be specified <--> it's valid for all assets.
-                                if pList[4]:
-                                    if int(pList[4]):
+                                # asset:
+                                #    a privilege does not require the networks to be specified <--> it's valid for all networks within the asset;
+                                #    set "any" for networks value.
+                                #
+                                # object:
+                                #     standard.
+
+                                if pList[3]:
+                                    if pList[3] == "global":
                                         pList[1] = 0
+                                        pList[2] = "any"
+                                    if pList[3] == "asset":
                                         pList[2] = "any"
 
                                 if not any(v['assetId'] == 0 for v in ppStructure[pList[0]]): # insert value only if not already present (applied to assetId "0").

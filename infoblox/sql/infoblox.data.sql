@@ -25,27 +25,27 @@ SET time_zone = "+00:00";
 -- Dump dei dati per la tabella `privilege`
 --
 
-INSERT INTO `privilege` (`id`, `privilege`, `propagate_to_all_asset_networks`, `propagate_to_all_assets`, `description`) VALUES
-(1, 'asset_patch', 1, 0, NULL),
-(2, 'asset_delete', 1, 0, NULL),
-(3, 'assets_get', 1, 0, NULL),
-(4, 'assets_post', 1, 0, NULL),
-(5, 'network_containers_get', 0, 0, NULL),
-(6, 'network_container_get', 0, 0, NULL),
-(7, 'network_get', 0, 0, NULL),
-(8, 'network_post', 0, 0, NULL),
-(9, 'network_delete', 0, 0, NULL),
-(10, 'networks_get', 0, 0, NULL),
-(11, 'ipv4_get', 0, 0, NULL),
-(12, 'ipv4s_post', 0, 0, NULL),
-(13, 'ipv4_delete', 0, 0, NULL),
-(14, 'ipv4_patch', 0, 0, NULL),
-(15, 'permission_identityGroups_get', 1, 1, NULL),
-(16, 'permission_identityGroups_post', 1, 1, NULL),
-(17, 'permission_roles_get', 1, 1, NULL),
-(18, 'permission_identityGroup_patch', 1, 1, NULL),
-(19, 'permission_identityGroup_delete', 1, 1, NULL),
-(20, 'historyComplete_get', 1, 1, NULL);
+INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VALUES
+(1, 'asset_patch', 'asset', NULL),
+(2, 'asset_delete', 'asset', NULL),
+(3, 'assets_get', 'asset', NULL),
+(4, 'assets_post', 'asset', NULL),
+(5, 'network_containers_get', 'object', NULL),
+(6, 'network_container_get', 'object', NULL),
+(7, 'network_get', 'object', NULL),
+(8, 'network_post', 'object', NULL),
+(9, 'network_delete', 'object', NULL),
+(10, 'networks_get', 'object', NULL),
+(11, 'ipv4_get', 'object', NULL),
+(12, 'ipv4s_post', 'object', NULL),
+(13, 'ipv4_delete', 'object', NULL),
+(14, 'ipv4_patch', 'object', NULL),
+(15, 'permission_identityGroups_get', 'global', NULL),
+(16, 'permission_identityGroups_post', 'global', NULL),
+(17, 'permission_roles_get', 'global', NULL),
+(18, 'permission_identityGroup_patch', 'global', NULL),
+(19, 'permission_identityGroup_delete', 'global', NULL),
+(20, 'historyComplete_get', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
