@@ -9,7 +9,6 @@ from infoblox.helpers.Database import Database as DBHelper
 from django.db import connection
 
 
-
 class IdentityGroup:
     def __init__(self, identityGroupIdentifier: str,  *args, **kwargs):
         super().__init__(*args, **kwargs)

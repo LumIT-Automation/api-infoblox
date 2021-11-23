@@ -1,12 +1,8 @@
-from django.db import connection
-
 from infoblox.models.Infoblox.Network import Network as InfobloxNetwork
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as InfobloxNetworkContainer
 
-from infoblox.helpers.Exception import CustomException
-from infoblox.helpers.Database import Database as DBHelper
+from infoblox.repository.Network import Network as Repository
 
-from infoblox.helpers.Log import Log
 
 class Network:
     def __init__(self, assetId: int, networkId: int = 0, networkName: str = "", *args, **kwargs):
@@ -23,52 +19,27 @@ class Network:
     ####################################################################################################################
 
     def exists(self) -> bool:
-        c = connection.cursor()
         try:
-            c.execute("SELECT COUNT(*) AS c FROM `network` WHERE `network` = %s AND id_asset = %s", [
-                self.networkName,
-                self.assetId
-            ])
-            o = DBHelper.asDict(c)
-
-            return bool(int(o[0]['c']))
-
+            pid = self.info()["id"] # just a probe.
+            return True
         except Exception:
             return False
-        finally:
-            c.close()
 
 
 
     def info(self) -> dict:
-        c = connection.cursor()
         try:
-            c.execute("SELECT * FROM `network` WHERE `network` = %s AND id_asset = %s", [
-                self.networkName,
-                self.assetId
-            ])
-
-            return DBHelper.asDict(c)[0]
-
+            return Repository.get(self.assetId, self.networkName)
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
+            raise e
 
 
 
     def delete(self) -> None:
-        c = connection.cursor()
         try:
-            c.execute("DELETE FROM `network` WHERE `network` = %s AND id_asset = %s", [
-                self.networkName,
-                self.assetId
-            ])
-
+            Repository.delete(self.assetId, self.networkName)
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
+            raise e
 
 
 
@@ -78,38 +49,19 @@ class Network:
 
     @staticmethod
     def add(assetId, networkName) -> int:
-        c = connection.cursor()
-
         if networkName == "any":
             try:
-                c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
-                    assetId,
-                    networkName
-                ])
-
-                return c.lastrowid
-
+                return Repository.add(assetId, networkName)
             except Exception as e:
-                raise CustomException(status=400, payload={"database": e.__str__()})
-            finally:
-                c.close()
+                raise e
 
         else:
             # Check if assetId/networkName is a valid Infoblox network (at the time of the insertion).
             infobloxNetworks = InfobloxNetwork.list(assetId)["data"] + InfobloxNetworkContainer.list(assetId)["data"]
 
             for v in infobloxNetworks:
-
                 if v["network"] == networkName:
                     try:
-                        c.execute("INSERT INTO `network` (id_asset, `network`) VALUES (%s, %s)", [
-                            assetId,
-                            networkName
-                        ])
-
-                        return c.lastrowid
-
+                        return Repository.add(assetId, networkName)
                     except Exception as e:
-                        raise CustomException(status=400, payload={"database": e.__str__()})
-                    finally:
-                        c.close()
+                        raise e
