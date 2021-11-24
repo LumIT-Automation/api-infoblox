@@ -97,12 +97,3 @@ class Permission:
             Repository.add(identityGroupId, roleId, networkId)
         except Exception as e:
             raise e
-
-
-
-    @staticmethod
-    def cleanup(identityGroupId: int) -> None:
-        try:
-            Repository.cleanup(identityGroupId)
-        except Exception as e:
-            raise e

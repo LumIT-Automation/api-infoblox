@@ -1,12 +1,4 @@
-from django.utils.html import strip_tags
-from django.db import transaction
-
-from infoblox.models.Permission.Permission import Permission
-
-from infoblox.helpers.Log import Log
-from infoblox.helpers.Exception import CustomException
-from infoblox.helpers.Database import Database as DBHelper
-from django.db import connection
+from infoblox.repository.IdentityGroup import IdentityGroup as Repository
 
 
 class IdentityGroup:
@@ -22,101 +14,26 @@ class IdentityGroup:
     ####################################################################################################################
 
     def info(self) -> dict:
-        c = connection.cursor()
-
         try:
-            c.execute("SELECT * FROM identity_group WHERE identity_group_identifier = %s", [
-                self.identityGroupIdentifier
-            ])
-
-            return DBHelper.asDict(c)[0]
-
+            return Repository.get(self.identityGroupIdentifier)
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
+            raise e
 
 
 
     def modify(self, data: dict) -> None:
-        sql = ""
-        values = []
-        roles = dict()
-
-        c = connection.cursor()
-        if self.__exists():
-            for k, v in data.items():
-                if any(exc in k for exc in (
-                        "roles_network",
-                )):
-                    # "roles_network": {
-                    #     "staff": [
-                    #         {
-                    #             "assetId": 1,
-                    #             "network": "any"
-                    #         }
-                    #     ],
-                    #  "nonExistent": []
-                    # }
-
-                    if isinstance(v, dict):
-                        for rk, rv in v.items():
-                            roles[rk] = rv
-                else:
-                    sql += k + "=%s,"
-                    values.append(strip_tags(v))  # no HTML allowed.
-
-            try:
-                with transaction.atomic():
-                    identityGroupId = self.info()["id"]
-
-                    # Patch identity group.
-                    c.execute("UPDATE identity_group SET "+sql[:-1]+" WHERE id = "+str(identityGroupId),
-                        values
-                    )
-
-                    # Replace associated roles with roles[]' elements.
-                    try:
-                        # Empty existent roles.
-                        Permission.cleanup(identityGroupId)
-                    except Exception:
-                        pass
-
-                    for roleName, networksAssetsList in roles.items():
-                        for networksAssetDict in networksAssetsList:
-                            try:
-                                Permission.add(identityGroupId, roleName, networksAssetDict["assetId"], networksAssetDict["network"])
-                            except Exception:
-                                pass
-
-            except Exception as e:
-                raise CustomException(status=400, payload={"database": e.__str__()})
-            finally:
-                c.close()
-
-        else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent identity group"}})
+        try:
+            Repository.modify(self.identityGroupIdentifier, data)
+        except Exception as e:
+            raise e
 
 
 
     def delete(self) -> None:
-        c = connection.cursor()
-
-        if self.__exists():
-            try:
-                c.execute("DELETE FROM identity_group WHERE identity_group_identifier = %s", [
-                    self.identityGroupIdentifier
-                ])
-
-                # Foreign keys' on cascade rules will clean the linked items on db.
-
-            except Exception as e:
-                raise CustomException(status=400, payload={"database": e.__str__()})
-            finally:
-                c.close()
-
-        else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent identity group"}})
+        try:
+            Repository.delete(self.identityGroupIdentifier)
+        except Exception as e:
+            raise e
 
 
 
@@ -128,46 +45,10 @@ class IdentityGroup:
     def list(showPrivileges: bool = False) -> dict:
         # List identity groups with related information regarding the associated roles on networks
         # and optionally detailed privileges' descriptions.
-
         j = 0
-        c = connection.cursor()
 
         try:
-            c.execute("SELECT "
-                "identity_group.*, " 
-
-                "IFNULL(GROUP_CONCAT( "
-                    "DISTINCT CONCAT(role.role,'::',CONCAT(network.id_asset,'::',network.network)) " 
-                    "ORDER BY role.id "
-                    "SEPARATOR ',' "
-                "), '') AS roles_network, "
-
-                "IFNULL(GROUP_CONCAT( "
-                    "DISTINCT CONCAT(privilege.privilege,'::',network.id_asset,'::',network.network,'::',privilege.privilege_type) " 
-                    "ORDER BY privilege.id "
-                    "SEPARATOR ',' "
-                "), '') AS privileges_network "
-
-                "FROM identity_group "
-                "LEFT JOIN group_role_network ON group_role_network.id_group = identity_group.id "
-                "LEFT JOIN role ON role.id = group_role_network.id_role "
-                "LEFT JOIN `network` ON `network`.id = group_role_network.id_network "
-                "LEFT JOIN role_privilege ON role_privilege.id_role = role.id "
-                "LEFT JOIN privilege ON privilege.id = role_privilege.id_privilege "
-                "GROUP BY identity_group.id"
-            )
-
-            # Simple start query:
-            # SELECT identity_group.*, role.role, privilege.privilege, `network`.network
-            # FROM identity_group
-            # LEFT JOIN group_role_network ON group_role_network.id_group = identity_group.id
-            # LEFT JOIN role ON role.id = group_role_network.id_role
-            # LEFT JOIN `network` ON `network`.id = group_role_network.id_network
-            # LEFT JOIN role_privilege ON role_privilege.id_role = role.id
-            # LEFT JOIN privilege ON privilege.id = role_privilege.id_privilege
-            # GROUP BY identity_group.id
-
-            items = DBHelper.asDict(c)
+            items = Repository.list()
 
             # "items": [
             # ...,
@@ -277,87 +158,14 @@ class IdentityGroup:
             return dict({
                 "items": items
             })
-
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
+            raise e
 
 
 
     @staticmethod
     def add(data: dict) -> None:
-        s = ""
-        keys = "("
-        values = []
-        roles = dict()
-
-        c = connection.cursor()
-
-        # Build SQL query according to dict fields (only whitelisted fields pass).
-        for k, v in data.items():
-            # roles is a dictionary of related roles/networks, which is POSTed together with the main identity group item.
-            if any(exc in k for exc in (
-                    "roles_network",
-            )):
-                # "roles_network": {
-                #     "staff": [
-                #         {
-                #             "assetId": 1,
-                #             "network": "any"
-                #         }
-                #     ],
-                #  "nonExistent": []
-                # }
-
-                if isinstance(v, dict):
-                    for rk, rv in v.items():
-                        roles[rk] = rv
-            else:
-                s += "%s,"
-                keys += k + ","
-                values.append(strip_tags(v))  # no HTML allowed.
-
-        keys = keys[:-1]+")"
-
         try:
-            with transaction.atomic():
-                # Insert identity group.
-                c.execute("INSERT INTO identity_group "+keys+" VALUES ("+s[:-1]+")",
-                    values
-                )
-                igId = c.lastrowid
-
-                # Add associated roles (no error on non-existent role).
-                for roleName, networksAssetsList in roles.items():
-                    for networksAssetDict in networksAssetsList:
-                        try:
-                            Permission.add(igId, roleName, networksAssetDict["assetId"], networksAssetDict["network"])
-                        except Exception:
-                            pass
-
+            Repository.add(data)
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
-
-
-
-    ####################################################################################################################
-    # Private methods
-    ####################################################################################################################
-
-    def __exists(self) -> int:
-        c = connection.cursor()
-        try:
-            c.execute("SELECT COUNT(*) AS c FROM identity_group WHERE identity_group_identifier = %s", [
-                self.identityGroupIdentifier
-            ])
-            o = DBHelper.asDict(c)
-
-            return int(o[0]['c'])
-
-        except Exception:
-            return 0
-        finally:
-            c.close()
+            raise e

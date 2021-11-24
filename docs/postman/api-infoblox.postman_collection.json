@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "07abb06f-e61f-4e2f-910f-27439a6ce758",
+		"_postman_id": "32d86a47-1074-4bbb-9258-518af995d9d3",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -327,7 +327,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"groupLocalNew\",\n        \"identity_group_identifier\": \"cn=groupStaff,cn=users,dc=lab,dc=localNew\",\n        \"roles_network\": {\n            \"staff\": [\n                {\n                    \"assetId\": 1,\n                    \"network\": \"10.8.0.0/17\"\n                }\n            ],\n            \"nonExistent\": []\n        }\n    }\n}",
+									"raw": "{\n    \"data\": {\n        \"name\": \"groupLocalNew\",\n        \"identity_group_identifier\": \"cn=groupStaff,cn=users,dc=lab,dc=localNew\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -378,7 +378,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNewModified/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -391,7 +391,7 @@
 										"v1",
 										"infoblox",
 										"identity-group",
-										"cn=groupStaff,cn=users,dc=lab,dc=localNewModified",
+										"cn=groupStaff,cn=users,dc=lab,dc=localNew",
 										""
 									]
 								}
@@ -414,7 +414,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"groupStaffModified\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=local\",\n        \"roles_network\": {\n            \"readonly\": [\n                {\n                    \"assetId\": 1,\n                    \"network\": \"10.8.1.0/17\"\n                }\n            ]\n        }\n    }\n}",
+									"raw": "{\n    \"data\": {\n        \"name\": \"groupNewModified\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=localNewModified\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -422,7 +422,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupstaff,cn=users,dc=lab,dc=local/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -435,7 +435,7 @@
 										"v1",
 										"infoblox",
 										"identity-group",
-										"cn=groupstaff,cn=users,dc=lab,dc=local",
+										"cn=groupStaff,cn=users,dc=lab,dc=localNew",
 										""
 									]
 								}

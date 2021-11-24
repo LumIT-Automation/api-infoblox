@@ -71,7 +71,8 @@ class PermissionIdentityGroupsController(CustomController):
 
                 serializer = GroupSerializer(data=request.data)
                 if serializer.is_valid():
-                    IdentityGroup.add(serializer.validated_data["data"])
+                    data = serializer.validated_data["data"]
+                    IdentityGroup.add(data)
 
                     httpStatus = status.HTTP_201_CREATED
                 else:
