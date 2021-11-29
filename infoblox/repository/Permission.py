@@ -7,6 +7,23 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class Permission:
 
+    # IdentityGroupRoleNetwork
+
+    # Table: group_role_network
+
+    #   `id` int(255) NOT NULL AUTO_INCREMENT,
+    #   `id_group` int(11) NOT NULL KEY,
+    #   `id_role` int(11) NOT NULL KEY,
+    #   `id_network` int(11) NOT NULL KEY
+    #
+    #   PRIMARY KEY (`id_group`,`id_role`,`id_network`)
+    #
+    #   CONSTRAINT `grp_group` FOREIGN KEY (`id_group`) REFERENCES `identity_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    #   CONSTRAINT `grp_network` FOREIGN KEY (`id_network`) REFERENCES `network` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    #   CONSTRAINT `grp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################

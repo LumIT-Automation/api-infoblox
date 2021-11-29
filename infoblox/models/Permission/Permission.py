@@ -6,7 +6,7 @@ from infoblox.repository.Permission import Permission as Repository
 
 class Permission:
 
-    # IdentityGroupRolePartition
+    # IdentityGroupRoleNetwork
 
     def __init__(self, id: int, groupId: int = 0, roleId: int = 0, partitionId: int = 0, *args, **kwargs):
         super().__init__(*args, **kwargs)

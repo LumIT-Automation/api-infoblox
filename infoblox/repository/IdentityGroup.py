@@ -10,6 +10,14 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class IdentityGroup:
 
+    # Table: identity_group
+
+    #   `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    #   `name` varchar(64) NOT NULL KEY,
+    #   `identity_group_identifier` varchar(255) DEFAULT NULL UNIQUE KEY
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################
