@@ -5,7 +5,8 @@ class IdentityGroup:
     def __init__(self, identityGroupIdentifier: str,  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.identityGroupIdentifier = identityGroupIdentifier
+        self.identity_group_identifier = identityGroupIdentifier
+        self.name = ""
 
 
 
@@ -15,7 +16,7 @@ class IdentityGroup:
 
     def info(self) -> dict:
         try:
-            return Repository.get(self.identityGroupIdentifier)
+            return Repository.get(self.identity_group_identifier)
         except Exception as e:
             raise e
 
@@ -23,7 +24,7 @@ class IdentityGroup:
 
     def modify(self, data: dict) -> None:
         try:
-            Repository.modify(self.identityGroupIdentifier, data)
+            Repository.modify(self.identity_group_identifier, data)
         except Exception as e:
             raise e
 
@@ -31,7 +32,7 @@ class IdentityGroup:
 
     def delete(self) -> None:
         try:
-            Repository.delete(self.identityGroupIdentifier)
+            Repository.delete(self.identity_group_identifier)
         except Exception as e:
             raise e
 
@@ -42,7 +43,16 @@ class IdentityGroup:
     ####################################################################################################################
 
     @staticmethod
-    def list(showPrivileges: bool = False) -> dict:
+    def list() -> list:
+        try:
+            return Repository.list()
+        except Exception as e:
+            raise e
+
+
+
+    @staticmethod
+    def listWithRelated(showPrivileges: bool = False) -> dict:
         # List identity groups with related information regarding the associated roles on networks
         # and optionally detailed privileges' descriptions.
         j = 0
@@ -155,9 +165,7 @@ class IdentityGroup:
 
                 j = j+1
 
-            return dict({
-                "items": items
-            })
+            return items
         except Exception as e:
             raise e
 

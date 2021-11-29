@@ -5,12 +5,12 @@ from infoblox.repository.Network import Network as Repository
 
 
 class Network:
-    def __init__(self, assetId: int, networkId: int = 0, networkName: str = "", *args, **kwargs):
+    def __init__(self, assetId: int, networkName: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.assetId = assetId
-        self.networkId = id
         self.networkName = networkName
+        self.description = ""
 
 
 
