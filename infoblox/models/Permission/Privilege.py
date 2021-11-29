@@ -5,6 +5,11 @@ class Privilege:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.id = id
+        self.privilege = ""
+        self.privilege_type = ""
+        self.description = ""
+
 
 
     ####################################################################################################################
@@ -12,10 +17,8 @@ class Privilege:
     ####################################################################################################################
 
     @staticmethod
-    def list() -> dict:
+    def list() -> list:
         try:
-            return dict({
-                "items": Repository.list()
-            })
+            return Repository.list()
         except Exception as e:
             raise e

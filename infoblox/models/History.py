@@ -2,26 +2,35 @@ from infoblox.repository.History import History as Repository
 
 
 class History:
+    def __init__(self, id: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.id = id
+        self.username = ""
+        self.action = ""
+        self.asset_id = 0
+        self.config_object_type = ""
+        self.config_object = ""
+        self.status = ""
+        self.date = ""
+
+
 
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################
 
     @staticmethod
-    def list(username: str, allUsersHistory: bool) -> dict:
+    def list(username: str, allUsersHistory: bool) -> list:
         try:
-            return dict({
-                "data": {
-                    "items": Repository.list(username, allUsersHistory)
-                }
-            })
+            return Repository.list(username, allUsersHistory)
         except Exception as e:
             raise e
 
 
 
     @staticmethod
-    def add(data: dict, logType: str) -> int:
+    def addByType(data: dict, logType: str) -> int:
         if logType in ["object", "log"]:
             table = "log"
             if logType == "object":

@@ -40,13 +40,13 @@ class Ipv4:
                 apiParams["_return_fields+"] = fields
 
             infoblox = Asset(self.assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/ipv4address",
+                endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"],
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
                 silent=silent
             )
 
@@ -117,17 +117,17 @@ class Ipv4:
                     ref = fixedaddress # release only the fixedaddress data.
 
                 infoblox = Asset(self.assetId)
-                asset = infoblox.info()
+                infoblox.load()
 
                 apiParams = {
                     "_return_as_object": 1
                 }
 
                 api = ApiSupplicant(
-                    endpoint=asset["baseurl"]+"/"+ref,
-                    auth=asset["auth"],
+                    endpoint=infoblox.baseurl+"/"+ref,
+                    auth=(infoblox.username, infoblox.password),
                     params=apiParams,
-                    tlsVerify=asset["tlsverify"]
+                    tlsVerify=infoblox.tlsverify
                 )
 
                 api.delete()
@@ -170,12 +170,12 @@ class Ipv4:
     def reserve(assetId, data: dict) -> dict:
         try:
             infoblox = Asset(assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/fixedaddress?_return_as_object=1",
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"]
+                endpoint=infoblox.baseurl+"/fixedaddress?_return_as_object=1",
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify
             )
 
             o = api.post(

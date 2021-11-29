@@ -5,8 +5,9 @@ class Role:
     def __init__(self, roleId: int = 0, roleName: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.roleId = roleId
-        self.roleName = roleName
+        self.id = roleId
+        self.role = roleName
+        self.description = ""
 
 
 
@@ -16,7 +17,7 @@ class Role:
 
     def info(self) -> dict:
         try:
-            return Repository.get(roleName=self.roleName)
+            return Repository.get(roleName=self.role)
         except Exception as e:
             raise e
 
@@ -27,7 +28,16 @@ class Role:
     ####################################################################################################################
 
     @staticmethod
-    def list(showPrivileges: bool = False) -> dict:
+    def list() -> list:
+        try:
+            return Repository.list()
+        except Exception as e:
+            raise e
+
+
+
+    @staticmethod
+    def listWithPrivileges(showPrivileges: bool = False) -> list:
         j = 0
 
         try:
@@ -42,8 +52,6 @@ class Role:
                             items[j]["privileges"] = [ ln["privileges"] ]
                 j = j+1
 
-            return dict({
-                "items": items
-            })
+            return items
         except Exception as e:
             raise e

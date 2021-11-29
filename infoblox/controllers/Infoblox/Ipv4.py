@@ -207,7 +207,7 @@ class InfobloxIpv4Controller(CustomController):
         hId = 0
 
         try:
-            oId = History.add({
+            oId = History.addByType({
                 "type": "ipv4",
                 "address": ipv4,
                 "network": network,
@@ -215,7 +215,7 @@ class InfobloxIpv4Controller(CustomController):
                 "gateway": gateway
             }, "object")
 
-            hId = History.add({
+            hId = History.addByType({
                 "username": user,
                 "action": action,
                 "asset_id": assetId,

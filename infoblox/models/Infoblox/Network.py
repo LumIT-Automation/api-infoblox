@@ -40,13 +40,13 @@ class Network:
                 apiParams["_return_fields+"] = fields 
 
             infoblox = Asset(self.assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/network",
+                endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"],
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
                 silent=silent
             )
             o["data"] = api.get()
@@ -73,13 +73,13 @@ class Network:
                 apiParams["_return_fields+"] = "ip_address,status,usage," + fields 
 
             infoblox = Asset(self.assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/ipv4address",
+                endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"],
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
                 silent=silent
             )
 
@@ -409,13 +409,13 @@ class Network:
                 apiParams["_return_fields+"] = fields 
 
             infoblox = Asset(assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/network",
+                endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"]
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify
             )
 
             o["data"] = api.get()

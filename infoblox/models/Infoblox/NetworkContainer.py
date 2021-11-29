@@ -34,13 +34,13 @@ class NetworkContainer:
 
         try:
             infoblox = Asset(self.assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"] + "/networkcontainer",
+                endpoint=infoblox.baseurl + "/networkcontainer",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"]
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify
             )
             o["data"] = api.get()
         except Exception as e:
@@ -66,13 +66,13 @@ class NetworkContainer:
 
         try:
             infoblox = Asset(self.assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/network",
+                endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"]
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify
             )
             o["data"] = api.get()
         except Exception as e:
@@ -103,13 +103,13 @@ class NetworkContainer:
                 apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
-            asset = infoblox.info()
+            infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=asset["baseurl"]+"/networkcontainer",
+                endpoint=infoblox.baseurl+"/networkcontainer",
                 params=apiParams,
-                auth=asset["auth"],
-                tlsVerify=asset["tlsverify"]
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify
             )
 
             o["data"] = api.get()

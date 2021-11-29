@@ -204,7 +204,7 @@ class InfobloxIpv4sController(CustomController):
             for createdObject in response["data"]:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
 
-                oId = History.add({
+                oId = History.addByType({
                     "type": "ipv4",
                     "address": ipv4,
                     "network": network,
@@ -212,7 +212,7 @@ class InfobloxIpv4sController(CustomController):
                     "gateway": gateway
                 }, "object")
 
-                hId = History.add({
+                hId = History.addByType({
                     "username": user,
                     "action": action,
                     "asset_id": assetId,

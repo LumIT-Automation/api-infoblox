@@ -5,10 +5,17 @@ from infoblox.repository.Permission import Permission as Repository
 
 
 class Permission:
-    def __init__(self, permissionId: int, *args, **kwargs):
+
+    # IdentityGroupRolePartition
+
+    def __init__(self, id: int, groupId: int = 0, roleId: int = 0, partitionId: int = 0, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.permissionId = permissionId
+        self.id = id
+
+        self.id_group = groupId
+        self.id_role = roleId
+        self.id_partition = partitionId
 
 
 
@@ -25,14 +32,10 @@ class Permission:
             r = Role(roleName=role)
             roleId = r.info()["id"]
 
-            # Network id. If network does not exist, create it.
-            p = Network(assetId=assetId, networkName=networkName)
-            if p.exists():
-                networkId = p.info()["id"]
-            else:
-                networkId = p.add(assetId, networkName)
+            # Network id.
+            networkId = Permission.__getNetwork(assetId, networkName)
 
-            Repository.modify(identityGroupId, roleId, networkId, self.permissionId)
+            Repository.modify(identityGroupId, roleId, networkId, self.id)
         except Exception as e:
             raise e
 
@@ -40,7 +43,7 @@ class Permission:
 
     def delete(self) -> None:
         try:
-            Repository.delete(self.permissionId)
+            Repository.delete(self.id)
         except Exception as e:
             raise e
 
@@ -67,11 +70,9 @@ class Permission:
 
 
     @staticmethod
-    def list() -> dict:
+    def listIdentityGroupsRolesPartitions() -> list:
         try:
-            return {
-                "items": Repository.list()
-            }
+            return Repository.list()
         except Exception as e:
             raise e
 
@@ -87,13 +88,26 @@ class Permission:
             r = Role(roleName=role)
             roleId = r.info()["id"]
 
-            # Network id. If network does not exist, create it.
-            p = Network(assetId=assetId, networkName=networkName)
-            if p.exists():
-                networkId = p.info()["id"]
-            else:
-                networkId = p.add(assetId, networkName)
+            # Network id.
+            networkId = Permission.__getNetwork(assetId, networkName)
 
             Repository.add(identityGroupId, roleId, networkId)
         except Exception as e:
             raise e
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    @staticmethod
+    def __getNetwork(assetId: int, networkName: str):
+        p = Network(assetId=assetId, networkName=networkName)
+        if p.exists():
+            networkId = p.info()["id"]
+        else:
+            # If partition does not exist, create it (on Permissions database, not F5 endpoint).
+            networkId = p.add(assetId, networkName)
+
+        return networkId

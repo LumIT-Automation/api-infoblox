@@ -17,6 +17,7 @@ class HistoryLogsController(CustomController):
     def get(request: Request) -> Response:
         allUsersHistory = False
         data = dict()
+        itemData = {"data": dict()}
         etagCondition = { "responseEtag": "" }
 
         user = CustomController.loggedUser(request)
@@ -27,7 +28,7 @@ class HistoryLogsController(CustomController):
 
             Log.actionLog("History log", user)
 
-            itemData = History.list(user["username"], allUsersHistory)
+            itemData["data"]["items"] = History.list(user["username"], allUsersHistory)
             serializer = Serializer(data=itemData)
             if serializer.is_valid():
                 data["data"] = serializer.validated_data["data"]
