@@ -13,8 +13,20 @@ class Ipv4:
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.assetId = int(assetId)
-        self.address = address
+        self.asset_id = int(assetId)
+        self.ip_address = address
+
+        self._ref = ""
+        self.network = ""
+        self.network_view = ""
+        self.mac_address = ""
+        self.status = ""
+        self.is_conflict = False
+        self.names = list()
+        self.objects = list()
+        self.types = list()
+        self.usage = list()
+        self.extattrs = dict()
 
 
 
@@ -22,11 +34,11 @@ class Ipv4:
     # Public methods
     ####################################################################################################################
 
-    def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def info(self) -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.get(self.assetId, self.address, additionalFields, returnFields, silent)
+            o["data"] = Connector.get(self.asset_id, self.ip_address)
         except Exception as e:
             raise e
 
@@ -39,9 +51,7 @@ class Ipv4:
 
         try:
             # Read IPv4 address' extra attributes from Infoblox.
-            ipInformation = self.info(
-                returnFields=["network", "extattrs"]
-            )["data"]
+            ipInformation = self.info()["data"]
 
             if "extattrs" in ipInformation:
                 for k, v in ipInformation["extattrs"].items():
@@ -57,9 +67,9 @@ class Ipv4:
                         "value": v
                     }
 
-            data["ipv4addr"] = self.address
+            data["ipv4addr"] = self.ip_address
 
-            Ipv4.reserve(self.assetId, data)
+            Ipv4.reserve(self.asset_id, data)
 
             # @todo: if re-add fails...
 
@@ -92,7 +102,7 @@ class Ipv4:
                 if fixedaddressOnly:
                     ref = fixedaddress # release only the fixedaddress data.
 
-                Connector.delete(self.assetId, ref)
+                Connector.delete(self.asset_id, ref)
         except Exception as e:
             raise e
 
@@ -101,22 +111,22 @@ class Ipv4:
     def network(self) -> str:
         try:
             # First check if the ip address belongs to a network container. If so, check in the child networks.
-            netContainer = Ipv4.__getNetwork(self.address, NetworkContainer.list(self.assetId)["data"])
+            netContainer = Ipv4.__getNetwork(self.ip_address, NetworkContainer.list(self.asset_id)["data"])
 
             if netContainer:
                 # Now look into the network container to find the right network.
                 netC, netCMask = netContainer.split("/")
-                nC = NetworkContainer(self.assetId, netC+"/"+netCMask)
+                nC = NetworkContainer(self.asset_id, netC + "/" + netCMask)
                 netList = nC.innerNetworks()["data"]
-                network = Ipv4.__getNetwork(self.address, netList)
+                network = Ipv4.__getNetwork(self.ip_address, netList)
             else:
                 # If the ip don't belong to any network container maybe is in a standalone network.
                 # Unfortunately the network_container filter breaks if when using the root network container ("/"). The call below currently does't work.
                 # (https://community.infoblox.com/t5/API-Integration/List-of-Top-Level-Networks-using-Rest-API/m-p/1417/highlight/true#M41)
                 # netList = Network.list(self.assetId, additionalFields=["network_container"], attrsFilter={"network_container": "/"})
                 # So we are forced to search in all networks
-                netList = Network.list(self.assetId)["data"]
-                network = Ipv4.__getNetwork(self.address, netList)
+                netList = Network.list(self.asset_id)["data"]
+                network = Ipv4.__getNetwork(self.ip_address, netList)
         except Exception:
             raise CustomException(status=500, payload={"message": "Error on find the network of the ip address."})
 

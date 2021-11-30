@@ -43,9 +43,7 @@ class InfobloxIpv4Controller(CustomController):
                     lock.lock()
 
                     p = Ipv4(assetId, ipv4address)
-                    itemData = p.info(
-                        returnFields=["network", "extattrs"],
-                    )
+                    itemData = p.info()
 
                     serializer = Serializer(data=itemData)
                     if serializer.is_valid():

@@ -13,18 +13,16 @@ class Ipv4:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId, address, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def get(assetId, address) -> dict:
         try:
             apiParams = {
                 "ip_address": address
             }
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+            returnFields = ["network", "extattrs"]
 
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields
+            fields = ','.join(returnFields)
+            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             infoblox.load()
@@ -33,8 +31,7 @@ class Ipv4:
                 endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
+                tlsVerify=infoblox.tlsverify
             )
 
             return api.get()[0]
