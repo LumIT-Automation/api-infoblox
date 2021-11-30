@@ -1,14 +1,12 @@
 import ipaddress
-import json
-
-from infoblox.models.Infoblox.Asset.Asset import Asset
-from infoblox.helpers.ApiSupplicant import ApiSupplicant
 
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
+
+from infoblox.connectors.Ipv4 import Ipv4 as Connector
 
 
 class Ipv4:
@@ -28,29 +26,7 @@ class Ipv4:
         o = dict()
 
         try:
-            apiParams = {
-                "ip_address": self.address
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-
-            o["data"] = api.get()[0]
+            o["data"] = Connector.get(self.assetId, self.address, additionalFields, returnFields, silent)
         except Exception as e:
             raise e
 
@@ -116,21 +92,7 @@ class Ipv4:
                 if fixedaddressOnly:
                     ref = fixedaddress # release only the fixedaddress data.
 
-                infoblox = Asset(self.assetId)
-                infoblox.load()
-
-                apiParams = {
-                    "_return_as_object": 1
-                }
-
-                api = ApiSupplicant(
-                    endpoint=infoblox.baseurl+"/"+ref,
-                    auth=(infoblox.username, infoblox.password),
-                    params=apiParams,
-                    tlsVerify=infoblox.tlsverify
-                )
-
-                api.delete()
+                Connector.delete(self.assetId, ref)
         except Exception as e:
             raise e
 
@@ -169,25 +131,9 @@ class Ipv4:
     @staticmethod
     def reserve(assetId, data: dict) -> dict:
         try:
-            infoblox = Asset(assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/fixedaddress?_return_as_object=1",
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-
-            o = api.post(
-                additionalHeaders={
-                    "Content-Type": "application/json",
-                },
-                data=json.dumps(data)
-            )
+            return Connector.reserve(assetId, data)
         except Exception as e:
             raise e
-
-        return o
 
 
 
