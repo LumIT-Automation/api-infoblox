@@ -43,18 +43,20 @@ class Network:
 
 
     @staticmethod
-    def addresses(assetId, network, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def addresses(assetId, network, maxResults, fromIp, toIp) -> dict:
         try:
             apiParams = {
                 "network": network
             }
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+            if maxResults and fromIp and toIp:
+                additionalFields = {
+                    "_max_results": maxResults,
+                    "ip_address>": fromIp,
+                    "ip_address<": toIp
+                }
 
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = "ip_address,status,usage," + fields 
+                apiParams = {**apiParams, **additionalFields} # merge dicts.
 
             infoblox = Asset(assetId)
             infoblox.load()
@@ -63,8 +65,7 @@ class Network:
                 endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
+                tlsVerify=infoblox.tlsverify
             )
 
             return api.get()

@@ -31,7 +31,6 @@ class Network:
 
         try:
             o["data"] = Connector.get(self.assetId, self.network, filter, silent)
-            Log.log(o["data"], "_")
         except Exception as e:
             raise e
 
@@ -39,11 +38,11 @@ class Network:
 
 
 
-    def ipv4Addresses(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def ipv4Addresses(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.addresses(self.assetId, self.network, additionalFields, returnFields, silent)
+            o["data"] = Connector.addresses(self.assetId, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
 
@@ -71,8 +70,7 @@ class Network:
             if isinstance(networkInformation, list):
                 networkInformation = networkInformation[0]
 
-                if "network" not in networkInformation \
-                        or "network_container" not in networkInformation:
+                if "network" not in networkInformation or "network_container" not in networkInformation:
                     raise CustomException(status=400, payload={"message": "Cannot read network information."})
 
                 # Example for a network container logic.
@@ -97,7 +95,7 @@ class Network:
 
                 networkInfoList = Network(assetId, networkInformation["network"]).get(
                     filter={
-                      "*Real Network": "yes"
+                        "*Real Network": "yes"
                     })["data"]
 
                 if isinstance(networkInfoList, list) and len(networkInfoList) > 0 and "network" in networkInfoList[0]:
@@ -229,7 +227,7 @@ class Network:
                             "_return_as_object": 1
                         }
                     )["data"]["result"]
-                    
+
                     # [
                     #     {
                     #         '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4zLjAvMjQvMA:10.8.3.0/24/default',
@@ -249,7 +247,7 @@ class Network:
                         sn, sm = s["network"].split("/")
                         allSubnetworks.append(sn)
 
-                    allSubnetworks = sorted(allSubnetworks, key=lambda item: socket.inet_aton(item)) # order subnetworks.
+                    allSubnetworks = sorted(allSubnetworks, key=lambda item: socket.inet_aton(item))  # order subnetworks.
 
         except Exception:
             raise CustomException(status=400, payload={"message": "No network found."})
@@ -257,7 +255,7 @@ class Network:
         if not allSubnetworks:
             raise CustomException(status=400, payload={"message": "No network found: make sure that Object Type is valid, if required."})
         else:
-            Log.log("All subnetworks: " + str(allSubnetworks))
+            Log.log("All subnetworks: "+str(allSubnetworks))
 
         return allSubnetworks
 
@@ -289,7 +287,7 @@ class Network:
             checkAttrs += ' ("type" in address and attrs["type"] == address["type"])' # lists must be identical (order matters)
 
         if checkAttrs:
-            condition = condition + " and " + checkAttrs
+            condition = condition+" and "+checkAttrs
 
         try:
             networkCidr = self.get()["data"][0]["network"]
@@ -301,7 +299,7 @@ class Network:
             ipList = list(ipaddressNetworkObj.hosts())
 
             if int(mask) > 22:
-                ipListChunks = [ipList[x:x+100] for x in range(0, len(ipList), 100)]
+                ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:
                 ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
 
@@ -309,14 +307,7 @@ class Network:
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = self.ipv4Addresses(
-                    additionalFields={
-                        "_max_results": 100,
-                        "ip_address>": startIp,
-                        "ip_address<": endIp
-                    },
-                    silent=True
-                )["data"]
+                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)["data"]
 
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 
