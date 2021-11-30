@@ -28,9 +28,7 @@ class InfobloxNetworkController(CustomController):
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress).info(
-                returnFields=["network_container"]
-            )["data"][0]
+            netInfo = Network(assetId, networkAddress).get()["data"][0]
 
             permissionNetwork.append(netInfo["network"])
             if "network_container" in netInfo:
@@ -58,9 +56,7 @@ class InfobloxNetworkController(CustomController):
                     lock.lock()
 
                     n = Network(assetId, networkAddress)
-                    itemData = n.info(
-                        returnFields=["network_container", "extattrs"],
-                    )
+                    itemData = n.get()
 
                     serializer = InfobloxNetworkSerializer(data=itemData)
                     if serializer.is_valid():

@@ -11,11 +11,14 @@ from infoblox.connectors.Network import Network as Connector
 
 
 class Network:
-    def __init__(self, assetId: int, userNetwork: str, *args, **kwargs):
+    def __init__(self, assetId: int, network: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.assetId = int(assetId)
-        self.userNetwork = userNetwork
+        self._ref = ""
+        self.network = network
+        self.network_container = ""
+        self.extattrs = dict()
 
 
 
@@ -23,11 +26,12 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def get(self, filter: dict = {}, silent: bool = False) -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.get(self.assetId, self.userNetwork, additionalFields, returnFields, silent)
+            o["data"] = Connector.get(self.assetId, self.network, filter, silent)
+            Log.log(o["data"], "_")
         except Exception as e:
             raise e
 
@@ -39,7 +43,7 @@ class Network:
         o = dict()
 
         try:
-            o["data"] = Connector.addresses(self.assetId, self.userNetwork, additionalFields, returnFields, silent)
+            o["data"] = Connector.addresses(self.assetId, self.network, additionalFields, returnFields, silent)
         except Exception as e:
             raise e
 
@@ -62,9 +66,7 @@ class Network:
             # "Real Network" = "yes" extensible attribute must be previously set within Infoblox.
 
             # Get userNetwork's information.
-            networkInformation = Network(assetId, userNetwork).info(
-                returnFields=["network_container"]
-            )["data"]
+            networkInformation = Network(assetId, userNetwork).get()["data"]
 
             if isinstance(networkInformation, list):
                 networkInformation = networkInformation[0]
@@ -93,12 +95,10 @@ class Network:
                 # Try networkLogic: "network" first.
                 ####################################
 
-                networkInfoList = Network(assetId, networkInformation["network"]).info(
-                    additionalFields={
+                networkInfoList = Network(assetId, networkInformation["network"]).get(
+                    filter={
                       "*Real Network": "yes"
-                    },
-                    returnFields=["extattrs"]
-                )["data"]
+                    })["data"]
 
                 if isinstance(networkInfoList, list) and len(networkInfoList) > 0 and "network" in networkInfoList[0]:
                     networkInfo = networkInfoList[0]
@@ -292,7 +292,7 @@ class Network:
             condition = condition + " and " + checkAttrs
 
         try:
-            networkCidr = self.info()["data"][0]["network"]
+            networkCidr = self.get()["data"][0]["network"]
             n, mask = networkCidr.split('/')
 
             # There can be many IP addresses here.

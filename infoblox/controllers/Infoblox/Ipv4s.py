@@ -184,7 +184,7 @@ class InfobloxIpv4sController(CustomController):
             n, mn = targetNetwork.split("/")
 
             try:
-                info = Network(assetId, targetNetwork).info(returnFields=["network", "extattrs"])
+                info = Network(assetId, targetNetwork).get()
                 m = info["data"][0]["extattrs"]["Mask"]["value"]
                 g = info["data"][0]["extattrs"]["Gateway"]["value"]
             except Exception:

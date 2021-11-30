@@ -10,19 +10,20 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId, network, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def get(assetId, network, filter: dict = {}, silent: bool = False) -> dict:
         try:
             apiParams = {
                 "network": network,
                 "_max_results": 65535
             }
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+            returnFields = ["network", "network_container", "extattrs"]
 
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
+            fields = ','.join(returnFields)
+            apiParams["_return_fields+"] = fields
+
+            if filter:
+                apiParams = {**apiParams, **filter} # merge dicts.
 
             infoblox = Asset(assetId)
             infoblox.load()
