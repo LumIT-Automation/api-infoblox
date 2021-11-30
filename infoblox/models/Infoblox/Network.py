@@ -3,11 +3,11 @@ import socket
 import ipaddress
 
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-from infoblox.models.Infoblox.Asset.Asset import Asset
 
-from infoblox.helpers.ApiSupplicant import ApiSupplicant
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
+
+from infoblox.connectors.Network import Network as Connector
 
 
 class Network:
@@ -27,29 +27,7 @@ class Network:
         o = dict()
 
         try:
-            apiParams = {
-                "network": self.userNetwork,
-                "_max_results": 65535
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-            o["data"] = api.get()
+            o["data"] = Connector.get(self.assetId, self.userNetwork, additionalFields, returnFields, silent)
         except Exception as e:
             raise e
 
@@ -57,33 +35,11 @@ class Network:
 
 
 
-    def ipv4(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def ipv4Addresses(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
         o = dict()
 
         try:
-            apiParams = {
-                "network": self.userNetwork
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields}  # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = "ip_address,status,usage," + fields 
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-
-            o["data"] = api.get()
+            o["data"] = Connector.addresses(self.assetId, self.userNetwork, additionalFields, returnFields, silent)
         except Exception as e:
             raise e
 
@@ -353,7 +309,7 @@ class Network:
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = self.ipv4(
+                addresses = self.ipv4Addresses(
                     additionalFields={
                         "_max_results": 100,
                         "ip_address>": startIp,
@@ -393,32 +349,11 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
         o = dict()
 
         try:
-            apiParams = {
-                "_max_results": 65535
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields}  # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
-
-            infoblox = Asset(assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-
-            o["data"] = api.get()
+            o["data"] = Connector.list(assetId, additionalFields, returnFields)
         except Exception as e:
             raise e
 

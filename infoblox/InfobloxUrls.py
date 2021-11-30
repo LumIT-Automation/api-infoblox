@@ -26,7 +26,7 @@ urlpatterns = [
     path('<int:assetId>/networks/', Networks.InfobloxNetworksController.as_view(), name='infoblox-networks'),
     path('<int:assetId>/network-container/<str:networkAddress>/<str:mask>/', NetworkContainer.InfobloxNetworkContainerController.as_view(), name='infoblox-network-container-info'),
     path('<int:assetId>/network-containers/', NetworkContainers.InfobloxNetworkContainersController.as_view(), name='infoblox-network-containers'),
-    path('<int:assetId>/ipv4/<str:ipv4address>/', Ipv4.InfobloxIpv4Controller.as_view(), name='infoblox-ipv4'),
+    path('<int:assetId>/ipv4Addresses/<str:ipv4address>/', Ipv4.InfobloxIpv4Controller.as_view(), name='infoblox-ipv4Addresses'),
     path('<int:assetId>/ipv4s/', Ipv4s.InfobloxIpv4sController.as_view(), name='infoblox-ipv4s'),
 
     # Log history.

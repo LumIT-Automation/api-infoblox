@@ -68,7 +68,7 @@ class InfobloxNetworkController(CustomController):
                         data["href"] = request.get_full_path()
 
                         if showIp:
-                            ipv4Info = n.ipv4()
+                            ipv4Info = n.ipv4Addresses()
                             serializerIpv4 = InfobloxNetworkIpv4Serializer(data=ipv4Info)
 
                             if serializerIpv4.is_valid():

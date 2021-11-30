@@ -36,7 +36,7 @@ class InfobloxIpv4Controller(CustomController):
                 pass
 
             if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
-                Log.actionLog("Get ipv4 address information: "+ipv4address, user)
+                Log.actionLog("Get ipv4Addresses address information: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
                 if lock.isUnlocked():
@@ -106,7 +106,7 @@ class InfobloxIpv4Controller(CustomController):
                 pass
 
             if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
-                Log.actionLog("Delete ipv4 address: "+ipv4address, user)
+                Log.actionLog("Delete ipv4Addresses address: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
                 if lock.isUnlocked():
@@ -154,7 +154,7 @@ class InfobloxIpv4Controller(CustomController):
                 pass
 
             if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
-                Log.actionLog("Modify ipv4 address: "+ipv4address, user)
+                Log.actionLog("Modify ipv4Addresses address: "+ipv4address, user)
                 Log.actionLog("User data: "+str(request.data), user)
 
                 serializer = Serializer(data=request.data, partial=True)
@@ -208,7 +208,7 @@ class InfobloxIpv4Controller(CustomController):
 
         try:
             oId = History.addByType({
-                "type": "ipv4",
+                "type": "ipv4Addresses",
                 "address": ipv4,
                 "network": network,
                 "mask": mask,

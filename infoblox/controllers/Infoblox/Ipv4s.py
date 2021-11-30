@@ -205,7 +205,7 @@ class InfobloxIpv4sController(CustomController):
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
 
                 oId = History.addByType({
-                    "type": "ipv4",
+                    "type": "ipv4Addresses",
                     "address": ipv4,
                     "network": network,
                     "mask": mask,
