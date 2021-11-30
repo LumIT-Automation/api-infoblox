@@ -145,7 +145,7 @@ class Ipv4:
                 # Now look into the network container to find the right network.
                 netC, netCMask = netContainer.split("/")
                 nC = NetworkContainer(self.assetId, netC, netCMask)
-                netList = nC.subnetsList()["data"]
+                netList = nC.innerNetworks()["data"]
                 network = Ipv4.__getNetwork(self.address, netList)
             else:
                 # If the ip don't belong to any network container maybe is in a standalone network.

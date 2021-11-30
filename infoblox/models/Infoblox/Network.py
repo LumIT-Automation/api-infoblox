@@ -263,11 +263,11 @@ class Network:
 
             if networkLogic == "container":
                 if objectType:
-                    # Get all subnets in the network container.
+                    # Get all innerNetworks in the network container.
                     n, m = networkContainer.split('/')
 
                     netContainer = NetworkContainer(assetId, n, m)
-                    subnetworks = netContainer.subnetsList(
+                    subnetworks = netContainer.innerNetworks(
                         additionalFields={
                             "*Object Type": objectType,
                             "_return_as_object": 1

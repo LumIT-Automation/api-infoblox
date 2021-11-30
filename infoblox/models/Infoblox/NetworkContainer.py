@@ -1,7 +1,4 @@
-from infoblox.models.Infoblox.Asset.Asset import Asset
-
-from infoblox.helpers.ApiSupplicant import ApiSupplicant
-from infoblox.helpers.Log import Log
+from infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
 class NetworkContainer:
@@ -21,28 +18,8 @@ class NetworkContainer:
     def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
         o = dict()
 
-        apiParams = {
-            "network": self.networkContainerAddr+"/"+self.Mask
-        }
-
-        if additionalFields:
-            apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-        if returnFields:
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
-
         try:
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl + "/networkcontainer",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-            o["data"] = api.get()
+            o["data"] = Connector.get(self.assetId, self.networkContainerAddr+"/"+self.Mask, additionalFields, returnFields)
         except Exception as e:
             raise e
 
@@ -50,31 +27,11 @@ class NetworkContainer:
 
 
 
-    def subnetsList(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def innerNetworks(self, additionalFields: dict = {}, returnFields: list = []) -> dict:
         o = dict()
 
-        apiParams = {
-            "network_container": self.networkContainerAddr+"/"+self.Mask
-        }
-
-        if additionalFields:
-            apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-        if returnFields:
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
-
         try:
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-            o["data"] = api.get()
+            o["data"] = Connector.networks(self.assetId, self.networkContainerAddr+"/"+self.Mask, additionalFields, returnFields)
         except Exception as e:
             raise e
 
@@ -87,32 +44,11 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
         o = dict()
 
         try:
-            apiParams = {
-                "_max_results": 65535
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields
-
-            infoblox = Asset(assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/networkcontainer",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-
-            o["data"] = api.get()
+            o["data"] = Connector.list(assetId, additionalFields, returnFields)
         except Exception as e:
             raise e
 
@@ -121,7 +57,7 @@ class NetworkContainer:
 
 
     @staticmethod
-    def tree(assetId: int, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
+    def tree(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
         from infoblox.models.Infoblox.Network import Network
 
         containers = dict()
@@ -135,7 +71,7 @@ class NetworkContainer:
         }
 
         # Get a containers' key/values structure.
-        l = NetworkContainer.list(assetId, additionalFields, ["network_container,extattrs"], silent)
+        l = NetworkContainer.list(assetId, additionalFields, ["network_container,extattrs"])
         for container in l["data"]:
             # {
             #      "_ref": "networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMTAuMC8yNC8w:10.8.10.0/24/default",
