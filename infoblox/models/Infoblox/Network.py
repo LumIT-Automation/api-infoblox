@@ -341,11 +341,11 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def list(assetId: int) -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.list(assetId, additionalFields, returnFields)
+            o["data"] = Connector.list(assetId)
 
             for i, v in enumerate(o["data"]):
                 o["data"][i]["assetId"] = assetId # add assetId information.

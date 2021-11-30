@@ -75,7 +75,7 @@ class Network:
 
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def list(assetId: int) -> dict:
         try:
             apiParams = {
                 "_max_results": 65535
