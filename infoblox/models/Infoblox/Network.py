@@ -15,6 +15,7 @@ class Network:
         super().__init__(*args, **kwargs)
 
         self.assetId = int(assetId)
+
         self._ref = ""
         self.network = network
         self.network_container = ""
@@ -345,6 +346,9 @@ class Network:
 
         try:
             o["data"] = Connector.list(assetId, additionalFields, returnFields)
+
+            for i, v in enumerate(o["data"]):
+                o["data"][i]["assetId"] = assetId # add assetId information.
         except Exception as e:
             raise e
 

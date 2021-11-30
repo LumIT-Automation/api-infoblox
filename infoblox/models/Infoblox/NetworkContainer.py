@@ -143,7 +143,7 @@ class NetworkContainer:
             # }
 
         # Add networks information to the containers' data structure.
-        l = Network.list(assetId, additionalFields, returnFields=["network_container,extattrs"])
+        l = Network.list(assetId)
         for network in l["data"]:
             c = network["network_container"]
 

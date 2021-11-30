@@ -81,12 +81,10 @@ class Network:
                 "_max_results": 65535
             }
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+            returnFields = ["network", "network_container", "extattrs"]
 
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
+            fields = ','.join(returnFields)
+            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             infoblox.load()
