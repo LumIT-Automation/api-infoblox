@@ -106,7 +106,7 @@ class Ipv4:
             if netContainer:
                 # Now look into the network container to find the right network.
                 netC, netCMask = netContainer.split("/")
-                nC = NetworkContainer(self.assetId, netC, netCMask)
+                nC = NetworkContainer(self.assetId, netC+"/"+netCMask)
                 netList = nC.innerNetworks()["data"]
                 network = Ipv4.__getNetwork(self.address, netList)
             else:

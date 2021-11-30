@@ -11,24 +11,25 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId: int, container: str, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def get(assetId: int, container: str, filter: dict = {}) -> dict:
         apiParams = {
             "network": container
         }
 
-        if additionalFields:
-            apiParams = {**apiParams, **additionalFields} # merge dicts.
+        returnFields = ["network", "network_container", "extattrs"]
 
-        if returnFields:
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
+        fields = ','.join(returnFields)
+        apiParams["_return_fields+"] = fields
+
+        if filter:
+            apiParams = {**apiParams, **filter} # merge dicts.
 
         try:
             infoblox = Asset(assetId)
             infoblox.load()
 
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl + "/networkcontainer",
+                endpoint=infoblox.baseurl+"/networkcontainer",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
@@ -41,17 +42,18 @@ class NetworkContainer:
 
 
     @staticmethod
-    def networks(assetId: int, container: str, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def networks(assetId: int, container: str, filter: dict = {}) -> dict:
         apiParams = {
             "network_container": container
         }
 
-        if additionalFields:
-            apiParams = {**apiParams, **additionalFields} # merge dicts.
+        returnFields = ["network", "network_container", "extattrs"]
 
-        if returnFields:
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
+        fields = ','.join(returnFields)
+        apiParams["_return_fields+"] = fields
+
+        if filter:
+            apiParams = {**apiParams, **filter} # merge dicts.
 
         try:
             infoblox = Asset(assetId)
@@ -71,18 +73,16 @@ class NetworkContainer:
 
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def list(assetId: int) -> dict:
         try:
             apiParams = {
                 "_max_results": 65535
             }
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+            returnFields = ["network", "network_container", "extattrs"]
 
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields
+            fields = ','.join(returnFields)
+            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             infoblox.load()

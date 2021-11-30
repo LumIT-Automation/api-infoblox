@@ -2,12 +2,16 @@ from infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
 class NetworkContainer:
-    def __init__(self, assetId: int, networkContainerAddr: str, Mask: str, *args, **kwargs):
+    def __init__(self, assetId: int, container: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.assetId = int(assetId)
-        self.networkContainerAddr = networkContainerAddr
-        self.Mask = Mask # /N.
+        self.asset_id = int(assetId)
+
+        self._ref = ""
+        self.network = ""
+        self.network_container = container
+        self.network_view = ""
+        self.extattrs = dict()
 
 
 
@@ -15,23 +19,24 @@ class NetworkContainer:
     # Public methods
     ####################################################################################################################
 
-    def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
-        o = dict()
-
+    def get(self, filter: dict = {}) -> dict:
         try:
-            o["data"] = Connector.get(self.assetId, self.networkContainerAddr+"/"+self.Mask, additionalFields, returnFields)
+            o = Connector.get(self.asset_id, self.network_container, filter)
+
+            if o:
+                o[0]["asset_id"] = self.asset_id
+
+            return o
         except Exception as e:
             raise e
 
-        return o
 
 
-
-    def innerNetworks(self, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def innerNetworks(self, filter: dict = {}) -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.networks(self.assetId, self.networkContainerAddr+"/"+self.Mask, additionalFields, returnFields)
+            o["data"] = Connector.networks(self.asset_id, self.network_container, filter)
         except Exception as e:
             raise e
 
@@ -44,11 +49,11 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def list(assetId: int) -> dict:
         o = dict()
 
         try:
-            o["data"] = Connector.list(assetId, additionalFields, returnFields)
+            o["data"] = Connector.list(assetId)
         except Exception as e:
             raise e
 
@@ -57,7 +62,7 @@ class NetworkContainer:
 
 
     @staticmethod
-    def tree(assetId: int, additionalFields: dict = {}, returnFields: list = []) -> dict:
+    def tree(assetId: int) -> dict:
         from infoblox.models.Infoblox.Network import Network
 
         containers = dict()
@@ -71,7 +76,7 @@ class NetworkContainer:
         }
 
         # Get a containers' key/values structure.
-        l = NetworkContainer.list(assetId, additionalFields, ["network_container,extattrs"])
+        l = NetworkContainer.list(assetId)
         for container in l["data"]:
             # {
             #      "_ref": "networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMTAuMC8yNC8w:10.8.10.0/24/default",

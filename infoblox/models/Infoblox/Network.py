@@ -14,11 +14,12 @@ class Network:
     def __init__(self, assetId: int, network: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.assetId = int(assetId)
+        self.asset_id = int(assetId)
 
         self._ref = ""
         self.network = network
         self.network_container = ""
+        self.network_view = ""
         self.extattrs = dict()
 
 
@@ -31,7 +32,10 @@ class Network:
         o = dict()
 
         try:
-            o["data"] = Connector.get(self.assetId, self.network, filter, silent)
+            o["data"] = Connector.get(self.asset_id, self.network, filter, silent)
+
+            if o["data"]:
+                o["data"][0]["asset_id"] = self.asset_id
         except Exception as e:
             raise e
 
@@ -43,7 +47,7 @@ class Network:
         o = dict()
 
         try:
-            o["data"] = Connector.addresses(self.assetId, self.network, maxResults, fromIp, toIp)
+            o["data"] = Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
 
@@ -144,15 +148,10 @@ class Network:
                         if "/" in networkInformation["network_container"]:
                             n, m = networkInformation["network_container"].split("/")
 
-                            networkContainerInfoList = NetworkContainer(assetId, n, m).info(
-                                additionalFields={
+                            networkContainerInfoList = NetworkContainer(assetId, n+"/"+m).get(
+                                filter={
                                     "*Real Network": "yes"
-                                },
-                                returnFields=[
-                                    "network_container",
-                                    "extattrs"
-                                ]
-                            )["data"]
+                                })
 
                             if isinstance(networkContainerInfoList, list) and len(networkContainerInfoList) > 0 and "extattrs" in networkContainerInfoList[0]:
                                 networkContainerInfo = networkContainerInfoList[0]
@@ -221,13 +220,12 @@ class Network:
                     # Get all innerNetworks in the network container.
                     n, m = networkContainer.split('/')
 
-                    netContainer = NetworkContainer(assetId, n, m)
+                    netContainer = NetworkContainer(assetId, n+"/"+m)
                     subnetworks = netContainer.innerNetworks(
-                        additionalFields={
-                            "*Object Type": objectType,
-                            "_return_as_object": 1
+                        filter={
+                            "*Object Type": objectType
                         }
-                    )["data"]["result"]
+                    )["data"]
 
                     # [
                     #     {
@@ -348,7 +346,7 @@ class Network:
             o["data"] = Connector.list(assetId)
 
             for i, v in enumerate(o["data"]):
-                o["data"][i]["assetId"] = assetId # add assetId information.
+                o["data"][i]["asset_id"] = assetId # add assetId information.
         except Exception as e:
             raise e
 
