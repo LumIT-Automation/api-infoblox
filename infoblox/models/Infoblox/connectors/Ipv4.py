@@ -16,13 +16,9 @@ class Ipv4:
     def get(assetId, address) -> dict:
         try:
             apiParams = {
-                "ip_address": address
+                "ip_address": address,
+                "_return_fields+": "network,extattrs"
             }
-
-            returnFields = ["network", "extattrs"]
-
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(

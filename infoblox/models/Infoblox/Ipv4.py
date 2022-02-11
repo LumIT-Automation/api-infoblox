@@ -47,28 +47,34 @@ class Ipv4:
 
         try:
             # Read IPv4 address' extra attributes from Infoblox.
-            ipInformation = self.info()
-
-            if "extattrs" in ipInformation:
-                for k, v in ipInformation["extattrs"].items():
+            ipv4 = self.info()
+            if "extattrs" in ipv4:
+                for k, v in ipv4["extattrs"].items():
                     extraAttributes[k] = v["value"]
 
+            # No PATCH API available: delete and reserve.
             # Delete the IPv4 (fixedaddressOnly).
             self.release(fixedaddressOnly=True)
 
-            # Re-add with union data.
-            for k, v in extraAttributes.items():
-                if k not in data["extattrs"]:
-                    data["extattrs"][k] = {
-                        "value": v
-                    }
+            try:
+                # Re-add with union data (data values overwrite ye olde ones).
+                data["ipv4addr"] = self.ip_address
+                for k, v in extraAttributes.items():
+                    if k not in data["extattrs"]:
+                        data["extattrs"][k] = {
+                            "value": v
+                        }
 
-            data["ipv4addr"] = self.ip_address
+                Ipv4.reserve(self.asset_id, data)
+            except Exception as e:
+                # Restore the old one.
+                Ipv4.reserve(self.asset_id, {
+                    "ipv4addr": self.ip_address,
+                    "mac": ipv4["mac_address"] or "00:00:00:00:00:00",
+                    "extattrs": ipv4["extattrs"]
+                })
 
-            Ipv4.reserve(self.asset_id, data)
-
-            # @todo: if re-add fails...
-
+                raise e
         except Exception as e:
             raise e
 
@@ -79,22 +85,23 @@ class Ipv4:
         fixedaddress = ""
 
         try:
-            ipv4Data = self.info()
+            ipv4 = self.info()
 
-            # Reference to "IP slot".
-            if "_ref" in ipv4Data: # _ref as dict key.
-                ref = ipv4Data["_ref"]
+            # Reference to the IP "slot".
+            if "_ref" in ipv4:
+                ref = ipv4["_ref"]
 
             # Reference to IP data.
-            if "objects" in ipv4Data and isinstance(ipv4Data["objects"], list):
-                for el in ipv4Data["objects"]:
+            if "objects" in ipv4 and isinstance(ipv4["objects"], list):
+                for el in ipv4["objects"]:
                     if "fixedaddress" in el:
                         fixedaddress = el
+                        break
 
             if not fixedaddress:
                 raise CustomException(status=404, payload={})
             else:
-                # Release ref (by default) or fixedaddress.
+                # Release ref (the "slot") or fixedaddress ("content").
                 if fixedaddressOnly:
                     ref = fixedaddress # release only the fixedaddress data.
 
@@ -104,7 +111,7 @@ class Ipv4:
 
 
 
-    def network(self) -> str:
+    def getNetwork(self) -> str:
         try:
             # First check if the ip address belongs to a network container. If so, check in the child networks.
             netContainer = Ipv4.__getNetwork(self.ip_address, NetworkContainer.list(self.asset_id)["data"])
@@ -116,11 +123,11 @@ class Ipv4:
                 netList = nC.innerNetworks()["data"]
                 network = Ipv4.__getNetwork(self.ip_address, netList)
             else:
-                # If the ip don't belong to any network container maybe is in a standalone network.
-                # Unfortunately the network_container filter breaks if when using the root network container ("/"). The call below currently does't work.
+                # If the ip does not belong to any network container maybe is in a standalone network.
+                # Unfortunately the network_container filter breaks when using the root network container ("/"). The call below currently doesn't work.
                 # (https://community.infoblox.com/t5/API-Integration/List-of-Top-Level-Networks-using-Rest-API/m-p/1417/highlight/true#M41)
                 # netList = Network.list(self.assetId, additionalFields=["network_container"], attrsFilter={"network_container": "/"})
-                # So we are forced to search in all networks
+                # So we are forced to search in all networks.
                 netList = Network.list(self.asset_id)["data"]
                 network = Ipv4.__getNetwork(self.ip_address, netList)
         except Exception:

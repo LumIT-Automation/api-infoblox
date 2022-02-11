@@ -32,7 +32,7 @@ class Network:
                 silent=silent
             )
 
-            return api.get()
+            return api.get()[0]
         except Exception as e:
             raise e
 

@@ -180,7 +180,7 @@ class InfobloxIpv4sController(CustomController):
 
         try:
             ipv4 = Ipv4(assetId, userData["ipv4addr"])
-            permissionCheckNetwork = targetNetwork = ipv4.network()
+            permissionCheckNetwork = targetNetwork = ipv4.getNetwork()
             n, mn = targetNetwork.split("/")
 
             try:

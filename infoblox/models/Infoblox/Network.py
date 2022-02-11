@@ -29,18 +29,14 @@ class Network:
 
     def get(self, filter: dict = None, silent: bool = False) -> dict:
         filter = {} if filter is None else filter
-        o = {}
 
         try:
             data = Connector.get(self.asset_id, self.network, filter, silent)
-            if isinstance(data, list):
-                if len(data):
-                    o = data[0]
-                    o["asset_id"] = self.asset_id
+            data["asset_id"] = self.asset_id
         except Exception as e:
             raise e
 
-        return o
+        return data
 
 
 
