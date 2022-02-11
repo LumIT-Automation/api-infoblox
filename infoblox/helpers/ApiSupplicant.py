@@ -78,10 +78,8 @@ class ApiSupplicant:
                     infobloxError = self.responseObject
 
                 raise CustomException(status=self.responseStatus, payload={"Infoblox": infobloxError})
-
         except Exception as e:
             raise e
-
         return self.responseObject
 
 
@@ -141,7 +139,6 @@ class ApiSupplicant:
                     infobloxError = self.responseObject
 
                 raise CustomException(status=self.responseStatus, payload={"Infoblox": infobloxError})
-
         except Exception as e:
             raise e
 
@@ -203,7 +200,6 @@ class ApiSupplicant:
                     infobloxError = self.responseObject
 
                 raise CustomException(status=self.responseStatus, payload={"Infoblox": infobloxError})
-
         except Exception as e:
             raise e
 
@@ -265,7 +261,6 @@ class ApiSupplicant:
                     infobloxError = self.responseObject
 
                 raise CustomException(status=self.responseStatus, payload={"Infoblox": infobloxError})
-
         except Exception as e:
             raise e
 
@@ -325,7 +320,6 @@ class ApiSupplicant:
                     infobloxError = self.responseObject
 
                 raise CustomException(status=self.responseStatus, payload={"Infoblox": infobloxError})
-
         except Exception as e:
             raise e
 

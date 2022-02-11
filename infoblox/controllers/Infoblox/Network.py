@@ -20,6 +20,7 @@ class InfobloxNetworkController(CustomController):
         auth = False
         data = dict()
         showIp = False
+        ipv4Info = dict()
         etagCondition = { "responseEtag": "" }
         permissionNetwork = list("none")
 
@@ -62,12 +63,11 @@ class InfobloxNetworkController(CustomController):
                         data["href"] = request.get_full_path()
 
                         if showIp:
-                            ipv4Info = n.ipv4Addresses()
+                            ipv4Info["items"] = n.ipv4Addresses()
                             serializerIpv4 = InfobloxNetworkIpv4Serializer(data=ipv4Info)
-
                             if serializerIpv4.is_valid():
                                 data["data"].update({
-                                    "ipv4Info": serializerIpv4.validated_data["data"]
+                                    "ipv4Info": serializerIpv4.validated_data["items"]
                                 })
 
                                 # Check the response's ETag validity (against client request).

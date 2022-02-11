@@ -52,7 +52,7 @@ class Network:
                     "ip_address<": toIp
                 }
 
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
+                apiParams.update(additionalFields)
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(

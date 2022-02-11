@@ -52,4 +52,4 @@ class InfobloxNetworkIpv4Serializer(serializers.Serializer):
         types = InfobloxNetworkIpv4TypesInnerSerializer(required=False)
         usage = InfobloxNetworkIpv4UsageInnerSerializer(required=False)
 
-    data = InfobloxNetworkIpv4InnerSerializer(many=True, required=False)
+    items = InfobloxNetworkIpv4InnerSerializer(many=True, required=False)

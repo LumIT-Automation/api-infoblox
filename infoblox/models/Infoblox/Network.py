@@ -33,10 +33,10 @@ class Network:
 
         try:
             data = Connector.get(self.asset_id, self.network, filter, silent)
-
             if isinstance(data, list):
-                o = data[0]
-                o["asset_id"] = self.asset_id
+                if len(data):
+                    o = data[0]
+                    o["asset_id"] = self.asset_id
         except Exception as e:
             raise e
 
@@ -45,14 +45,10 @@ class Network:
 
 
     def ipv4Addresses(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
-        o = dict()
-
         try:
-            o["data"] = Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
+            return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
-
-        return o
 
 
 
@@ -301,7 +297,7 @@ class Network:
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)["data"]
+                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)
 
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 
