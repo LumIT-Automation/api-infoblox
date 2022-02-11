@@ -42,12 +42,9 @@ class InfobloxIpv4Controller(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    p = Ipv4(assetId, ipv4address)
-                    itemData = p.info()
-
-                    serializer = Serializer(data=itemData)
+                    serializer = Serializer(data=Ipv4(assetId, ipv4address).info())
                     if serializer.is_valid():
-                        data["data"] = serializer.validated_data["data"]
+                        data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
 
                         # Check the response's ETag validity (against client request).

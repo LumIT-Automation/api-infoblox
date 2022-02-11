@@ -35,14 +35,10 @@ class Ipv4:
     ####################################################################################################################
 
     def info(self) -> dict:
-        o = dict()
-
         try:
-            o["data"] = Connector.get(self.asset_id, self.ip_address)
+            return Connector.get(self.asset_id, self.ip_address)
         except Exception as e:
             raise e
-
-        return o
 
 
 
@@ -51,7 +47,7 @@ class Ipv4:
 
         try:
             # Read IPv4 address' extra attributes from Infoblox.
-            ipInformation = self.info()["data"]
+            ipInformation = self.info()
 
             if "extattrs" in ipInformation:
                 for k, v in ipInformation["extattrs"].items():
@@ -83,7 +79,7 @@ class Ipv4:
         fixedaddress = ""
 
         try:
-            ipv4Data = self.info()["data"]
+            ipv4Data = self.info()
 
             # Reference to "IP slot".
             if "_ref" in ipv4Data: # _ref as dict key.
