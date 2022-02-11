@@ -33,7 +33,7 @@ class InfobloxIpv4Serializer(serializers.Serializer):
         _ref = serializers.CharField(max_length=255, required=True)
         extattrs = InfobloxIpv4ExtattrsInnerSerializer(required=False)
         ip_address = serializers.IPAddressField(required=True)
-        ip_conflict = serializers.CharField(max_length=255, required=False)
+        is_conflict = serializers.BooleanField(required=False)
         mac_address = serializers.RegexField(regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', required=False, allow_blank=True)
         mac = serializers.RegexField(regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', required=False)
         names = InfobloxIpv4NamesInnerSerializer(required=False)
