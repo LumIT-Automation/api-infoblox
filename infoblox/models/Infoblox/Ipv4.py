@@ -6,7 +6,7 @@ from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
-from infoblox.connectors.Ipv4 import Ipv4 as Connector
+from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
 
 class Ipv4:

@@ -17,30 +17,13 @@ class Asset:
         self.username = ""
         self.password = ""
 
+        self.__load()
+
 
 
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
-
-    def load(self) -> None:
-        try:
-            data = Repository.get(self.id)
-            for k, v in data.items():
-                setattr(self, k, v)
-        except Exception as e:
-            raise e
-
-
-
-    def info(self) -> dict:
-        try:
-            info = Repository.get(self.id)
-            return info
-        except Exception as e:
-            raise e
-
-
 
     def modify(self, data: dict) -> None:
         try:
@@ -79,5 +62,19 @@ class Asset:
             # When inserting an asset, add the "any" network (Permission).
             from infoblox.models.Permission.Network import Network as PermissionNetwork
             PermissionNetwork.add(aid, "any")
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __load(self) -> None:
+        try:
+            data = Repository.get(self.id)
+            for k, v in data.items():
+                setattr(self, k, v)
         except Exception as e:
             raise e

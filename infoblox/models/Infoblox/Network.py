@@ -7,7 +7,7 @@ from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
-from infoblox.connectors.Network import Network as Connector
+from infoblox.models.Infoblox.connectors.Network import Network as Connector
 
 
 class Network:

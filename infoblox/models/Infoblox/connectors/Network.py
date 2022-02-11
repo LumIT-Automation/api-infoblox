@@ -10,24 +10,20 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId, network, filter: dict = {}, silent: bool = False) -> dict:
+    def get(assetId, network, filter: dict = None, silent: bool = False) -> dict:
+        filter = {} if filter is None else filter
+
         try:
             apiParams = {
                 "network": network,
-                "_max_results": 65535
+                "_max_results": 65535,
+                "_return_fields+": "network,network_container,extattrs"
             }
 
-            returnFields = ["network", "network_container", "extattrs"]
-
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
-
             if filter:
-                apiParams = {**apiParams, **filter} # merge dicts.
+                apiParams.update(filter)
 
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
@@ -59,8 +55,6 @@ class Network:
                 apiParams = {**apiParams, **additionalFields} # merge dicts.
 
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
@@ -87,8 +81,6 @@ class Network:
             apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
                 params=apiParams,

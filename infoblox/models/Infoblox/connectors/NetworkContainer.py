@@ -26,8 +26,6 @@ class NetworkContainer:
 
         try:
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/networkcontainer",
                 params=apiParams,
@@ -57,8 +55,6 @@ class NetworkContainer:
 
         try:
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
@@ -85,8 +81,6 @@ class NetworkContainer:
             apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/networkcontainer",
                 params=apiParams,

@@ -25,8 +25,6 @@ class Ipv4:
             apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/ipv4address",
                 params=apiParams,
@@ -43,13 +41,11 @@ class Ipv4:
     @staticmethod
     def delete(assetId, ref) -> None:
         try:
-            infoblox = Asset(assetId)
-            infoblox.load()
-
             apiParams = {
                 "_return_as_object": 1
             }
 
+            infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/"+ref,
                 auth=(infoblox.username, infoblox.password),
@@ -67,8 +63,6 @@ class Ipv4:
     def reserve(assetId, data: dict) -> dict:
         try:
             infoblox = Asset(assetId)
-            infoblox.load()
-
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/fixedaddress?_return_as_object=1",
                 auth=(infoblox.username, infoblox.password),

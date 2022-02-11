@@ -1,4 +1,4 @@
-from infoblox.connectors.NetworkContainer import NetworkContainer as Connector
+from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
 class NetworkContainer:
