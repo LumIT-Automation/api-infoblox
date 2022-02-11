@@ -185,8 +185,8 @@ class InfobloxIpv4sController(CustomController):
 
             try:
                 info = Network(assetId, targetNetwork).get()
-                m = info["data"][0]["extattrs"]["Mask"]["value"]
-                g = info["data"][0]["extattrs"]["Gateway"]["value"]
+                m = info["extattrs"]["Mask"]["value"]
+                g = info["extattrs"]["Gateway"]["value"]
             except Exception:
                 m = IPv4Network(targetNetwork).netmask
         except Exception as e:

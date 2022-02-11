@@ -11,7 +11,8 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId: int, container: str, filter: dict = {}) -> dict:
+    def get(assetId: int, container: str, filter: dict = None) -> dict:
+        filter = {} if filter is None else filter
         apiParams = {
             "network": container
         }
@@ -40,7 +41,8 @@ class NetworkContainer:
 
 
     @staticmethod
-    def networks(assetId: int, container: str, filter: dict = {}) -> dict:
+    def networks(assetId: int, container: str, filter: dict = None) -> dict:
+        filter = {} if filter is None else filter
         apiParams = {
             "network_container": container
         }

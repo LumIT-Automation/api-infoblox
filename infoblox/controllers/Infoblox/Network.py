@@ -28,7 +28,7 @@ class InfobloxNetworkController(CustomController):
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress).get()["data"][0]
+            netInfo = Network(assetId, networkAddress).get()
 
             permissionNetwork.append(netInfo["network"])
             if "network_container" in netInfo:
@@ -56,11 +56,9 @@ class InfobloxNetworkController(CustomController):
                     lock.lock()
 
                     n = Network(assetId, networkAddress)
-                    itemData = n.get()
-
-                    serializer = InfobloxNetworkSerializer(data=itemData)
+                    serializer = InfobloxNetworkSerializer(data=n.get())
                     if serializer.is_valid():
-                        data["data"] = serializer.validated_data["data"]
+                        data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
 
                         if showIp:
@@ -68,10 +66,9 @@ class InfobloxNetworkController(CustomController):
                             serializerIpv4 = InfobloxNetworkIpv4Serializer(data=ipv4Info)
 
                             if serializerIpv4.is_valid():
-                                ipData = {
+                                data["data"].update({
                                     "ipv4Info": serializerIpv4.validated_data["data"]
-                                }
-                                data["data"].append(ipData)
+                                })
 
                                 # Check the response's ETag validity (against client request).
                                 conditional = Conditional(request)
