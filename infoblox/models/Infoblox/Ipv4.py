@@ -46,13 +46,13 @@ class Ipv4:
         extraAttributes = dict()
 
         try:
-            # Read IPv4 address' extra attributes from Infoblox.
+            # Read IPv4 address' extra attributes from Infoblox into a proper dictionary.
             ipv4 = self.info()
             if "extattrs" in ipv4:
                 for k, v in ipv4["extattrs"].items():
                     extraAttributes[k] = v["value"]
 
-            # No PATCH API available: delete and reserve.
+            # No PATCH API available: delete and reserve needed.
             # Delete the IPv4 (fixedaddressOnly).
             self.release(fixedaddressOnly=True)
 
@@ -131,7 +131,7 @@ class Ipv4:
                 netList = Network.list(self.asset_id)["data"]
                 network = Ipv4.__getNetwork(self.ip_address, netList)
         except Exception:
-            raise CustomException(status=500, payload={"message": "Error on find the network of the ip address."})
+            raise CustomException(status=500, payload={"message": "IP address network unknown."})
 
         return network
 
@@ -156,7 +156,7 @@ class Ipv4:
             # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
             # Delete the address' information regarding the fixedaddress value, if available.
 
-            # @todo: atomicity is a dream here. Do something...
+            # @todo: atomic wtf.
             try:
                 ipv4 = Ipv4(assetId, address)
                 ipv4.release(fixedaddressOnly=True)
