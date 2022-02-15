@@ -50,6 +50,7 @@ class Network:
 
 
     def ipv4Addresses(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
+        # Please note: composition is not so valuable here.
         try:
             return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
