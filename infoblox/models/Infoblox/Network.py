@@ -1,6 +1,7 @@
 import re
 import socket
 import ipaddress
+from typing import Dict
 
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Infoblox.connectors.Network import Network as Connector
@@ -13,13 +14,18 @@ class Network:
     def __init__(self, assetId: int, network: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.asset_id = int(assetId)
+        self.asset_id: int = int(assetId)
 
-        self._ref = ""
-        self.network = network
-        self.network_container = ""
-        self.network_view = ""
-        self.extattrs = dict()
+        self._ref: str = ""
+        self.network: str = network
+        self.network_container: str = ""
+        self.network_view: str = ""
+        self.extattrs: Dict[str, Dict[str, str]] = {
+            "Gateway": { "value": "" },
+            "Mask": { "value": "" },
+            "Object Type": { "value": "" },
+            "Real Network": { "value": "" },
+        }
 
 
 
@@ -109,7 +115,7 @@ class Network:
                 try:
                     m = networkInfo["extattrs"]["Mask"]["value"]
                 except Exception:
-                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
+                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
 
                 try:
                     g = networkInfo["extattrs"]["Gateway"]["value"]
@@ -213,7 +219,7 @@ class Network:
                         filter={
                             "*Object Type": objectType
                         }
-                    )["data"]
+                    )
 
                     # [
                     #     {
@@ -245,29 +251,6 @@ class Network:
             Log.log("All subnetworks: "+str(allSubnetworks))
 
         return allSubnetworks
-
-
-
-    @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
-        # Get the next available IP address within allSubnetworks.
-        # Select the first IPv4 among them which is:
-        # * unused or used but with usage == "DNS" (only "DNS")
-        # * not ending in 0 or 255.
-        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
-
-        try:
-            for n in allSubnetworks:
-                # Find the first <number> free IPv4(s) in the subnet.
-                netObj = Network(assetId, n)
-                addresses = netObj.findFirstIpByAttrs(number)
-
-                if len(addresses) == number:
-                    return n, addresses
-        except Exception as e:
-            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
-
-        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
 
 
 
@@ -351,14 +334,35 @@ class Network:
 
     @staticmethod
     def list(assetId: int) -> dict:
-        o = dict()
-
         try:
-            o["data"] = Connector.list(assetId)
+            o = Connector.list(assetId)
 
-            for i, v in enumerate(o["data"]):
-                o["data"][i]["asset_id"] = assetId # add assetId information.
+            for i, v in enumerate(o):
+                o[i]["asset_id"] = assetId # add assetId information.
         except Exception as e:
             raise e
 
         return o
+
+
+
+    @staticmethod
+    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
+        # Get the next available IP address within allSubnetworks.
+        # Select the first IPv4 among them which is:
+        # * unused or used but with usage == "DNS" (only "DNS")
+        # * not ending in 0 or 255.
+        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+
+        try:
+            for n in allSubnetworks:
+                # Find the first <number> free IPv4(s) in the subnet.
+                netObj = Network(assetId, n)
+                addresses = netObj.findFirstIpByAttrs(number)
+
+                if len(addresses) == number:
+                    return n, addresses
+        except Exception as e:
+            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
+
+        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})

@@ -77,13 +77,9 @@ class Network:
     def list(assetId: int) -> dict:
         try:
             apiParams = {
-                "_max_results": 65535
+                "_max_results": 65535,
+                "_return_fields+": "network,network_container,extattrs"
             }
-
-            returnFields = ["network", "network_container", "extattrs"]
-
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(

@@ -1,3 +1,5 @@
+from typing import Dict
+
 from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
@@ -5,13 +7,17 @@ class NetworkContainer:
     def __init__(self, assetId: int, container: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.asset_id = int(assetId)
+        self.asset_id: int = int(assetId)
 
-        self._ref = ""
-        self.network = ""
-        self.network_container = container
-        self.network_view = ""
-        self.extattrs = dict()
+        self._ref: str = ""
+        self.network: str = ""
+        self.network_container: str = container
+        self.extattrs: Dict[str, Dict[str, str]] = {
+            "Gateway": { "value": "" },
+            "Mask": { "value": "" },
+            "Object Type": { "value": "" },
+            "Real Network": { "value": "" },
+        }
 
 
 
@@ -19,7 +25,9 @@ class NetworkContainer:
     # Public methods
     ####################################################################################################################
 
-    def get(self, filter: dict = {}) -> dict:
+    def get(self, filter: dict = None) -> dict:
+        filter = {} if filter is None else filter
+
         try:
             o = Connector.get(self.asset_id, self.network_container, filter)
 
@@ -32,15 +40,13 @@ class NetworkContainer:
 
 
 
-    def innerNetworks(self, filter: dict = {}) -> dict:
-        o = dict()
+    def innerNetworks(self, filter: dict = None) -> dict:
+        filter = {} if filter is None else filter
 
         try:
-            o["data"] = Connector.networks(self.asset_id, self.network_container, filter)
+            return Connector.networks(self.asset_id, self.network_container, filter)
         except Exception as e:
             raise e
-
-        return o
 
 
 
@@ -50,11 +56,7 @@ class NetworkContainer:
 
     @staticmethod
     def list(assetId: int) -> dict:
-        o = dict()
-
         try:
-            o["data"] = Connector.list(assetId)
+            return Connector.list(assetId)
         except Exception as e:
             raise e
-
-        return o

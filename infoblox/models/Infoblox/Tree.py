@@ -22,7 +22,7 @@ class Tree:
 
         # Get a containers' key/values structure.
         l = NetworkContainer.list(assetId)
-        for container in l["data"]:
+        for container in l:
             # {
             #      "_ref": "networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMTAuMC8yNC8w:10.8.10.0/24/default",
             #      "network": "10.8.10.0/24",
@@ -94,7 +94,7 @@ class Tree:
 
         # Add networks information to the containers' data structure.
         l = Network.list(assetId)
-        for network in l["data"]:
+        for network in l:
             c = network["network_container"]
 
             del (network["network_view"])

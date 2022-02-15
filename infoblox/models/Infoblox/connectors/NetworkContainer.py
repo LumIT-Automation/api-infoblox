@@ -13,17 +13,14 @@ class NetworkContainer:
     @staticmethod
     def get(assetId: int, container: str, filter: dict = None) -> dict:
         filter = {} if filter is None else filter
+
         apiParams = {
-            "network": container
+            "network": container,
+            "_return_fields+": "network,network_container,extattrs"
         }
 
-        returnFields = ["network", "network_container", "extattrs"]
-
-        fields = ','.join(returnFields)
-        apiParams["_return_fields+"] = fields
-
         if filter:
-            apiParams = {**apiParams, **filter} # merge dicts.
+            apiParams.update(filter)
 
         try:
             infoblox = Asset(assetId)
@@ -43,17 +40,14 @@ class NetworkContainer:
     @staticmethod
     def networks(assetId: int, container: str, filter: dict = None) -> dict:
         filter = {} if filter is None else filter
+
         apiParams = {
-            "network_container": container
+            "network_container": container,
+            "_return_fields+": "network,network_container,extattrs"
         }
 
-        returnFields = ["network", "network_container", "extattrs"]
-
-        fields = ','.join(returnFields)
-        apiParams["_return_fields+"] = fields
-
         if filter:
-            apiParams = {**apiParams, **filter} # merge dicts.
+            apiParams.update(filter)
 
         try:
             infoblox = Asset(assetId)
@@ -74,13 +68,9 @@ class NetworkContainer:
     def list(assetId: int) -> dict:
         try:
             apiParams = {
-                "_max_results": 65535
+                "_max_results": 65535,
+                "_return_fields+": "network,network_container,extattrs"
             }
-
-            returnFields = ["network", "network_container", "extattrs"]
-
-            fields = ','.join(returnFields)
-            apiParams["_return_fields+"] = fields
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(

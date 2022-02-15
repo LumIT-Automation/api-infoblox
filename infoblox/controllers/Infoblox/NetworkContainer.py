@@ -18,6 +18,7 @@ class InfobloxNetworkContainerController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int, networkAddress: str, mask: str) -> Response:
         data = dict()
+        itemData = dict()
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
@@ -30,11 +31,11 @@ class InfobloxNetworkContainerController(CustomController):
                     lock.lock()
 
                     p = NetworkContainer(assetId, networkAddress+"/"+mask)
-                    itemData = p.innerNetworks()
+                    itemData["items"] = p.innerNetworks()
 
                     serializer = Serializer(data=itemData)
                     if serializer.is_valid():
-                        data["data"] = serializer.validated_data["data"]
+                        data["data"] = serializer.validated_data["items"]
                         data["href"] = request.get_full_path()
 
                         # Check the response's ETag validity (against client request).
