@@ -6,27 +6,24 @@ class InfobloxNetworkInnerExtattrsValueSerializer(serializers.Serializer):
     value = serializers.CharField(max_length=255)
 
 class InfobloxNetworkSerializer(serializers.Serializer):
-    class InfobloxNetworkInnerSerializer(serializers.Serializer):
-        class InfobloxNetworkInnerExtattrsSerializer(serializers.Serializer):
-            class InfobloxNetworkInnerExtattrsValueSerializer(serializers.Serializer):
-                value = serializers.IPAddressField()
+    class InfobloxNetworkInnerExtattrsSerializer(serializers.Serializer):
+        class InfobloxNetworkInnerExtattrsValueSerializer(serializers.Serializer):
+            value = serializers.IPAddressField()
 
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
 
-                # A trick to allow spaces in names.
-                self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
+            # A trick to allow spaces in names.
+            self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
 
-            Gateway = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
-            Mask = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
+        Gateway = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
+        Mask = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
 
-        _ref = serializers.CharField(max_length=255)
-        network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
-        network_container = serializers.CharField(max_length=255, required=False)
-        network_view = serializers.CharField(max_length=255)
-        extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
-
-    data = InfobloxNetworkInnerSerializer(many=True, required=False)
+    _ref = serializers.CharField(max_length=255)
+    network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
+    network_container = serializers.CharField(max_length=255, required=False)
+    network_view = serializers.CharField(max_length=255)
+    extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
 
 
 
@@ -55,4 +52,4 @@ class InfobloxNetworkIpv4Serializer(serializers.Serializer):
         types = InfobloxNetworkIpv4TypesInnerSerializer(required=False)
         usage = InfobloxNetworkIpv4UsageInnerSerializer(required=False)
 
-    data = InfobloxNetworkIpv4InnerSerializer(many=True, required=False)
+    items = InfobloxNetworkIpv4InnerSerializer(many=True, required=False)

@@ -111,7 +111,7 @@ class InfobloxIpv4sController(CustomController):
             if number > 10:
                 number = 10 # limited to 10.
 
-        actualNetwork, addresses = Ipv4.getNextAvailableIpv4Addresses(assetId, networkLogic, targetNetwork, networkContainer, number, objectType)
+        actualNetwork, addresses = Network.getNextAvailableIpv4Addresses(assetId, networkLogic, targetNetwork, networkContainer, number, objectType)
         for address in addresses:
             try:
                 mac = data["mac"][j]
@@ -180,13 +180,13 @@ class InfobloxIpv4sController(CustomController):
 
         try:
             ipv4 = Ipv4(assetId, userData["ipv4addr"])
-            permissionCheckNetwork = targetNetwork = ipv4.network()
+            permissionCheckNetwork = targetNetwork = ipv4.info()["network"]
             n, mn = targetNetwork.split("/")
 
             try:
-                info = Network(assetId, targetNetwork).info(returnFields=["network", "extattrs"])
-                m = info["data"][0]["extattrs"]["Mask"]["value"]
-                g = info["data"][0]["extattrs"]["Gateway"]["value"]
+                info = Network(assetId, targetNetwork).get()
+                m = info["extattrs"]["Mask"]["value"]
+                g = info["extattrs"]["Gateway"]["value"]
             except Exception:
                 m = IPv4Network(targetNetwork).netmask
         except Exception as e:
@@ -205,7 +205,7 @@ class InfobloxIpv4sController(CustomController):
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
 
                 oId = History.addByType({
-                    "type": "ipv4",
+                    "type": "ipv4Addresses",
                     "address": ipv4,
                     "network": network,
                     "mask": mask,

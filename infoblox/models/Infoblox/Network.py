@@ -1,21 +1,31 @@
 import re
 import socket
 import ipaddress
+from typing import Dict
 
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-from infoblox.models.Infoblox.Asset.Asset import Asset
+from infoblox.models.Infoblox.connectors.Network import Network as Connector
 
-from infoblox.helpers.ApiSupplicant import ApiSupplicant
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
 class Network:
-    def __init__(self, assetId: int, userNetwork: str, *args, **kwargs):
+    def __init__(self, assetId: int, network: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.assetId = int(assetId)
-        self.userNetwork = userNetwork
+        self.asset_id: int = int(assetId)
+
+        self._ref: str = ""
+        self.network: str = network
+        self.network_container: str = ""
+        self.network_view: str = ""
+        self.extattrs: Dict[str, Dict[str, str]] = {
+            "Gateway": { "value": "" },
+            "Mask": { "value": "" },
+            "Object Type": { "value": "" },
+            "Real Network": { "value": "" },
+        }
 
 
 
@@ -23,71 +33,25 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
-        o = dict()
+    def get(self, filter: dict = None, silent: bool = False) -> dict:
+        filter = {} if filter is None else filter
 
         try:
-            apiParams = {
-                "network": self.userNetwork,
-                "_max_results": 65535
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-            o["data"] = api.get()
+            data = Connector.get(self.asset_id, self.network, filter, silent)
+            if data:
+                data["asset_id"] = self.asset_id
         except Exception as e:
             raise e
 
-        return o
+        return data
 
 
 
-    def ipv4(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
-        o = dict()
-
+    def ipv4Addresses(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
         try:
-            apiParams = {
-                "network": self.userNetwork
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields}  # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = "ip_address,status,usage," + fields 
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-
-            o["data"] = api.get()
+            return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
-
-        return o
 
 
 
@@ -106,134 +70,118 @@ class Network:
             # "Real Network" = "yes" extensible attribute must be previously set within Infoblox.
 
             # Get userNetwork's information.
-            networkInformation = Network(assetId, userNetwork).info(
-                returnFields=["network_container"]
-            )["data"]
+            networkInformation = Network(assetId, userNetwork).get()
 
-            if isinstance(networkInformation, list):
-                networkInformation = networkInformation[0]
+            if "network" not in networkInformation or "network_container" not in networkInformation:
+                raise CustomException(status=400, payload={"message": "Cannot read network information."})
 
-                if "network" not in networkInformation \
-                        or "network_container" not in networkInformation:
-                    raise CustomException(status=400, payload={"message": "Cannot read network information."})
+            # Example for a network container logic.
+            # {
+            #     '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xLjAvMjQvMA:10.8.1.0/24/default',
+            #     'network': '10.8.1.0/24',
+            #     'network_container': '10.8.0.0/17',
+            #     'network_view': 'default'
+            # }
 
-                # Example for a network container logic.
-                # {
-                #     '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xLjAvMjQvMA:10.8.1.0/24/default',
-                #     'network': '10.8.1.0/24',
-                #     'network_container': '10.8.0.0/17',
-                #     'network_view': 'default'
-                # }
+            # Example for a network logic.
+            # {
+            #     '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
+            #     'network': '10.8.128.0/17',
+            #     'network_container': '/',
+            #     'network_view': 'default'
+            # }
 
-                # Example for a network logic.
-                # {
-                #     '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
-                #     'network': '10.8.128.0/17',
-                #     'network_container': '/',
-                #     'network_view': 'default'
-                # }
+            ####################################
+            # Try networkLogic: "network" first.
+            ####################################
 
-                ####################################
-                # Try networkLogic: "network" first.
-                ####################################
+            networkInfo = Network(assetId, networkInformation["network"]).get(
+                filter={
+                    "*Real Network": "yes"
+                })
 
-                networkInfoList = Network(assetId, networkInformation["network"]).info(
-                    additionalFields={
-                      "*Real Network": "yes"
-                    },
-                    returnFields=["extattrs"]
-                )["data"]
+            # {
+            # '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
+            # 'extattrs': {
+            #     'Gateway': {'value': '10.8.128.1'},
+            #     'Mask': {'value': '255.255.128.0'},
+            #     'Real Network': {'value': 'yes'}
+            #     },
+            # 'network': '10.8.128.0/17',
+            # 'network_view': 'default'
+            # }
 
-                if isinstance(networkInfoList, list) and len(networkInfoList) > 0 and "network" in networkInfoList[0]:
-                    networkInfo = networkInfoList[0]
+            if "network" in networkInfo and networkInfo["network"]:
+                try:
+                    m = networkInfo["extattrs"]["Mask"]["value"]
+                except Exception:
+                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
 
-                    # {
-                    # '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
-                    # 'extattrs': {
-                    #     'Gateway': {'value': '10.8.128.1'},
-                    #     'Mask': {'value': '255.255.128.0'},
-                    #     'Real Network': {'value': 'yes'}
-                    #     },
-                    # 'network': '10.8.128.0/17',
-                    # 'network_view': 'default'
-                    # }
+                try:
+                    g = networkInfo["extattrs"]["Gateway"]["value"]
+                except Exception:
+                    g = ""
 
-                    if networkInfo["network"]:
-                        try:
-                            m = networkInfo["extattrs"]["Mask"]["value"]
-                        except Exception:
-                            raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
+                o = {
+                    "networkLogic": "network",
+                    "targetNetwork": networkInfo["network"],
+                    "mask": m,
+                    "gateway": g
+                }
 
-                        try:
-                            g = networkInfo["extattrs"]["Gateway"]["value"]
-                        except Exception:
-                            g = ""
+                Log.log("Network information: "+str(o))
+                return o
 
-                        o = {
-                            "networkLogic": "network",
-                            "targetNetwork": networkInfo["network"],
-                            "mask": m,
-                            "gateway": g
-                        }
+            ################################
+            # Try networkLogic: "container".
+            ################################
 
-                        Log.log("Network information: "+str(o))
-                        return o
+            else:
+                # Is container logic?
+                if networkInformation["network_container"] != "/":
+                    if "/" in networkInformation["network_container"]:
+                        n, m = networkInformation["network_container"].split("/")
 
-                ################################
-                # Try networkLogic: "container".
-                ################################
+                        networkContainerInfoList = NetworkContainer(assetId, n+"/"+m).get(
+                            filter={
+                                "*Real Network": "yes"
+                            })
 
-                else:
-                    # Is container logic?
-                    if networkInformation["network_container"] != "/":
-                        if "/" in networkInformation["network_container"]:
-                            n, m = networkInformation["network_container"].split("/")
+                        if isinstance(networkContainerInfoList, list) and len(networkContainerInfoList) > 0 and "extattrs" in networkContainerInfoList[0]:
+                            networkContainerInfo = networkContainerInfoList[0]
 
-                            networkContainerInfoList = NetworkContainer(assetId, n, m).info(
-                                additionalFields={
-                                    "*Real Network": "yes"
-                                },
-                                returnFields=[
-                                    "network_container",
-                                    "extattrs"
-                                ]
-                            )["data"]
+                            # {
+                            #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
+                            #     'extattrs': {
+                            #         'Gateway': {'value': '10.8.1.1'},
+                            #         'Mask': {'value': '255.255.128.0'},
+                            #         'Real Network': {'value': 'yes'}
+                            #         },
+                            #     'network': '10.8.0.0/17',
+                            #     'network_container': '/',
+                            #     'network_view': 'default'
+                            # ]
 
-                            if isinstance(networkContainerInfoList, list) and len(networkContainerInfoList) > 0 and "extattrs" in networkContainerInfoList[0]:
-                                networkContainerInfo = networkContainerInfoList[0]
+                            if networkContainerInfo["network"]:
+                                try:
+                                    m = networkContainerInfo["extattrs"]["Mask"]["value"]
+                                except Exception:
+                                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
 
-                                # {
-                                #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
-                                #     'extattrs': {
-                                #         'Gateway': {'value': '10.8.1.1'},
-                                #         'Mask': {'value': '255.255.128.0'},
-                                #         'Real Network': {'value': 'yes'}
-                                #         },
-                                #     'network': '10.8.0.0/17',
-                                #     'network_container': '/',
-                                #     'network_view': 'default'
-                                # ]
+                                try:
+                                    g = networkContainerInfo["extattrs"]["Gateway"]["value"]
+                                except Exception:
+                                    g = ""
 
-                                if networkContainerInfo["network"]:
-                                    try:
-                                        m = networkContainerInfo["extattrs"]["Mask"]["value"]
-                                    except Exception:
-                                        raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
+                                o = {
+                                    "networkLogic": "container",
+                                    "mask": m,
+                                    "gateway": g,
+                                    "network_container": networkInformation["network_container"]
+                                }
 
-                                    try:
-                                        g = networkContainerInfo["extattrs"]["Gateway"]["value"]
-                                    except Exception:
-                                        g = ""
-
-                                    o = {
-                                        "networkLogic": "container",
-                                        "mask": m,
-                                        "gateway": g,
-                                        "network_container": networkInformation["network_container"]
-                                    }
-
-                                    Log.log("Network information: "+str(o))
-                                    return o
+                                Log.log("Network information: "+str(o))
+                                return o
 
             raise CustomException(status=400, payload={"message": "Cannot discriminate network."})
 
@@ -263,17 +211,16 @@ class Network:
 
             if networkLogic == "container":
                 if objectType:
-                    # Get all subnets in the network container.
+                    # Get all innerNetworks in the network container.
                     n, m = networkContainer.split('/')
 
-                    netContainer = NetworkContainer(assetId, n, m)
-                    subnetworks = netContainer.subnetsList(
-                        additionalFields={
-                            "*Object Type": objectType,
-                            "_return_as_object": 1
+                    netContainer = NetworkContainer(assetId, n+"/"+m)
+                    subnetworks = netContainer.innerNetworks(
+                        filter={
+                            "*Object Type": objectType
                         }
-                    )["data"]["result"]
-                    
+                    )
+
                     # [
                     #     {
                     #         '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4zLjAvMjQvMA:10.8.3.0/24/default',
@@ -293,7 +240,7 @@ class Network:
                         sn, sm = s["network"].split("/")
                         allSubnetworks.append(sn)
 
-                    allSubnetworks = sorted(allSubnetworks, key=lambda item: socket.inet_aton(item)) # order subnetworks.
+                    allSubnetworks = sorted(allSubnetworks, key=lambda item: socket.inet_aton(item))  # order subnetworks.
 
         except Exception:
             raise CustomException(status=400, payload={"message": "No network found."})
@@ -301,7 +248,7 @@ class Network:
         if not allSubnetworks:
             raise CustomException(status=400, payload={"message": "No network found: make sure that Object Type is valid, if required."})
         else:
-            Log.log("All subnetworks: " + str(allSubnetworks))
+            Log.log("All subnetworks: "+str(allSubnetworks))
 
         return allSubnetworks
 
@@ -333,10 +280,10 @@ class Network:
             checkAttrs += ' ("type" in address and attrs["type"] == address["type"])' # lists must be identical (order matters)
 
         if checkAttrs:
-            condition = condition + " and " + checkAttrs
+            condition = condition+" and "+checkAttrs
 
         try:
-            networkCidr = self.info()["data"][0]["network"]
+            networkCidr = self.get()["network"]
             n, mask = networkCidr.split('/')
 
             # There can be many IP addresses here.
@@ -345,7 +292,7 @@ class Network:
             ipList = list(ipaddressNetworkObj.hosts())
 
             if int(mask) > 22:
-                ipListChunks = [ipList[x:x+100] for x in range(0, len(ipList), 100)]
+                ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:
                 ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
 
@@ -353,14 +300,7 @@ class Network:
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = self.ipv4(
-                    additionalFields={
-                        "_max_results": 100,
-                        "ip_address>": startIp,
-                        "ip_address<": endIp
-                    },
-                    silent=True
-                )["data"]
+                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)
 
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 
@@ -393,33 +333,36 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
-        o = dict()
-
+    def list(assetId: int) -> dict:
         try:
-            apiParams = {
-                "_max_results": 65535
-            }
+            o = Connector.list(assetId)
 
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields}  # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields 
-
-            infoblox = Asset(assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-
-            o["data"] = api.get()
+            for i, v in enumerate(o):
+                o[i]["asset_id"] = assetId # add assetId information.
         except Exception as e:
             raise e
 
         return o
+
+
+
+    @staticmethod
+    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
+        # Get the next available IP address within allSubnetworks.
+        # Select the first IPv4 among them which is:
+        # * unused or used but with usage == "DNS" (only "DNS")
+        # * not ending in 0 or 255.
+        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+
+        try:
+            for n in allSubnetworks:
+                # Find the first <number> free IPv4(s) in the subnet.
+                netObj = Network(assetId, n)
+                addresses = netObj.findFirstIpByAttrs(number)
+
+                if len(addresses) == number:
+                    return n, addresses
+        except Exception as e:
+            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
+
+        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})

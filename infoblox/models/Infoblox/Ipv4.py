@@ -1,11 +1,6 @@
-import ipaddress
-import json
+from typing import List, Dict
 
-from infoblox.models.Infoblox.Asset.Asset import Asset
-from infoblox.helpers.ApiSupplicant import ApiSupplicant
-
-from infoblox.models.Infoblox.Network import Network
-from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
@@ -15,8 +10,27 @@ class Ipv4:
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.assetId = int(assetId)
-        self.address = address
+        self.asset_id: int = int(assetId)
+        self.ip_address: str = address
+        self.ipv4Addr: str = address # alternative in Infoblox model.
+
+        self._ref: str = ""
+        self.network: str = ""
+        self.network_view: str = ""
+        self.mac_address: str = ""
+        self.mac: str = "" # alternative in Infoblox model.
+        self.status: str = ""
+        self.is_conflict: bool = False
+        self.names: List[str] = []
+        self.objects: List[str] = []
+        self.types: List[str] = []
+        self.usage: List[str] = []
+        self.extattrs: Dict[str, Dict[str, str]] = {
+            "Gateway": { "value": "" },
+            "Mask": { "value": "" },
+            "Reference": { "value": "" },
+            "Name Server": { "value": "" }
+        }
 
 
 
@@ -24,37 +38,11 @@ class Ipv4:
     # Public methods
     ####################################################################################################################
 
-    def info(self, additionalFields: dict = {}, returnFields: list = [], silent: bool = False) -> dict:
-        o = dict()
-
+    def info(self) -> dict:
         try:
-            apiParams = {
-                "ip_address": self.address
-            }
-
-            if additionalFields:
-                apiParams = {**apiParams, **additionalFields} # merge dicts.
-
-            if returnFields:
-                fields = ','.join(returnFields)
-                apiParams["_return_fields+"] = fields
-
-            infoblox = Asset(self.assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
-                params=apiParams,
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-
-            o["data"] = api.get()[0]
+            return Connector.get(self.asset_id, self.ip_address)
         except Exception as e:
             raise e
-
-        return o
 
 
 
@@ -62,31 +50,35 @@ class Ipv4:
         extraAttributes = dict()
 
         try:
-            # Read IPv4 address' extra attributes from Infoblox.
-            ipInformation = self.info(
-                returnFields=["network", "extattrs"]
-            )["data"]
+            ipv4 = self.info()
 
-            if "extattrs" in ipInformation:
-                for k, v in ipInformation["extattrs"].items():
-                    extraAttributes[k] = v["value"]
-
+            # No PATCH API available: delete and reserve needed.
             # Delete the IPv4 (fixedaddressOnly).
             self.release(fixedaddressOnly=True)
 
-            # Re-add with union data.
-            for k, v in extraAttributes.items():
-                if k not in data["extattrs"]:
-                    data["extattrs"][k] = {
-                        "value": v
-                    }
+            try:
+                # Re-add with union data (data values overwrite ye olde ones).
+                if "extattrs" in ipv4:
+                    for k, v in ipv4["extattrs"].items():
+                        extraAttributes[k] = v["value"]
 
-            data["ipv4addr"] = self.address
+                data["ipv4addr"] = self.ip_address
+                for k, v in extraAttributes.items():
+                    if k not in data["extattrs"]:
+                        data["extattrs"][k] = {
+                            "value": v
+                        }
 
-            Ipv4.reserve(self.assetId, data)
+                Ipv4.reserve(self.asset_id, data)
+            except Exception as e:
+                # Restore the old one.
+                Ipv4.reserve(self.asset_id, {
+                    "ipv4addr": self.ip_address,
+                    "mac": ipv4["mac_address"] or "00:00:00:00:00:00",
+                    "extattrs": ipv4["extattrs"]
+                })
 
-            # @todo: if re-add fails...
-
+                raise e
         except Exception as e:
             raise e
 
@@ -97,68 +89,29 @@ class Ipv4:
         fixedaddress = ""
 
         try:
-            ipv4Data = self.info()["data"]
+            ipv4 = self.info()
 
-            # Reference to "IP slot".
-            if "_ref" in ipv4Data: # _ref as dict key.
-                ref = ipv4Data["_ref"]
+            # Reference to the IP "slot".
+            if "_ref" in ipv4:
+                ref = ipv4["_ref"]
 
             # Reference to IP data.
-            if "objects" in ipv4Data and isinstance(ipv4Data["objects"], list):
-                for el in ipv4Data["objects"]:
+            if "objects" in ipv4 and isinstance(ipv4["objects"], list):
+                for el in ipv4["objects"]:
                     if "fixedaddress" in el:
                         fixedaddress = el
+                        break
 
             if not fixedaddress:
                 raise CustomException(status=404, payload={})
             else:
-                # Release ref (by default) or fixedaddress.
+                # Release ref (the "slot") or fixedaddress ("content").
                 if fixedaddressOnly:
                     ref = fixedaddress # release only the fixedaddress data.
 
-                infoblox = Asset(self.assetId)
-                infoblox.load()
-
-                apiParams = {
-                    "_return_as_object": 1
-                }
-
-                api = ApiSupplicant(
-                    endpoint=infoblox.baseurl+"/"+ref,
-                    auth=(infoblox.username, infoblox.password),
-                    params=apiParams,
-                    tlsVerify=infoblox.tlsverify
-                )
-
-                api.delete()
+                Connector.delete(self.asset_id, ref)
         except Exception as e:
             raise e
-
-
-
-    def network(self) -> str:
-        try:
-            # First check if the ip address belongs to a network container. If so, check in the child networks.
-            netContainer = Ipv4.__getNetwork(self.address, NetworkContainer.list(self.assetId)["data"])
-
-            if netContainer:
-                # Now look into the network container to find the right network.
-                netC, netCMask = netContainer.split("/")
-                nC = NetworkContainer(self.assetId, netC, netCMask)
-                netList = nC.subnetsList()["data"]
-                network = Ipv4.__getNetwork(self.address, netList)
-            else:
-                # If the ip don't belong to any network container maybe is in a standalone network.
-                # Unfortunately the network_container filter breaks if when using the root network container ("/"). The call below currently does't work.
-                # (https://community.infoblox.com/t5/API-Integration/List-of-Top-Level-Networks-using-Rest-API/m-p/1417/highlight/true#M41)
-                # netList = Network.list(self.assetId, additionalFields=["network_container"], attrsFilter={"network_container": "/"})
-                # So we are forced to search in all networks
-                netList = Network.list(self.assetId)["data"]
-                network = Ipv4.__getNetwork(self.address, netList)
-        except Exception:
-            raise CustomException(status=500, payload={"message": "Error on find the network of the ip address."})
-
-        return network
 
 
 
@@ -169,36 +122,20 @@ class Ipv4:
     @staticmethod
     def reserve(assetId, data: dict) -> dict:
         try:
-            infoblox = Asset(assetId)
-            infoblox.load()
-
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/fixedaddress?_return_as_object=1",
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
-            )
-
-            o = api.post(
-                additionalHeaders={
-                    "Content-Type": "application/json",
-                },
-                data=json.dumps(data)
-            )
+            return Connector.reserve(assetId, data)
         except Exception as e:
             raise e
-
-        return o
 
 
 
     @staticmethod
     def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> object:
         try:
-            # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
-            # Delete the address' information regarding the fixedaddress value, if available.
+            # @todo: atomicity?
 
-            # @todo: atomicity is a dream here. Do something...
             try:
+                # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
+                # Delete the address' information regarding the fixedaddress value, if available.
                 ipv4 = Ipv4(assetId, address)
                 ipv4.release(fixedaddressOnly=True)
             except Exception:
@@ -213,57 +150,3 @@ class Ipv4:
 
         except Exception as e:
             raise e
-
-
-
-    @staticmethod
-    def ipv4InNetwork(address: str, network_cidr: str) -> bool:
-        return ipaddress.ip_address(address) in ipaddress.ip_network(network_cidr)
-
-
-
-    @staticmethod
-    def subnetInNetwork(subnet_cidr: str, network_cidr: str) -> bool:
-        return ipaddress.ip_network(subnet_cidr).subnet_of(ipaddress.ip_network(network_cidr))
-
-
-
-    @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
-        # Get the next available IP address within allSubnetworks.
-        # Select the first IPv4 among them which is:
-        # * unused or used but with usage == "DNS" (only "DNS")
-        # * not ending in 0 or 255.
-        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
-
-        try:
-            for n in allSubnetworks:
-                # Find the first <number> free IPv4(s) in the subnet.
-                netObj = Network(assetId, n)
-                addresses = netObj.findFirstIpByAttrs(number)
-
-                if len(addresses) == number:
-                    return n, addresses
-        except Exception as e:
-            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
-
-        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
-
-
-
-    ####################################################################################################################
-    # Private static methods
-    ####################################################################################################################
-
-    @staticmethod
-    def __getNetwork(address: str, networks: list) -> str:
-        network = ""
-        for net in networks:
-            if "network" in net:
-                if Ipv4.ipv4InNetwork(address, net["network"]):
-                    network = net["network"]
-
-                    Log.log("Ip address "+str(address)+" belongs to network or network container "+str(network), "Ipv4 method: __isAddressInNetworkList")
-                    break
-
-        return network

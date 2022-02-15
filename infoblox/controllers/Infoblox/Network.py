@@ -20,6 +20,7 @@ class InfobloxNetworkController(CustomController):
         auth = False
         data = dict()
         showIp = False
+        ipv4Info = dict()
         etagCondition = { "responseEtag": "" }
         permissionNetwork = list("none")
 
@@ -28,9 +29,7 @@ class InfobloxNetworkController(CustomController):
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress).info(
-                returnFields=["network_container"]
-            )["data"][0]
+            netInfo = Network(assetId, networkAddress).get()
 
             permissionNetwork.append(netInfo["network"])
             if "network_container" in netInfo:
@@ -58,24 +57,18 @@ class InfobloxNetworkController(CustomController):
                     lock.lock()
 
                     n = Network(assetId, networkAddress)
-                    itemData = n.info(
-                        returnFields=["network_container", "extattrs"],
-                    )
-
-                    serializer = InfobloxNetworkSerializer(data=itemData)
+                    serializer = InfobloxNetworkSerializer(data=n.get())
                     if serializer.is_valid():
-                        data["data"] = serializer.validated_data["data"]
+                        data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
 
                         if showIp:
-                            ipv4Info = n.ipv4()
+                            ipv4Info["items"] = n.ipv4Addresses()
                             serializerIpv4 = InfobloxNetworkIpv4Serializer(data=ipv4Info)
-
                             if serializerIpv4.is_valid():
-                                ipData = {
-                                    "ipv4Info": serializerIpv4.validated_data["data"]
-                                }
-                                data["data"].append(ipData)
+                                data["data"].update({
+                                    "ipv4Info": serializerIpv4.validated_data["items"]
+                                })
 
                                 # Check the response's ETag validity (against client request).
                                 conditional = Conditional(request)

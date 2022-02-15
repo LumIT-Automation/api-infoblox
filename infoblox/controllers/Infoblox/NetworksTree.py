@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+from infoblox.models.Infoblox.Tree import Tree
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.controllers.CustomController import CustomController
@@ -106,14 +106,14 @@ class InfobloxNetworksTreeController(CustomController):
 
         try:
             if (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) and Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId)) or user["authDisabled"]:
-                Log.actionLog("NetworkContainers list", user)
+                Log.actionLog("Tree", user)
 
-                lock = Lock("networkContainer", locals())
+                lock = Lock("tree", locals())
                 if lock.isUnlocked():
                     lock.lock()
 
                     # Get the tree and check here user's permissions.
-                    itemData = NetworkContainer.tree(assetId)
+                    itemData = Tree.tree(assetId)
                     __allowedTree(itemData["/"], "", tree) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]
@@ -159,7 +159,7 @@ class InfobloxNetworksTreeController(CustomController):
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("networkContainer", locals()).release()
+            Lock("tree", locals()).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
