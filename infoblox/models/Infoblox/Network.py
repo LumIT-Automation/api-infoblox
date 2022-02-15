@@ -32,7 +32,8 @@ class Network:
 
         try:
             data = Connector.get(self.asset_id, self.network, filter, silent)
-            data["asset_id"] = self.asset_id
+            if data:
+                data["asset_id"] = self.asset_id
         except Exception as e:
             raise e
 

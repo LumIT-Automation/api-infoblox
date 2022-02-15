@@ -1,6 +1,7 @@
 from infoblox.models.Infoblox.Asset.Asset import Asset
 
 from infoblox.helpers.ApiSupplicant import ApiSupplicant
+from infoblox.helpers.Log import Log
 
 
 class Network:
@@ -32,7 +33,11 @@ class Network:
                 silent=silent
             )
 
-            return api.get()[0]
+            n = api.get()
+            if isinstance(n, list) and len(n) > 0:
+                return n[0]
+            else:
+                return n
         except Exception as e:
             raise e
 

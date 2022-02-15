@@ -1,8 +1,9 @@
-import ipaddress
+from typing import List, Dict
 
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 
+from infoblox.helpers.Network import Network as NetworkHelper
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
@@ -13,20 +14,27 @@ class Ipv4:
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.asset_id = int(assetId)
-        self.ip_address = address
+        self.asset_id: int = int(assetId)
+        self.ip_address: str = address
+        self.ipv4Addr: str = address # alternative in Infoblox model.
 
-        self._ref = ""
-        self.network = ""
-        self.network_view = ""
-        self.mac_address = ""
-        self.status = ""
-        self.is_conflict = False
-        self.names = list()
-        self.objects = list()
-        self.types = list()
-        self.usage = list()
-        self.extattrs = dict()
+        self._ref: str = ""
+        self.network: str = ""
+        self.network_view: str = ""
+        self.mac_address: str = ""
+        self.mac: str = "" # alternative in Infoblox model.
+        self.status: str = ""
+        self.is_conflict: bool = False
+        self.names: List[str] = []
+        self.objects: List[str] = []
+        self.types: List[str] = []
+        self.usage: List[str] = []
+        self.extattrs: Dict[str, Dict[str, str]] = {
+            "Gateway": { "value": "" },
+            "Mask": { "value": "" },
+            "Reference": { "value": "" },
+            "Name Server": { "value": "" }
+        }
 
 
 
@@ -116,6 +124,8 @@ class Ipv4:
             # First check if the ip address belongs to a network container. If so, check in the child networks.
             netContainer = Ipv4.__getNetwork(self.ip_address, NetworkContainer.list(self.asset_id)["data"])
 
+            #network = self.info()["network"]
+
             if netContainer:
                 # Now look into the network container to find the right network.
                 netC, netCMask = netContainer.split("/")
@@ -176,18 +186,6 @@ class Ipv4:
 
 
     @staticmethod
-    def ipv4InNetwork(address: str, network_cidr: str) -> bool:
-        return ipaddress.ip_address(address) in ipaddress.ip_network(network_cidr)
-
-
-
-    @staticmethod
-    def subnetInNetwork(subnet_cidr: str, network_cidr: str) -> bool:
-        return ipaddress.ip_network(subnet_cidr).subnet_of(ipaddress.ip_network(network_cidr))
-
-
-
-    @staticmethod
     def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
         # Get the next available IP address within allSubnetworks.
         # Select the first IPv4 among them which is:
@@ -219,7 +217,7 @@ class Ipv4:
         network = ""
         for net in networks:
             if "network" in net:
-                if Ipv4.ipv4InNetwork(address, net["network"]):
+                if NetworkHelper.isIpv4InNetwork(address, net["network"]):
                     network = net["network"]
 
                     Log.log("Ip address "+str(address)+" belongs to network or network container "+str(network), "Ipv4 method: __isAddressInNetworkList")
