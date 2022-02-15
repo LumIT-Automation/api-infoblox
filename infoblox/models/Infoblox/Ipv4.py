@@ -6,19 +6,11 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-
-class Ipv4(metaclass=Singleton):
+class Ipv4:
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        Value: Dict[str, str] = {"value": ""}
 
         self.asset_id: int = int(assetId)
         self.ip_address: str = address
@@ -36,10 +28,10 @@ class Ipv4(metaclass=Singleton):
         self.types: List[str] = []
         self.usage: List[str] = []
         self.extattrs: Dict[str, Dict[str, str]] = {
-            "Gateway": { "value": "" },
-            "Mask": { "value": "" },
-            "Reference": { "value": "" },
-            "Name Server": { "value": "" }
+            "Gateway": Value,
+            "Mask": Value,
+            "Reference": Value,
+            "Name Server": Value
         }
 
         self.__load()
