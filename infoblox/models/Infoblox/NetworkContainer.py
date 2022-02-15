@@ -3,6 +3,8 @@ from typing import Dict
 from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
+Value: Dict[str, str] = {"value": ""}
+
 class NetworkContainer:
     def __init__(self, assetId: int, container: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -13,10 +15,10 @@ class NetworkContainer:
         self.network: str = ""
         self.network_container: str = container
         self.extattrs: Dict[str, Dict[str, str]] = {
-            "Gateway": { "value": "" },
-            "Mask": { "value": "" },
-            "Object Type": { "value": "" },
-            "Real Network": { "value": "" },
+            "Gateway": Value,
+            "Mask": Value,
+            "Object Type": Value,
+            "Real Network": Value,
         }
 
 

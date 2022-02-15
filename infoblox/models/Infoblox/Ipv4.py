@@ -6,11 +6,11 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
+Value: Dict[str, str] = {"value": ""}
+
 class Ipv4:
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        Value: Dict[str, str] = {"value": ""}
 
         self.asset_id: int = int(assetId)
         self.ip_address: str = address

@@ -10,6 +10,8 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
+Value: Dict[str, str] = {"value": ""}
+
 class Network:
     def __init__(self, assetId: int, network: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,11 +23,13 @@ class Network:
         self.network_container: str = ""
         self.network_view: str = ""
         self.extattrs: Dict[str, Dict[str, str]] = {
-            "Gateway": { "value": "" },
-            "Mask": { "value": "" },
-            "Object Type": { "value": "" },
-            "Real Network": { "value": "" },
+            "Gateway": Value,
+            "Mask": Value,
+            "Object Type": Value,
+            "Real Network": Value,
         }
+
+        self.__load()
 
 
 
@@ -33,11 +37,9 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def get(self, filter: dict = None, silent: bool = False) -> dict:
-        filter = {} if filter is None else filter
-
+    def getOnlyRealNetworkWithExtattrs(self, attrs: dict) -> dict:
         try:
-            data = Connector.get(self.asset_id, self.network, filter, silent)
+            data = Connector.get(self.asset_id, self.network, attrs)
             if data:
                 data["asset_id"] = self.asset_id
         except Exception as e:
@@ -52,6 +54,106 @@ class Network:
             return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
+
+
+
+    def findFirstIpByAttrs(self, number: int, attrs: dict = None, operator: str = "or") -> list:
+        j = 0
+        cleanAddresses = list()
+        checkAttrs = None
+        condition = '"ip_address" in address'
+
+        if attrs is None:
+            attrs = {
+                "status": "UNUSED",
+                "usage": ["DNS"]
+            }
+            # Supported attrs: "status": str, "usage": [], type: []
+            # Supported operators: and, or.
+
+        if "status" in attrs:
+            checkAttrs = ' ("status" in address and attrs["status"] == address["status"]) '
+        if "usage" in attrs:
+            if checkAttrs:
+                checkAttrs += operator
+            checkAttrs += ' ("usage" in address and attrs["usage"] == address["usage"]) ' # lists must be identical (order matters).
+        if "type" in attrs:
+            if checkAttrs:
+                checkAttrs += operator
+            checkAttrs += ' ("type" in address and attrs["type"] == address["type"])' # lists must be identical (order matters)
+
+        if checkAttrs:
+            condition = condition+" and "+checkAttrs
+
+        try:
+            networkCidr = self.network
+            n, mask = networkCidr.split('/')
+
+            # There can be many IP addresses here.
+            # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
+            ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
+            ipList = list(ipaddressNetworkObj.hosts())
+
+            if int(mask) > 22:
+                ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
+            else:
+                ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
+
+            for chunk in ipListChunks:
+                startIp = chunk[0]
+                endIp = chunk[-1]
+
+                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)
+
+                # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
+
+                if isinstance(addresses, list):
+                    # For all addresses in the subnet.
+                    for address in addresses:
+                        # Until <number> suitable addresses is found.
+                        if j < number:
+                            if eval(condition):
+                                # Addresses not ending in 0 or 255.
+                                matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
+                                if matches:
+                                    cleanAddress = str(matches.group(0)).strip()
+                                    cleanAddresses.append(cleanAddress)
+
+                                    j += 1
+
+                if len(cleanAddresses) == number:
+                    return cleanAddresses
+
+        except Exception as e:
+            raise e
+
+        return []
+
+
+
+    def repr(self) -> dict:
+        try:
+            return vars(self)
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Public static methods
+    ####################################################################################################################
+
+    @staticmethod
+    def list(assetId: int) -> dict:
+        try:
+            o = Connector.list(assetId)
+
+            for i, v in enumerate(o):
+                o[i]["asset_id"] = assetId # add assetId information.
+        except Exception as e:
+            raise e
+
+        return o
 
 
 
@@ -70,10 +172,7 @@ class Network:
             # "Real Network" = "yes" extensible attribute must be previously set within Infoblox.
 
             # Get userNetwork's information.
-            networkInformation = Network(assetId, userNetwork).get()
-
-            if "network" not in networkInformation or "network_container" not in networkInformation:
-                raise CustomException(status=400, payload={"message": "Cannot read network information."})
+            networkInformation = Network(assetId, userNetwork)
 
             # Example for a network container logic.
             # {
@@ -95,8 +194,8 @@ class Network:
             # Try networkLogic: "network" first.
             ####################################
 
-            networkInfo = Network(assetId, networkInformation["network"]).get(
-                filter={
+            networkInfo = Network(assetId, networkInformation.network).getOnlyRealNetworkWithExtattrs(
+                attrs={
                     "*Real Network": "yes"
                 })
 
@@ -138,9 +237,9 @@ class Network:
 
             else:
                 # Is container logic?
-                if networkInformation["network_container"] != "/":
-                    if "/" in networkInformation["network_container"]:
-                        n, m = networkInformation["network_container"].split("/")
+                if networkInformation.network_container != "/":
+                    if "/" in networkInformation.network_container:
+                        n, m = networkInformation.network_container.split("/")
 
                         networkContainerInfoList = NetworkContainer(assetId, n+"/"+m).get(
                             filter={
@@ -177,7 +276,7 @@ class Network:
                                     "networkLogic": "container",
                                     "mask": m,
                                     "gateway": g,
-                                    "network_container": networkInformation["network_container"]
+                                    "network_container": networkInformation.network_container
                                 }
 
                                 Log.log("Network information: "+str(o))
@@ -194,7 +293,7 @@ class Network:
     def getTargetSubnetworks(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, objectType: str = "") -> list:
         allSubnetworks = list()
 
-        # If networkLogic == "network" -> targetNetworkInformation["targetNetwork"]
+        # If networkLogic == "network" -> targetNetworkInformation.targetNetwork
         # If networkLogic == "container" -> find the networks which match the __objectType within the targetNetwork container.
 
         # targetNetworkInformation = {
@@ -254,98 +353,6 @@ class Network:
 
 
 
-    def findFirstIpByAttrs(self, number: int, attrs: dict = None, operator: str = "or") -> list:
-        j = 0
-        cleanAddresses = list()
-        checkAttrs = None
-        condition = '"ip_address" in address'
-
-        if attrs is None:
-            attrs = {
-                "status": "UNUSED",
-                "usage": ["DNS"]
-            }
-            # Supported attrs: "status": str, "usage": [], type: []
-            # Supported operators: and, or.
-
-        if "status" in attrs:
-            checkAttrs = ' ("status" in address and attrs["status"] == address["status"]) '
-        if "usage" in attrs:
-            if checkAttrs:
-                checkAttrs += operator
-            checkAttrs += ' ("usage" in address and attrs["usage"] == address["usage"]) ' # lists must be identical (order matters).
-        if "type" in attrs:
-            if checkAttrs:
-                checkAttrs += operator
-            checkAttrs += ' ("type" in address and attrs["type"] == address["type"])' # lists must be identical (order matters)
-
-        if checkAttrs:
-            condition = condition+" and "+checkAttrs
-
-        try:
-            networkCidr = self.get()["network"]
-            n, mask = networkCidr.split('/')
-
-            # There can be many IP addresses here.
-            # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
-            ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
-            ipList = list(ipaddressNetworkObj.hosts())
-
-            if int(mask) > 22:
-                ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
-            else:
-                ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
-
-            for chunk in ipListChunks:
-                startIp = chunk[0]
-                endIp = chunk[-1]
-
-                addresses = self.ipv4Addresses(maxResults=100, fromIp=startIp, toIp=endIp)
-
-                # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
-
-                if isinstance(addresses, list):
-                    # For all addresses in the subnet.
-                    for address in addresses:
-                        # Until <number> suitable addresses is found.
-                        if j < number:
-                            if eval(condition):
-                                # Addresses not ending in 0 or 255.
-                                matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
-                                if matches:
-                                    cleanAddress = str(matches.group(0)).strip()
-                                    cleanAddresses.append(cleanAddress)
-
-                                    j += 1
-
-                if len(cleanAddresses) == number:
-                    return cleanAddresses
-
-        except Exception as e:
-            raise e
-
-        return []
-
-
-
-    ####################################################################################################################
-    # Public static methods
-    ####################################################################################################################
-
-    @staticmethod
-    def list(assetId: int) -> dict:
-        try:
-            o = Connector.list(assetId)
-
-            for i, v in enumerate(o):
-                o[i]["asset_id"] = assetId # add assetId information.
-        except Exception as e:
-            raise e
-
-        return o
-
-
-
     @staticmethod
     def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
         # Get the next available IP address within allSubnetworks.
@@ -366,3 +373,17 @@ class Network:
             raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
 
         raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __load(self) -> None:
+        try:
+            data = Connector.get(self.asset_id, self.network)
+            for k, v in data.items():
+                setattr(self, k, v)
+        except Exception as e:
+            raise e
