@@ -105,7 +105,7 @@ class Network:
             # 'network_view': 'default'
             # }
 
-            if networkInfo["network"]:
+            if "network" in networkInfo and networkInfo["network"]:
                 try:
                     m = networkInfo["extattrs"]["Mask"]["value"]
                 except Exception:
