@@ -6,7 +6,17 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class Ipv4:
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+
+class Ipv4(metaclass=Singleton):
     def __init__(self, assetId: int, address: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -32,35 +42,26 @@ class Ipv4:
             "Name Server": { "value": "" }
         }
 
+        self.__load()
+
 
 
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
 
-    def info(self) -> dict:
-        try:
-            return Connector.get(self.asset_id, self.ip_address)
-        except Exception as e:
-            raise e
-
-
-
     def modify(self, data: dict) -> None:
         extraAttributes = dict()
 
         try:
-            ipv4 = self.info()
-
-            # No PATCH API available: delete and reserve needed.
+            # No PATCH API available: delete and reserve needed (@todo: ?).
             # Delete the IPv4 (fixedaddressOnly).
             self.release(fixedaddressOnly=True)
 
             try:
                 # Re-add with union data (data values overwrite ye olde ones).
-                if "extattrs" in ipv4:
-                    for k, v in ipv4["extattrs"].items():
-                        extraAttributes[k] = v["value"]
+                for k, v in self.extattrs.items():
+                    extraAttributes[k] = v["value"]
 
                 data["ipv4addr"] = self.ip_address
                 for k, v in extraAttributes.items():
@@ -74,8 +75,8 @@ class Ipv4:
                 # Restore the old one.
                 Ipv4.reserve(self.asset_id, {
                     "ipv4addr": self.ip_address,
-                    "mac": ipv4["mac_address"] or "00:00:00:00:00:00",
-                    "extattrs": ipv4["extattrs"]
+                    "mac": self.mac_address or "00:00:00:00:00:00",
+                    "extattrs": self.extattrs
                 })
 
                 raise e
@@ -85,22 +86,17 @@ class Ipv4:
 
 
     def release(self, fixedaddressOnly: bool = False) -> None:
-        ref = ""
         fixedaddress = ""
 
         try:
-            ipv4 = self.info()
-
             # Reference to the IP "slot".
-            if "_ref" in ipv4:
-                ref = ipv4["_ref"]
+            ref = self._ref
 
             # Reference to IP data.
-            if "objects" in ipv4 and isinstance(ipv4["objects"], list):
-                for el in ipv4["objects"]:
-                    if "fixedaddress" in el:
-                        fixedaddress = el
-                        break
+            for el in self.objects:
+                if "fixedaddress" in el:
+                    fixedaddress = el
+                    break
 
             if not fixedaddress:
                 raise CustomException(status=404, payload={})
@@ -110,6 +106,14 @@ class Ipv4:
                     ref = fixedaddress # release only the fixedaddress data.
 
                 Connector.delete(self.asset_id, ref)
+        except Exception as e:
+            raise e
+
+
+
+    def repr(self) -> dict:
+        try:
+            return vars(self)
         except Exception as e:
             raise e
 
@@ -148,5 +152,19 @@ class Ipv4:
                 "extattrs": extattrs
             })
 
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __load(self) -> None:
+        try:
+            data = Connector.get(self.asset_id, self.ip_address)
+            for k, v in data.items():
+                setattr(self, k, v)
         except Exception as e:
             raise e

@@ -30,7 +30,7 @@ class InfobloxIpv4Controller(CustomController):
         try:
             try:
                 ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.info()["network"]
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
@@ -42,7 +42,7 @@ class InfobloxIpv4Controller(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    serializer = Serializer(data=Ipv4(assetId, ipv4address).info())
+                    serializer = Serializer(data=Ipv4(assetId, ipv4address).repr())
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
@@ -95,7 +95,7 @@ class InfobloxIpv4Controller(CustomController):
         try:
             try:
                 ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.info()["network"]
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
@@ -143,7 +143,7 @@ class InfobloxIpv4Controller(CustomController):
         try:
             try:
                 ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.info()["network"]
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
