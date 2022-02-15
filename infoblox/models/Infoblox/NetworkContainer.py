@@ -27,16 +27,13 @@ class NetworkContainer:
     # Public methods
     ####################################################################################################################
 
-    def get(self, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
-
+    def getOnlyRealNetworkWithExtattrs(self, filter: dict) -> dict:
         try:
             o = Connector.get(self.asset_id, self.network_container, filter)
-
             if o:
                 o[0]["asset_id"] = self.asset_id
 
-            return o
+            return o[0]
         except Exception as e:
             raise e
 

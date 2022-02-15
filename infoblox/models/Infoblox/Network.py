@@ -241,46 +241,43 @@ class Network:
                     if "/" in networkInformation.network_container:
                         n, m = networkInformation.network_container.split("/")
 
-                        networkContainerInfoList = NetworkContainer(assetId, n+"/"+m).get(
+                        networkContainerInfo = NetworkContainer(assetId, n+"/"+m).getOnlyRealNetworkWithExtattrs(
                             filter={
                                 "*Real Network": "yes"
                             })
 
-                        if isinstance(networkContainerInfoList, list) and len(networkContainerInfoList) > 0 and "extattrs" in networkContainerInfoList[0]:
-                            networkContainerInfo = networkContainerInfoList[0]
+                        # {
+                        #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
+                        #     'extattrs': {
+                        #         'Gateway': {'value': '10.8.1.1'},
+                        #         'Mask': {'value': '255.255.128.0'},
+                        #         'Real Network': {'value': 'yes'}
+                        #         },
+                        #     'network': '10.8.0.0/17',
+                        #     'network_container': '/',
+                        #     'network_view': 'default'
+                        # ]
 
-                            # {
-                            #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
-                            #     'extattrs': {
-                            #         'Gateway': {'value': '10.8.1.1'},
-                            #         'Mask': {'value': '255.255.128.0'},
-                            #         'Real Network': {'value': 'yes'}
-                            #         },
-                            #     'network': '10.8.0.0/17',
-                            #     'network_container': '/',
-                            #     'network_view': 'default'
-                            # ]
+                        if "network" in networkContainerInfo and networkContainerInfo["network"]:
+                            try:
+                                m = networkContainerInfo["extattrs"]["Mask"]["value"]
+                            except Exception:
+                                raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
 
-                            if networkContainerInfo["network"]:
-                                try:
-                                    m = networkContainerInfo["extattrs"]["Mask"]["value"]
-                                except Exception:
-                                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox's network's extensible attributes."})
+                            try:
+                                g = networkContainerInfo["extattrs"]["Gateway"]["value"]
+                            except Exception:
+                                g = ""
 
-                                try:
-                                    g = networkContainerInfo["extattrs"]["Gateway"]["value"]
-                                except Exception:
-                                    g = ""
+                            o = {
+                                "networkLogic": "container",
+                                "mask": m,
+                                "gateway": g,
+                                "network_container": networkInformation.network_container
+                            }
 
-                                o = {
-                                    "networkLogic": "container",
-                                    "mask": m,
-                                    "gateway": g,
-                                    "network_container": networkInformation.network_container
-                                }
-
-                                Log.log("Network information: "+str(o))
-                                return o
+                            Log.log("Network information: "+str(o))
+                            return o
 
             raise CustomException(status=400, payload={"message": "Cannot discriminate network."})
 
