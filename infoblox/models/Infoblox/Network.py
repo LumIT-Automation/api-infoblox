@@ -248,6 +248,29 @@ class Network:
 
 
 
+    @staticmethod
+    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
+        # Get the next available IP address within allSubnetworks.
+        # Select the first IPv4 among them which is:
+        # * unused or used but with usage == "DNS" (only "DNS")
+        # * not ending in 0 or 255.
+        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+
+        try:
+            for n in allSubnetworks:
+                # Find the first <number> free IPv4(s) in the subnet.
+                netObj = Network(assetId, n)
+                addresses = netObj.findFirstIpByAttrs(number)
+
+                if len(addresses) == number:
+                    return n, addresses
+        except Exception as e:
+            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
+
+        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
+
+
+
     def findFirstIpByAttrs(self, number: int, attrs: dict = None, operator: str = "or") -> list:
         j = 0
         cleanAddresses = list()

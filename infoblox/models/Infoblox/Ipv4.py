@@ -1,13 +1,9 @@
 from typing import List, Dict
 
-from infoblox.models.Infoblox.Network import Network
-from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
-from infoblox.helpers.Network import Network as NetworkHelper
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
-
-from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
 
 class Ipv4:
@@ -54,11 +50,7 @@ class Ipv4:
         extraAttributes = dict()
 
         try:
-            # Read IPv4 address' extra attributes from Infoblox into a proper dictionary.
             ipv4 = self.info()
-            if "extattrs" in ipv4:
-                for k, v in ipv4["extattrs"].items():
-                    extraAttributes[k] = v["value"]
 
             # No PATCH API available: delete and reserve needed.
             # Delete the IPv4 (fixedaddressOnly).
@@ -66,6 +58,10 @@ class Ipv4:
 
             try:
                 # Re-add with union data (data values overwrite ye olde ones).
+                if "extattrs" in ipv4:
+                    for k, v in ipv4["extattrs"].items():
+                        extraAttributes[k] = v["value"]
+
                 data["ipv4addr"] = self.ip_address
                 for k, v in extraAttributes.items():
                     if k not in data["extattrs"]:
@@ -119,34 +115,6 @@ class Ipv4:
 
 
 
-    def getNetwork(self) -> str:
-        try:
-            # First check if the ip address belongs to a network container. If so, check in the child networks.
-            netContainer = Ipv4.__getNetwork(self.ip_address, NetworkContainer.list(self.asset_id)["data"])
-
-            #network = self.info()["network"]
-
-            if netContainer:
-                # Now look into the network container to find the right network.
-                netC, netCMask = netContainer.split("/")
-                nC = NetworkContainer(self.asset_id, netC + "/" + netCMask)
-                netList = nC.innerNetworks()["data"]
-                network = Ipv4.__getNetwork(self.ip_address, netList)
-            else:
-                # If the ip does not belong to any network container maybe is in a standalone network.
-                # Unfortunately the network_container filter breaks when using the root network container ("/"). The call below currently doesn't work.
-                # (https://community.infoblox.com/t5/API-Integration/List-of-Top-Level-Networks-using-Rest-API/m-p/1417/highlight/true#M41)
-                # netList = Network.list(self.assetId, additionalFields=["network_container"], attrsFilter={"network_container": "/"})
-                # So we are forced to search in all networks.
-                netList = Network.list(self.asset_id)["data"]
-                network = Ipv4.__getNetwork(self.ip_address, netList)
-        except Exception:
-            raise CustomException(status=500, payload={"message": "IP address network unknown."})
-
-        return network
-
-
-
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################
@@ -163,11 +131,11 @@ class Ipv4:
     @staticmethod
     def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> object:
         try:
-            # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
-            # Delete the address' information regarding the fixedaddress value, if available.
+            # @todo: atomicity?
 
-            # @todo: atomic wtf.
             try:
+                # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
+                # Delete the address' information regarding the fixedaddress value, if available.
                 ipv4 = Ipv4(assetId, address)
                 ipv4.release(fixedaddressOnly=True)
             except Exception:
@@ -182,45 +150,3 @@ class Ipv4:
 
         except Exception as e:
             raise e
-
-
-
-    @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
-        # Get the next available IP address within allSubnetworks.
-        # Select the first IPv4 among them which is:
-        # * unused or used but with usage == "DNS" (only "DNS")
-        # * not ending in 0 or 255.
-        allSubnetworks = Network.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
-
-        try:
-            for n in allSubnetworks:
-                # Find the first <number> free IPv4(s) in the subnet.
-                netObj = Network(assetId, n)
-                addresses = netObj.findFirstIpByAttrs(number)
-
-                if len(addresses) == number:
-                    return n, addresses
-        except Exception as e:
-            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
-
-        raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
-
-
-
-    ####################################################################################################################
-    # Private static methods
-    ####################################################################################################################
-
-    @staticmethod
-    def __getNetwork(address: str, networks: list) -> str:
-        network = ""
-        for net in networks:
-            if "network" in net:
-                if NetworkHelper.isIpv4InNetwork(address, net["network"]):
-                    network = net["network"]
-
-                    Log.log("Ip address "+str(address)+" belongs to network or network container "+str(network), "Ipv4 method: __isAddressInNetworkList")
-                    break
-
-        return network

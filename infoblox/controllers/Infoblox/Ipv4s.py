@@ -111,7 +111,7 @@ class InfobloxIpv4sController(CustomController):
             if number > 10:
                 number = 10 # limited to 10.
 
-        actualNetwork, addresses = Ipv4.getNextAvailableIpv4Addresses(assetId, networkLogic, targetNetwork, networkContainer, number, objectType)
+        actualNetwork, addresses = Network.getNextAvailableIpv4Addresses(assetId, networkLogic, targetNetwork, networkContainer, number, objectType)
         for address in addresses:
             try:
                 mac = data["mac"][j]
@@ -180,7 +180,7 @@ class InfobloxIpv4sController(CustomController):
 
         try:
             ipv4 = Ipv4(assetId, userData["ipv4addr"])
-            permissionCheckNetwork = targetNetwork = ipv4.getNetwork()
+            permissionCheckNetwork = targetNetwork = ipv4.info()["network"]
             n, mn = targetNetwork.split("/")
 
             try:
