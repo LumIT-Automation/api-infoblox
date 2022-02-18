@@ -15,7 +15,6 @@ class Ipv4:
         self.asset_id: int = int(assetId)
         self.ip_address: str = address
         self.ipv4Addr: str = address # alternative in Infoblox model.
-
         self._ref: str = ""
         self.network: str = ""
         self.network_view: str = ""

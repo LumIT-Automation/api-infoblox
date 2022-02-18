@@ -17,7 +17,6 @@ class Network:
         super().__init__(*args, **kwargs)
 
         self.asset_id: int = int(assetId)
-
         self._ref: str = ""
         self.network: str = network
         self.network_container: str = ""

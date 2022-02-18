@@ -1,27 +1,25 @@
 from rest_framework import serializers
-from infoblox.helpers.Log import Log
 
-
-class InfobloxNetworkInnerExtattrsValueSerializer(serializers.Serializer):
-    value = serializers.CharField(max_length=255)
 
 class InfobloxNetworkSerializer(serializers.Serializer):
     class InfobloxNetworkInnerExtattrsSerializer(serializers.Serializer):
-        class InfobloxNetworkInnerExtattrsValueSerializer(serializers.Serializer):
-            value = serializers.IPAddressField()
-
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-            # A trick to allow spaces in names.
-            self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
+            class InfobloxNetworkInnerExtattrsValueAddressSerializer(serializers.Serializer):
+                value = serializers.IPAddressField()
 
-        Gateway = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
-        Mask = InfobloxNetworkInnerExtattrsValueSerializer(required=False)
+            class InfobloxNetworkInnerExtattrsValueStringSerializer(serializers.Serializer):
+                value = serializers.CharField(max_length=255)
+
+            self.fields["Real Network"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False) # allows spaces in names.
+            self.fields["Gateway"] = InfobloxNetworkInnerExtattrsValueAddressSerializer(required=False)
+            self.fields["Mask"] = InfobloxNetworkInnerExtattrsValueAddressSerializer(required=False)
+            self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
     _ref = serializers.CharField(max_length=255)
     network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
-    network_container = serializers.CharField(max_length=255, required=False)
+    network_container = serializers.CharField(max_length=255)
     network_view = serializers.CharField(max_length=255)
     extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
 
