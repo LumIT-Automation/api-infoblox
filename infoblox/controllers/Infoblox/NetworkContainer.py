@@ -5,7 +5,7 @@ from rest_framework import status
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.serializers.Infoblox.NetworkContainer import InfobloxNetworkContainerSerializer as Serializer
+from infoblox.serializers.Infoblox.NetworkContainer import InfobloxNetworkContainerNetworksSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -13,6 +13,8 @@ from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
+
+# @todo: move to network-container/id/id/networks/
 
 class InfobloxNetworkContainerController(CustomController):
     @staticmethod
@@ -73,4 +75,3 @@ class InfobloxNetworkContainerController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
-

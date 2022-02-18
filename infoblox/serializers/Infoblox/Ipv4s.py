@@ -6,16 +6,17 @@ from infoblox.serializers.Infoblox.Ipv4 import InfobloxIpv4Serializer
 class InfobloxIpv4sExtattrsValueSerializer(serializers.Serializer):
     value = serializers.CharField(max_length=255)
 
+class InfobloxIpv4sExtattrsValueAddressSerializer(serializers.Serializer):
+    value = serializers.IPAddressField()
+
 class InfobloxIpv4sExtattrsInnerSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields["Name Server"] = InfobloxIpv4sExtattrsValueSerializer(required=False) # allows spaces in names.
-        self.fields["Gateway"] = InfobloxIpv4sExtattrsValueSerializer(required=False)
-        self.fields["Mask"] = InfobloxIpv4sExtattrsValueSerializer(required=False)
+        self.fields["Gateway"] = InfobloxIpv4sExtattrsValueAddressSerializer(required=False)
+        self.fields["Mask"] = InfobloxIpv4sExtattrsValueAddressSerializer(required=False)
         self.fields["Reference"] = InfobloxIpv4sExtattrsValueSerializer(required=False)
-
-    Reference = InfobloxIpv4sExtattrsValueSerializer(required=False, allow_null=True)
 
 class InfobloxIpv4sSerializer(serializers.Serializer):
     def __init__(self, reqType, *args, **kwargs):
