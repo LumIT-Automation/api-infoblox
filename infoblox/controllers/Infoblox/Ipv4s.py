@@ -39,7 +39,7 @@ class InfobloxIpv4sController(CustomController):
             if serializer.is_valid():
                 validatedData = serializer.validated_data["data"]
 
-                if reqType == "next-available":
+                if reqType == "post.next-available":
                     # Find the network to check permissions against (network or direct-father-container) and logic information.
                     # On "container" logic, targetNetwork is set; on "network" logic, networkContainer is set.
                     permissionCheckNetwork, networkLogic, targetNetwork, networkContainer, gateway, mask = InfobloxIpv4sController.__infoNextAvail(assetId, validatedData)
@@ -54,7 +54,7 @@ class InfobloxIpv4sController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        if reqType == "next-available":
+                        if reqType == "post.next-available":
                             response["data"], actualNetwork = InfobloxIpv4sController.__reserveNextAvail(assetId, validatedData, networkLogic, targetNetwork, networkContainer)
                             historyId = InfobloxIpv4sController.__historyLog(assetId, user["username"], "next-available", response, network=actualNetwork, gateway=gateway, mask=mask)
                         else:
