@@ -1,13 +1,12 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import serializers
 
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer
-from infoblox.serializers.Infoblox.Ipv4 import InfobloxIpv4Serializer
+from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -16,18 +15,13 @@ from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
 
-class InfobloxNetworkIpv4sSerializer(serializers.Serializer):
-    items = InfobloxIpv4Serializer(many=True, required=False)
-
-
-
 class InfobloxNetworkController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int, networkAddress: str) -> Response:
         auth = False
         data = dict()
         showIp = False
-        ipv4Info = dict()
+        ipv4Info = { "data": dict() }
         etagCondition = { "responseEtag": "" }
         permissionNetwork = list("none")
 
@@ -69,11 +63,11 @@ class InfobloxNetworkController(CustomController):
                         data["href"] = request.get_full_path()
 
                         if showIp:
-                            ipv4Info["items"] = n.ipv4Addresses()
-                            serializerIpv4 = InfobloxNetworkIpv4sSerializer(data=ipv4Info)
+                            ipv4Info["data"]["items"] = n.ipv4Addresses()
+                            serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
                             if serializerIpv4.is_valid():
                                 data["data"].update({
-                                    "ipv4Info": serializerIpv4.validated_data["items"]
+                                    "ipv4Info": serializerIpv4.validated_data["data"]["items"]
                                 })
 
                                 # Check the response's ETag validity (against client request).

@@ -29,10 +29,10 @@ class InfobloxIpv4sController(CustomController):
 
         if "next-available" in request.GET:
             # Next-available IPv4 ("network" or "container" logic).
-            reqType = "next-available"
+            reqType = "post.next-available"
         else:
             # Specified IPv4 address.
-            reqType = "specified-ip"
+            reqType = "post.specified-ip"
 
         try:
             serializer = Serializer(data=request.data, reqType=reqType) # adaptive serializer.
