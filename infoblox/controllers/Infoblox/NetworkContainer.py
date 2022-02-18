@@ -16,7 +16,7 @@ from infoblox.helpers.Log import Log
 
 # @todo: move to network-container/id/id/networks/
 
-class InfobloxNetworkContainerController(CustomController):
+class InfobloxNetworkContainerNetworksController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int, networkAddress: str, mask: str) -> Response:
         data = dict()
