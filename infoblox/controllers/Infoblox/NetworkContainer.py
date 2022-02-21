@@ -64,7 +64,8 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("networkContainer", locals(), locals()["networkAddress"]).release()
+            if "networkAddress" in locals():
+                Lock("networkContainer", locals(), locals()["networkAddress"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

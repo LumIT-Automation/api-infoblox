@@ -58,17 +58,17 @@ class CustomController(APIView):
         data = dict()
         headers = { "Cache-Control": "no-cache" }
 
-        if any(exc in e.__class__.__name__ for exc in ("ConnectionError", "Timeout", "TooManyRedirects", "SSLError", "HTTPError")):
+        if e.__class__.__name__ in ("ConnectionError", "Timeout", "TooManyRedirects", "SSLError", "HTTPError"):
             httpStatus = status.HTTP_503_SERVICE_UNAVAILABLE
             data["error"] = {
                 "network": e.__str__()
             }
         elif e.__class__.__name__ == "CustomException":
             httpStatus = e.status
-            if e.payload:
-                data["error"] = e.payload
-            else:
-                data = None
+            data["error"] = e.payload
+        elif e.__class__.__name__ == "ParseError":
+            data["error"] = None
+            httpStatus = status.HTTP_400_BAD_REQUEST # json parse.
         else:
             data = None
             httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR # generic.
