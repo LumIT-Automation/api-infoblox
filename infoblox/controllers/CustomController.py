@@ -67,7 +67,7 @@ class CustomController(APIView):
             httpStatus = e.status
             data["error"] = e.payload
         elif e.__class__.__name__ == "ParseError":
-            data["error"] = None
+            data = None
             httpStatus = status.HTTP_400_BAD_REQUEST # json parse.
         else:
             data = None
