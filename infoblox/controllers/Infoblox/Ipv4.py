@@ -206,7 +206,7 @@ class InfobloxIpv4Controller(CustomController):
 
         try:
             oId = History.addByType({
-                "type": "ipv4Addresses",
+                "type": "ipv4",
                 "address": ipv4,
                 "network": network,
                 "mask": mask,

@@ -17,7 +17,7 @@ class Ipv4UseCase:
         if "next-available" in request:
             self.request: str = "next-available"
         else:
-            self.request: str = "specified-ip"
+            self.request: str = "user-specified"
 
         self.data = userData
         self.username = username
@@ -38,11 +38,11 @@ class Ipv4UseCase:
 
     def reserve(self) -> Dict[str, List]:
         if self.request == "next-available":
-            response, actualNetwork = Ipv4UseCase.__reserveNextAvail(self.assetId, self.data, self.networkLogic, self.targetNetwork, self.networkContainer)
-            Ipv4UseCase.__historyLog(self.assetId, self.username, "next-available", response, network=actualNetwork, gateway=self.gateway, mask=self.mask)
+            response, actualNetwork = self.__reserveNextAvail()
+            self.__historyLog(response, network=actualNetwork)
         else:
-            response = Ipv4UseCase.__reserveProvided(self.assetId, self.data)
-            Ipv4UseCase.__historyLog(self.assetId, self.username, "user-specified", response, network=self.targetNetwork, gateway=self.gateway, mask=self.mask)
+            response = self.__reserveProvided()
+            self.__historyLog(response, network=self.targetNetwork)
 
         return response
 
@@ -87,78 +87,83 @@ class Ipv4UseCase:
 
 
 
-    ####################################################################################################################
-    # Private static methods
-    ####################################################################################################################
-
-    @staticmethod
-    def __reserveNextAvail(assetId, data, networkLogic, targetNetwork, networkContainer) -> tuple:
+    def __reserveNextAvail(self) -> tuple:
         j = 0
-        response = list()
-
         objectType = ""
         number = 1
-        if "object_type" in data:
-            objectType = data["object_type"]
-        if "number" in data:
-            number = int(data["number"])
+        response = list()
+
+        if "object_type" in self.data:
+            objectType = self.data["object_type"]
+        if "number" in self.data:
+            number = int(self.data["number"])
             if number > 10:
                 number = 10 # limited to 10.
 
-        actualNetwork, addresses = Network.getNextAvailableIpv4Addresses(assetId, networkLogic, targetNetwork, networkContainer, number, objectType)
+        actualNetwork, addresses = Network.getNextAvailableIpv4Addresses(
+            self.assetId,
+            self.networkLogic,
+            self.targetNetwork,
+            self.networkContainer,
+            number,
+            objectType
+        )
+
         for address in addresses:
             try:
-                mac = data["mac"][j]
+                mac = self.data["mac"][j]
             except Exception:
                 mac = "00:00:00:00:00:00"
 
             try:
-                extattrs = data["extattrs"][j]
+                extattrs = self.data["extattrs"][j]
             except Exception:
-                extattrs = data["extattrs"][0]
+                extattrs = self.data["extattrs"][0]
 
-            response.append(Ipv4.reserveNextAvailable(assetId, address, extattrs, mac))
+            response.append(Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac))
             j += 1
 
         return response, actualNetwork
 
 
 
-    @staticmethod
-    def __reserveProvided(assetId, data) -> list:
-        response = list()
+    def __reserveProvided(self) -> list:
+        if "number" in self.data:
+            del (self.data["number"])
 
-        if "number" in data:
-            del (data["number"])
-        data["mac"] = "00:00:00:00:00:00"
+        if "extattrs" in self.data:
+            self.data["extattrs"] = self.data["extattrs"][0]
 
-        if "extattrs" in data:
-            data["extattrs"] = data["extattrs"][0]
+        self.data["mac"] = "00:00:00:00:00:00"
 
-        response.append(Ipv4.reserve(assetId, data))
-
-        return response
+        return [
+            Ipv4.reserve(self.assetId, self.data)
+        ]
 
 
 
-    @staticmethod
-    def __historyLog(assetId, user, action, response, network: str = "", gateway: str = "", mask: str = "") -> None:
+    def __historyLog(self, response, network) -> None:
         try:
-            for createdObject in response["data"]:
+            for createdObject in response:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
 
+                try:
+                    network = network[0]+"/"+network[1]
+                except Exception:
+                    network = ""
+
                 oId = History.addByType({
-                    "type": "ipv4Addresses",
+                    "type": "ipv4",
                     "address": ipv4,
                     "network": network,
-                    "mask": mask,
-                    "gateway": gateway
+                    "mask": self.mask,
+                    "gateway": self.gateway
                 }, "object")
 
                 History.addByType({
-                    "username": user,
-                    "action": action,
-                    "asset_id": assetId,
+                    "username": self.username,
+                    "action": self.request,
+                    "asset_id": self.assetId,
                     "object_id": oId,
                     "status": "created"
                 }, "log")
