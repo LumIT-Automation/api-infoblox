@@ -13,6 +13,7 @@ class NetworkContainer:
         self._ref: str = ""
         self.network: str = ""
         self.network_container: str = container
+        self.network_view: str = ""
         self.extattrs: Dict[str, Dict[str, str]] = {
             "Gateway": Value,
             "Mask": Value,
@@ -26,22 +27,25 @@ class NetworkContainer:
     # Public methods
     ####################################################################################################################
 
-    def getOnlyRealNetworkWithExtattrs(self, filter: dict) -> dict:
+    def info(self, filter: dict = None) -> dict:
+        filter = {} if filter is None else filter
+
         try:
             o = Connector.get(self.asset_id, self.network_container, filter)
             if o:
                 o[0]["asset_id"] = self.asset_id
-
-            return o[0]
         except Exception as e:
             raise e
 
+        return o[0]
 
 
-    def innerNetworks(self, filter: dict = None) -> dict:
+
+    def networks(self, filter: dict = None) -> dict:
         filter = {} if filter is None else filter
 
         try:
+            # Quick list, do not using composition.
             return Connector.networks(self.asset_id, self.network_container, filter)
         except Exception as e:
             raise e
