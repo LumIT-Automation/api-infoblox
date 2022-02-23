@@ -299,33 +299,9 @@ class Ipv4CustomReserve:
 
 
     @staticmethod
-    def findFirstIpByAttrs(assetId: int, network: str, number: int, attrs: dict = None, operator: str = "or") -> list:
+    def findFirstIpByAttrs(assetId: int, network: str, number: int) -> list:
         j = 0
         cleanAddresses = list()
-        checkAttrs = None
-        condition = '"ip_address" in address'
-
-        if attrs is None:
-            attrs = {
-                "status": "UNUSED",
-                "usage": ["DNS"]
-            }
-            # Supported attrs: "status": str, "usage": [], type: []
-            # Supported operators: and, or.
-
-        if "status" in attrs:
-            checkAttrs = ' ("status" in address and attrs["status"] == address["status"]) '
-        if "usage" in attrs:
-            if checkAttrs:
-                checkAttrs += operator
-            checkAttrs += ' ("usage" in address and attrs["usage"] == address["usage"]) '  # lists must be identical (order matters).
-        if "type" in attrs:
-            if checkAttrs:
-                checkAttrs += operator
-            checkAttrs += ' ("type" in address and attrs["type"] == address["type"])'  # lists must be identical (order matters)
-
-        if checkAttrs:
-            condition = condition + " and " + checkAttrs
 
         try:
             networkCidr = network
@@ -354,7 +330,7 @@ class Ipv4CustomReserve:
                     for address in addresses:
                         # Until <number> suitable addresses is found.
                         if j < number:
-                            if eval(condition):
+                            if "ip_address" in address and ("status" in address and address["status"] == "UNUSED") or ("usage" in address and address["usage"] == ["DNS"]):
                                 # Addresses not ending in 0 or 255.
                                 matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
                                 if matches:
