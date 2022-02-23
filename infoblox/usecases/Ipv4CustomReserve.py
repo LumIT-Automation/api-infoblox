@@ -12,7 +12,7 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class Ipv4UseCase:
+class Ipv4CustomReserve:
     def __init__(self, assetId: int, request: str, userData: dict, username: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -23,6 +23,25 @@ class Ipv4UseCase:
             self.request: str = "user-specified"
 
         self.data = userData
+
+        # "ipv4addr": "10.8.1.100", --> only for user-specified.
+        # "network": "10.8.128.0", --> only next-available.
+        # "object_type": "Server", --> only for next-available container and next-available heartbeat.
+        # "number": 1,
+        # "mac": [
+        #     "00:00:00:00:00:00"
+        # ],
+        # "extattrs": [
+        #     {
+        #         "Name Server": {
+        #             "value": "Service"
+        #         },
+        #         "Reference": {
+        #             "value": "Reference"
+        #         }
+        #     }
+        # ]
+
         self.username = username
         self.permissionCheckNetwork: str = ""
         self.networkLogic: str = ""
@@ -30,6 +49,8 @@ class Ipv4UseCase:
         self.networkContainer: str = ""
         self.gateway: str = ""
         self.mask: str = ""
+
+        Log.log(self.data, "_")
 
         self.__init()
 
@@ -357,12 +378,12 @@ class Ipv4UseCase:
         # Select the first IPv4 among them which is:
         # * unused or used but with usage == "DNS" (only "DNS")
         # * not ending in 0 or 255.
-        allSubnetworks = Ipv4UseCase.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+        allSubnetworks = Ipv4CustomReserve.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
 
         try:
             for n in allSubnetworks:
                 # Find the first <number> free IPv4(s) in the subnet.
-                addresses = Ipv4UseCase.findFirstIpByAttrs(
+                addresses = Ipv4CustomReserve.findFirstIpByAttrs(
                     assetId,
                     Network(assetId, n).network,
                     number
@@ -390,7 +411,7 @@ class Ipv4UseCase:
             if number > 10:
                 number = 10 # limited to 10.
 
-        actualNetwork, addresses = Ipv4UseCase.getNextAvailableIpv4Addresses(
+        actualNetwork, addresses = Ipv4CustomReserve.getNextAvailableIpv4Addresses(
             self.assetId,
             self.networkLogic,
             self.targetNetwork,
