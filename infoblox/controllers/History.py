@@ -51,7 +51,6 @@ class HistoryLogsController(CustomController):
                 }
 
                 Log.log("Upstream data incorrect: "+str(serializer.errors))
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

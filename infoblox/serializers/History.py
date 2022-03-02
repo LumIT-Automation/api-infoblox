@@ -13,7 +13,8 @@ class HistorySerializer(serializers.Serializer):
             date = serializers.CharField(max_length=255, required=True)
 
             address = serializers.IPAddressField(required=True, allow_blank=True)
-            network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$', required=True, allow_blank=True)
+            #network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$', required=True, allow_blank=True)
+            network = serializers.CharField(max_length=255, required=True, allow_blank=True)
             mask = serializers.CharField(max_length=255, required=False, allow_blank=True)
             gateway = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
