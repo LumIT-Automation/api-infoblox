@@ -1,5 +1,7 @@
 from infoblox.repository.Role import Role as Repository
 
+from infoblox.helpers.Log import Log
+
 
 class Role:
     def __init__(self, roleId: int = 0, roleName: str = "", *args, **kwargs):
@@ -37,11 +39,11 @@ class Role:
 
 
     @staticmethod
-    def listWithPrivileges(showPrivileges: bool = False) -> list:
+    def listWithPrivileges() -> list:
         j = 0
 
         try:
-            items = Repository.list(showPrivileges)
+            items = Repository.list(True)
 
             for ln in items:
                 if "privileges" in items[j]:
