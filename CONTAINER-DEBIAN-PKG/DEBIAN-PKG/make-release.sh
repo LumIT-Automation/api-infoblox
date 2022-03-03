@@ -114,16 +114,16 @@ function System_codeCollect()
 
     # Copy files.
     cp -R ../api $workingFolderPath/var/www/api
-    if [ -f $workingFolderPath/var/www/api/plugins_conf/ciscospark.py ]; then
-        rm -f $workingFolderPath/var/www/api/plugins_conf/ciscospark.py
+    if [ -f $workingFolderPath/var/www/api/api/plugins_conf/ciscospark.py ]; then
+        rm -f $workingFolderPath/var/www/api/api/plugins_conf/ciscospark.py
     fi
-    
+
     cp -R ../infoblox $workingFolderPath/var/www/api
     cp ../license.txt $workingFolderPath/var/www/api
 
     # Remove development data.
-    if [ -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.initialData.sql ]; then
-        rm -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.initialData.sql
+    if [ -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.data-development.sql ]; then
+        rm -f $workingFolderPath/var/www/api/infoblox/sql/infoblox.data-development.sql
     fi
 
     # Remove __pycache__ folders and not-required ones.
