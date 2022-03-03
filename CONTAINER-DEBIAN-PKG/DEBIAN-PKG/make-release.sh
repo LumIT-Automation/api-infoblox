@@ -114,6 +114,10 @@ function System_codeCollect()
 
     # Copy files.
     cp -R ../api $workingFolderPath/var/www/api
+    if [ -f $workingFolderPath/var/www/api/plugins_conf/ciscospark.py ]; then
+        rm -f $workingFolderPath/var/www/api/plugins_conf/ciscospark.py
+    fi
+    
     cp -R ../infoblox $workingFolderPath/var/www/api
     cp ../license.txt $workingFolderPath/var/www/api
 
