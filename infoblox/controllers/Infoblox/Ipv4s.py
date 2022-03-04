@@ -2,7 +2,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.usecases.Ipv4CustomReserve import Ipv4CustomReserve
+from infoblox.usecases.ReserveFactory import ReserveFactory
 
 from infoblox.models.Permission.Permission import Permission
 
@@ -28,7 +28,7 @@ class InfobloxIpv4sController(CustomController):
         try:
             serializer = Serializer(data=request.data, reqType=reqType) # adaptive serializer.
             if serializer.is_valid():
-                ipv4CustomReserve = Ipv4CustomReserve(assetId, reqType, serializer.validated_data["data"], user["username"])
+                ipv4CustomReserve = ReserveFactory(assetId, reqType, serializer.validated_data["data"], user["username"])()
 
                 permissionCheckNetwork = ipv4CustomReserve.permissionCheckNetwork
                 if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, networkName=permissionCheckNetwork) or user["authDisabled"]:

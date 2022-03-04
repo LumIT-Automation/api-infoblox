@@ -3,6 +3,8 @@ import re
 import ipaddress
 from typing import Dict, List
 
+from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
+
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
@@ -12,7 +14,7 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class Ipv4CustomReserve:
+class Ipv4CustomReserve1(Ipv4Reserve):
     def __init__(self, assetId: int, request: str, userData: dict, username: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -49,8 +51,6 @@ class Ipv4CustomReserve:
         self.networkContainer: str = ""
         self.gateway: str = ""
         self.mask: str = ""
-
-        Log.log(self.data, "_")
 
         self.__init()
 
@@ -354,12 +354,12 @@ class Ipv4CustomReserve:
         # Select the first IPv4 among them which is:
         # * unused or used but with usage == "DNS" (only "DNS")
         # * not ending in 0 or 255.
-        allSubnetworks = Ipv4CustomReserve.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+        allSubnetworks = Ipv4CustomReserve1.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
 
         try:
             for n in allSubnetworks:
                 # Find the first <number> free IPv4(s) in the subnet.
-                addresses = Ipv4CustomReserve.findFirstIpByAttrs(
+                addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
                     assetId,
                     Network(assetId, n).network,
                     number
@@ -387,7 +387,7 @@ class Ipv4CustomReserve:
             if number > 10:
                 number = 10 # limited to 10.
 
-        actualNetwork, addresses = Ipv4CustomReserve.getNextAvailableIpv4Addresses(
+        actualNetwork, addresses = Ipv4CustomReserve1.getNextAvailableIpv4Addresses(
             self.assetId,
             self.networkLogic,
             self.targetNetwork,
