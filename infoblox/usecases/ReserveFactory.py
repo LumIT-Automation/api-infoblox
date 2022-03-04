@@ -1,6 +1,6 @@
-from django.conf import settings
+from importlib import import_module
 
-from infoblox.usecases.impl.Ipv4CustomReserve1 import Ipv4CustomReserve1
+from django.conf import settings
 
 
 class ReserveFactory:
@@ -14,7 +14,10 @@ class ReserveFactory:
 
     def __call__(self, *args, **kwargs):
         try:
-            Implementation = eval(settings.RESERVE_IMPLEMENTATION)
+            module = import_module(settings.IP_RESERVE_IMPLEMENTATION[0])
+            Implementation = eval(
+                "module."+settings.IP_RESERVE_IMPLEMENTATION[1]
+            )
 
             return Implementation(self.assetId, self.reqType, self.data, self.username)
         except Exception:
