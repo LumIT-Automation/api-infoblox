@@ -227,6 +227,8 @@ API_SUPPLICANT_NETWORK_TIMEOUT = 30 # seconds.
 LOCK_MAX_VALIDITY = 30 # seconds.
 
 # Plugins and configuration.
+RESERVE_IMPLEMENTATION = "Ipv4CustowmReserve1"
+
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'
 ]

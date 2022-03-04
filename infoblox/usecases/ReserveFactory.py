@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from infoblox.usecases.impl.Ipv4CustomReserve1 import Ipv4CustomReserve1
 
 
@@ -11,4 +13,9 @@ class ReserveFactory:
 
 
     def __call__(self, *args, **kwargs):
-        return Ipv4CustomReserve1(self.assetId, self.reqType, self.data, self.username)
+        try:
+            Implementation = eval(settings.RESERVE_IMPLEMENTATION)
+
+            return Implementation(self.assetId, self.reqType, self.data, self.username)
+        except Exception:
+            raise NotImplementedError

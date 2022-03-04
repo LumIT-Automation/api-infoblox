@@ -69,6 +69,9 @@ class CustomController(APIView):
         elif e.__class__.__name__ == "ParseError":
             data = None
             httpStatus = status.HTTP_400_BAD_REQUEST # json parse.
+        elif e.__class__.__name__ == "NotImplementedError":
+            data = None
+            httpStatus = status.HTTP_422_UNPROCESSABLE_ENTITY
         else:
             data = None
             httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR # generic.
