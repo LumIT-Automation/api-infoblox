@@ -114,7 +114,7 @@ class InfobloxIpv4Controller(CustomController):
                     lock.release()
 
                     historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
-                    Mail.send(user, "[Automation, Infoblox] IPv4 address deletion", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+".") # @todo: move away.
+                    Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
 
                     CustomController.plugins("ipv4_delete", locals())
                 else:
