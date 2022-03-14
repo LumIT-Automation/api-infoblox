@@ -16,7 +16,7 @@ from infoblox.helpers.Log import Log
 
 class Ipv4CustomReserve1(Ipv4Reserve):
     def __init__(self, assetId: int, request: str, userData: dict, username: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__( assetId, request, userData, username, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         if "next-available" in request:
