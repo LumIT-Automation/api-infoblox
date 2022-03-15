@@ -1,7 +1,6 @@
 import socket
 import re
 import ipaddress
-from typing import Dict, List
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
 
@@ -60,15 +59,17 @@ class Ipv4CustomReserve1(Ipv4Reserve):
     # Public methods
     ####################################################################################################################
 
-    def reserve(self) -> Dict[str, List]:
+    def reserve(self):
+        actualNetwork = ""
+
         if self.request == "next-available":
             response, actualNetwork = self.__reserveNextAvail()
-            self.__historyLog(response, network=actualNetwork)
+            historyId = self.__historyLog(response, network=actualNetwork)
         else:
             response = self.__reserveProvided()
-            self.__historyLog(response, network=self.targetNetwork)
+            historyId = self.__historyLog(response, network=self.targetNetwork)
 
-        return response
+        return response, actualNetwork, self.mask, self.gateway, historyId
 
 
 
@@ -429,7 +430,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
 
-    def __historyLog(self, response, network) -> None:
+    def __historyLog(self, response, network) -> int:
         try:
             for createdObject in response:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
@@ -447,12 +448,14 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     "gateway": self.gateway
                 }, "object")
 
-                History.addByType({
+                historyId = History.addByType({
                     "username": self.username,
                     "action": self.request,
                     "asset_id": self.assetId,
                     "object_id": oId,
                     "status": "created"
                 }, "log")
+
+                return historyId
         except Exception:
             pass

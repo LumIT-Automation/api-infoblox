@@ -97,28 +97,30 @@ def run(controller: str, o: dict):
             CiscoSpark.send(o["user"], message)
 
         if action == "created":
-            if o["reqType"] == "next-available":
+            if o["reqType"] == "post.next-available":
                 j = 0
+
                 for createdObject in o["response"]["data"]:
                     ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
                     message = "IPv4 address "+ip+" has been "+action+" by "+o["user"]["username"]+".\n"
 
-                    if "mac" in o["validatedData"]:
-                        message += "MAC: "+o["validatedData"]["mac"][j]+"\n"
-                    if o["actualNetwork"]:
+                    if "mac" in o["userValidatedData"]:
+                        message += "MAC: "+o["userValidatedData"]["mac"][j]+"\n"
+                    if "actualNetwork" in o and o["actualNetwork"]:
                         message += "Network: "+o["actualNetwork"]+"\n"
-                    if o["gateway"]:
+                    if "gateway" in o and o["gateway"]:
                         message += "Gateway: "+o["gateway"]+"\n"
-                    if o["mask"]:
+                    if "mask" in o and o["mask"]:
                         message += "Mask: "+o["mask"]+"\n"
-                    if "object_type" in o["validatedData"]:
-                        if o["validatedData"]["object_type"] != "undefined":
-                            message += "Type: "+o["validatedData"]["object_type"]+"\n"
-                    if "extattrs" in o["validatedData"]:
-                        if "Name Server" in o["validatedData"]["extattrs"][j]:
-                            message += "Hostname: "+o["validatedData"]["extattrs"][j]["Name Server"]["value"]+"\n"
-                        if "Reference" in o["validatedData"]["extattrs"][j]:
-                            message += "Reference: "+o["validatedData"]["extattrs"][j]["Reference"]["value"]+"\n"
+
+                    if "object_type" in o["userValidatedData"]:
+                        if o["userValidatedData"]["object_type"] != "undefined":
+                            message += "Type: "+o["userValidatedData"]["object_type"]+"\n"
+                    if "extattrs" in o["userValidatedData"]:
+                        if "Name Server" in o["userValidatedData"]["extattrs"][j]:
+                            message += "Hostname: "+o["userValidatedData"]["extattrs"][j]["Name Server"]["value"]+"\n"
+                        if "Reference" in o["userValidatedData"]["extattrs"][j]:
+                            message += "Reference: "+o["userValidatedData"]["extattrs"][j]["Reference"]["value"]+"\n"
                     if "historyId" in o:
                         message += "Unique operation ID: "+str(o["historyId"])+"\n"
                     j += 1
