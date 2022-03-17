@@ -444,14 +444,13 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     def __historyLog(self, response, network) -> int:
+        historyId = 0
+        
         try:
-            for createdObject in response:
-                ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
+            network = network + "/" + str(ipaddress.IPv4Network(f"0.0.0.0/{self.mask}").prefixlen)
 
-                try:
-                    network = network[0]+"/"+network[1]
-                except Exception:
-                    network = ""
+            for o in response:
+                ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', o["result"])[0]
 
                 oId = History.addByType({
                     "type": "ipv4",
@@ -469,6 +468,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     "status": "created"
                 }, "log")
 
-                return historyId
+            return historyId
         except Exception:
             pass
