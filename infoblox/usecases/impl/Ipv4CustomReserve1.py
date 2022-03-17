@@ -24,7 +24,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             self.request: str = "user-specified"
 
         self.data = userData
-
         # "ipv4addr": "10.8.1.100", --> only for user-specified.
         # "network": "10.8.128.0", --> only next-available.
         # "object_type": "Server", --> only for next-available container and next-available heartbeat.
@@ -65,6 +64,20 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         if self.request == "next-available":
             response, actualNetwork = self.__reserveNextAvail()
             historyId = self.__historyLog(response, network=actualNetwork)
+
+            # Example.
+            # Container:
+            #     actualNetwork = 10.8.0.0
+            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}]
+            # Network:
+            #     actualNetwork = 10.8.128.0
+            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMzIuMy4wLi4:10.8.132.3/default'}]
+            # HB:
+            #     actualNetwork = 10.8.128.0
+            #     response = [
+            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4xLjAuLg:10.8.10.1/default'},
+            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4yLjAuLg:10.8.10.2/default'}
+            #     ]
         else:
             response = self.__reserveProvided()
             historyId = self.__historyLog(response, network=self.targetNetwork)

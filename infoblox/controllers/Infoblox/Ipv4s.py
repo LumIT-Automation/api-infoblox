@@ -41,6 +41,7 @@ class InfobloxIpv4sController(CustomController):
                         lock.lock()
 
                         response["data"], actualNetwork, mask, gateway, historyId = ipv4CustomReserve.reserve()
+
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
 
