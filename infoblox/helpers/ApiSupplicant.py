@@ -143,8 +143,8 @@ class ApiSupplicant:
             elif self.responseStatus == 401:
                 raise CustomException(status=400, payload={"Infoblox": "Wrong credentials for the asset."})
             else:
-                if "message" in self.responsePayload:
-                    err = self.responsePayload["message"]
+                if "text" in self.responsePayload:
+                    err = self.responsePayload["text"]
                 else:
                     err = self.responsePayload
 
