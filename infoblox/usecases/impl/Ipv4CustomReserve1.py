@@ -393,6 +393,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         objectType = ""
         number = 1
         response = list()
+        reservedIps = list()
 
         if "object_type" in self.data:
             objectType = self.data["object_type"]
@@ -421,7 +422,16 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             except Exception:
                 extattrs = self.data["extattrs"][0]
 
-            response.append(Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac))
+            try:
+                response.append(Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac))
+                reservedIps.append(address)
+            except Exception as e:
+                if self.data["object_type"] == "Heartbeat":
+                    # If an error occurs in a Heartbeat creation, clean all the other created addresses.
+                    for i in reservedIps:
+                        Ipv4(self.assetId, i).release(fixedaddressOnly=True)
+
+                raise e
             j += 1
 
         return response, actualNetwork
@@ -445,9 +455,9 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
     def __historyLog(self, response, network) -> int:
         historyId = 0
-        
+
         try:
-            network = network + "/" + str(ipaddress.IPv4Network(f"0.0.0.0/{self.mask}").prefixlen)
+            network = network+"/"+str(ipaddress.IPv4Network(f"0.0.0.0/{self.mask}").prefixlen)
 
             for o in response:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', o["result"])[0]
