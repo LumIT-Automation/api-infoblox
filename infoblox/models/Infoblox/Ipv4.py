@@ -124,7 +124,7 @@ class Ipv4:
 
 
     @staticmethod
-    def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> object:
+    def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> dict:
         try:
             # @todo: atomicity?
 

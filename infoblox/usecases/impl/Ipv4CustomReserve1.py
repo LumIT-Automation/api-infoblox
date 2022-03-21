@@ -68,15 +68,15 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             # Example.
             # Container:
             #     actualNetwork = 10.8.0.0
-            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}]
+            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default', ...}]
             # Network:
             #     actualNetwork = 10.8.128.0
-            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMzIuMy4wLi4:10.8.132.3/default'}]
+            #     response = [{'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMzIuMy4wLi4:10.8.132.3/default', ...}]
             # HB:
             #     actualNetwork = 10.8.128.0
             #     response = [
-            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4xLjAuLg:10.8.10.1/default'},
-            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4yLjAuLg:10.8.10.2/default'}
+            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4xLjAuLg:10.8.10.1/default', ...},
+            #         {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4xMC4yLjAuLg:10.8.10.2/default', ...}
             #     ]
         else:
             response = self.__reserveProvided()
@@ -423,7 +423,12 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 extattrs = self.data["extattrs"][0]
 
             try:
-                response.append(Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac))
+                r = Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac) # {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}
+                if isinstance(r, dict):
+                    r["mask"] = self.mask
+                    r["gateway"] = self.gateway
+
+                response.append(r)
                 reservedIps.append(address)
             except Exception as e:
                 if self.data["object_type"] == "Heartbeat":
