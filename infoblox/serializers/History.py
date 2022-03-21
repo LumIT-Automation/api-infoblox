@@ -6,7 +6,7 @@ class HistorySerializer(serializers.Serializer):
         class HistoryItemsSerializer(serializers.Serializer):
             id = serializers.IntegerField(required=True)
             username = serializers.CharField(max_length=255, required=True)
-            action = serializers.CharField(max_length=255, required=True)
+            action = serializers.CharField(max_length=2048, required=True)
             asset_id = serializers.IntegerField(required=True)
             type = serializers.CharField(max_length=255, required=True)
             status = serializers.CharField(max_length=255, required=True)
