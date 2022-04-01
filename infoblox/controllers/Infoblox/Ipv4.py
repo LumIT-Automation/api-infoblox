@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
+from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Permission.Permission import Permission
 from infoblox.models.History import History
 
@@ -26,16 +27,19 @@ class InfobloxIpv4Controller(CustomController):
         etagCondition = { "responseEtag": "" }
         userNetwork = "Unauthorized"
         networkCidr = "/"
+        networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
             try:
-                ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.network
+                networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
+
+                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr) \
+                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
                 Log.actionLog("Get ipv4s address information: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
@@ -92,16 +96,19 @@ class InfobloxIpv4Controller(CustomController):
         user = CustomController.loggedUser(request)
         userNetwork = ""
         networkCidr = "/"
+        networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
             try:
-                ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.network
+                networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
+
+                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr) \
+                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
                 Log.actionLog("Delete ipv4s address: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
@@ -141,16 +148,19 @@ class InfobloxIpv4Controller(CustomController):
         user = CustomController.loggedUser(request)
         userNetwork = ""
         networkCidr = "/"
+        networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
             try:
-                ipv4 = Ipv4(assetId, ipv4address)
-                networkCidr = ipv4.network
+                networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
+
+                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr) \
+                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
                 Log.actionLog("Modify ipv4s address: "+ipv4address, user)
                 Log.actionLog("User data: "+str(request.data), user)
 
