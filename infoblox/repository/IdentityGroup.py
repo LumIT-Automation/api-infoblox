@@ -64,7 +64,7 @@ class IdentityGroup:
                 c.close()
 
         else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent identity group"}})
+            raise CustomException(status=404, payload={"database": "Non existent identity group"})
 
 
 
@@ -85,7 +85,7 @@ class IdentityGroup:
                 c.close()
 
         else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent identity group"}})
+            raise CustomException(status=404, payload={"database": "Non existent identity group"})
 
 
 

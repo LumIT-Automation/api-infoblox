@@ -75,7 +75,7 @@ class Asset:
                 c.close()
 
         else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent Infoblox endpoint"}})
+            raise CustomException(status=404, payload={"database": "Non existent Infoblox endpoint"})
 
 
 
@@ -94,7 +94,7 @@ class Asset:
                 c.close()
 
         else:
-            raise CustomException(status=404, payload={"database": {"message": "Non existent Infoblox endpoint"}})
+            raise CustomException(status=404, payload={"database": "Non existent Infoblox endpoint"})
 
 
 
