@@ -105,6 +105,10 @@ function containerSetup()
         fi
     fi
 
+    rm -f /home/bck/api-infoblox/placeholder
+    # Schedule the databases backup.
+    (crontab -l ; echo "03 3 * * * /usr/bin/bck-db_api-infoblox.sh api >/dev/null 2>&1") | crontab -
+
     printf "$wallBanner Installation completed." | wall -n
 }
 
