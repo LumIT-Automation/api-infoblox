@@ -35,6 +35,9 @@ class InfobloxNetworksController(CustomController):
                     itemData = Network.list(assetId)
 
                     # Filter networks' list basing on permissions.
+                    # This filter is strict: if you need to be able to read a network, that network must be enlisted in the permissions' table.
+                    # For example: network: 10.8.0.0/24 // network_container: 10.8.0.0/17.
+                    # 10.8.0.0/24 won't be read if group has permission only on 10.8.0.0/17 (db).
                     for p in itemData:
                         if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, networkName=str(p["network"])) or user["authDisabled"]:
                             allowedData["data"].append(p)
