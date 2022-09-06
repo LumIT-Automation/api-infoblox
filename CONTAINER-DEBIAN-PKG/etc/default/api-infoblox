@@ -1,6 +1,6 @@
-# Days of Retention for api-vmare databases backup
+# Days of Retention for api-infoblox databases backup
 API_INFOBLOX_DB_RETENTION=30
 
-# Days of Retention for api-vmare volumes backup
+# Days of Retention for api-infoblox volumes backup
 API_INFOBLOX_VOL_RETENTION=120
 
