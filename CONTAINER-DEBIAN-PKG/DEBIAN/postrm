@@ -20,7 +20,4 @@ fi
 # De-schedule db backups.
 (crontab -l | sed '/bck-db_api-infoblox.sh/d') | crontab -
 
-# Force debconf cleanup.
-echo PURGE | debconf-communicate automation-interface-api-infoblox-container
-
 exit 0
