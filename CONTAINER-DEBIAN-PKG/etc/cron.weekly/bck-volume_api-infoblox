@@ -5,7 +5,7 @@
 
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin
 
-[ -r /etc/default/api-infoblox ] && . /etc/default/api-infoblox
+[ -r /etc/default/api-infoblox-container ] && . /etc/default/api-infoblox-container
 
 now=`date +%Y%m%d-%H.%M`
 api="api-infoblox"
