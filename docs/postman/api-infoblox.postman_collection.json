@@ -368,15 +368,6 @@
 										"value": "Bearer {{jwttoken}}"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"groupStaff\",\n        \"ldap_dn\": \"cn=groupStaff,cn=users,dc=lab,dc=localxx\",\n        \"radius_group\": \"\",\n        \"roles\": [\n            \"admin\", \"wwwww\"\n        ]\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
 									"protocol": "http",
@@ -1049,7 +1040,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.0.0\",\n        \"object_type\": \"Database\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.0.0\",\n        \"object_type\": \"Server\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
