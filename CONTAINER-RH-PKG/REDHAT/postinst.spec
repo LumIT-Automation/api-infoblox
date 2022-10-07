@@ -23,9 +23,9 @@ function containerSetup()
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # api-infoblox folder will be bound to /var/lib/containers/storage/volumes/.
     podman run --name api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /sbin/init
-    podman exec api-infoblox chown www-data:www-data /var/www/api/api # within container.
 
-    podman exec api-infoblox chown mysql:mysql /var/lib/mysql # within container.
+    podman exec api-infoblox chown -R www-data:www-data /var/www/api/api # within container.
+    podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql # within container.
     podman exec api-infoblox systemctl restart mysql
 
     printf "$wallBanner Starting Container Service on HOST..." | wall -n
