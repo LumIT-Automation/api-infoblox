@@ -81,7 +81,7 @@ class Permission:
     @staticmethod
     def add(identityGroupId: int, role: str, assetId: int, networkName: str) -> None:
         try:
-            if role == "admin":
+            if role == "admin" or role == "workflow":
                 networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
 
             # RoleId.

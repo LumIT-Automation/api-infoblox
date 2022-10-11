@@ -66,12 +66,23 @@ class Asset:
 
     @staticmethod
     def add(data: dict) -> None:
+        from infoblox.models.Permission.Network import Network as PermissionNetwork
+        from infoblox.models.Permission.Permission import Permission
+        from infoblox.models.Permission.IdentityGroup import IdentityGroup
+
         try:
             aid = Repository.add(data)
 
             # When inserting an asset, add the "any" network (Permission).
-            from infoblox.models.Permission.Network import Network as PermissionNetwork
             PermissionNetwork.add(aid, "any")
+
+            # Also, add a "*" permission for the workflow.local system user.
+            Permission.add(
+                identityGroupId=IdentityGroup("workflow.local").info()["id"], # get the identityGroupId of the workflow system user.
+                role="workflow",
+                assetId=aid,
+                networkName="any"
+            )
         except Exception as e:
             raise e
 
