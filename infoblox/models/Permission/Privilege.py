@@ -1,4 +1,4 @@
-from infoblox.repository.Privilege import Privilege as Repository
+from infoblox.models.Permission.repository.Privilege import Privilege as Repository
 
 
 class Privilege:

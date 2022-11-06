@@ -1,7 +1,7 @@
 from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Network import Network
 
-from infoblox.repository.Permission import Permission as Repository
+from infoblox.models.Permission.repository.Permission import Permission as Repository
 
 
 class Permission:

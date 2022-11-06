@@ -7,7 +7,7 @@ from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-from infoblox.models.History import History
+from infoblox.models.History.History import History
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log

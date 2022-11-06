@@ -1,7 +1,7 @@
 from infoblox.models.Infoblox.Network import Network as InfobloxNetwork
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as InfobloxNetworkContainer
 
-from infoblox.repository.Network import Network as Repository
+from infoblox.models.Permission.repository.Network import Network as Repository
 
 
 class Network:

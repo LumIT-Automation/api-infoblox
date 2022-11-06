@@ -7,7 +7,7 @@ from rest_framework import status
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Permission.Permission import Permission
-from infoblox.models.History import History
+from infoblox.models.History.History import History
 
 from infoblox.serializers.Infoblox.Ipv4 import InfobloxIpv4Serializer as Serializer
 

@@ -1,4 +1,4 @@
-from infoblox.repository.History import History as Repository
+from infoblox.models.History.repository.History import History as Repository
 
 
 class History:

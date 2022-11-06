@@ -1,4 +1,4 @@
-from infoblox.repository.IdentityGroup import IdentityGroup as Repository
+from infoblox.models.Permission.repository.IdentityGroup import IdentityGroup as Repository
 
 
 class IdentityGroup:

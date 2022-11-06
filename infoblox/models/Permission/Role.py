@@ -1,6 +1,4 @@
-from infoblox.repository.Role import Role as Repository
-
-from infoblox.helpers.Log import Log
+from infoblox.models.Permission.repository.Role import Role as Repository
 
 
 class Role:
