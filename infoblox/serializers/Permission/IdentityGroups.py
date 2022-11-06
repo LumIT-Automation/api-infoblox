@@ -17,7 +17,7 @@ class IdentityGroupsSerializer(serializers.Serializer):
                     # Adding dynamic fields as taken from the Roles model.
                     # Who finds out a better way of doing this, will win a prize, phone me back.
                     additionalFields = []
-                    r = Role.list()
+                    r = Role.dataList()
                     for additionalField in r:
                         if "role" in additionalField:
                             additionalFields.append(additionalField["role"])
@@ -31,7 +31,7 @@ class IdentityGroupsSerializer(serializers.Serializer):
 
                     # Adding dynamic fields as taken from the Privilege model.
                     additionalFields = []
-                    r = Privilege.list()
+                    r = Privilege.dataList()
                     for additionalField in r:
                         if "privilege" in additionalField:
                             additionalFields.append(additionalField["privilege"])

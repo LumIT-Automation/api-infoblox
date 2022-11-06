@@ -29,8 +29,7 @@ class Permission:
                 networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
 
             # RoleId.
-            r = Role(roleName=role)
-            roleId = r.info()["id"]
+            roleId = Role(roleName=role).id
 
             # Network id.
             networkId = Permission.__getNetwork(assetId, networkName)
@@ -85,8 +84,7 @@ class Permission:
                 networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
 
             # RoleId.
-            r = Role(roleName=role)
-            roleId = r.info()["id"]
+            roleId = Role(roleName=role).id
 
             # Network id.
             networkId = Permission.__getNetwork(assetId, networkName)

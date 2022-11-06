@@ -5,7 +5,7 @@ from rest_framework import status
 from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.serializers.Permission.Roles import IdentityRolesSerializer as Serializer
+from infoblox.serializers.Permission.Roles import RolesSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Conditional import Conditional
@@ -15,9 +15,9 @@ from infoblox.helpers.Log import Log
 class PermissionRolesController(CustomController):
     @staticmethod
     def get(request: Request) -> Response:
-        data = dict()
-        itemData = {"data": dict()}
-        showPrivileges = False
+        data = {"data": dict()}
+        itemData = dict()
+        loadPrivilege = False
         etagCondition = {"responseEtag": ""}
 
         user = CustomController.loggedUser(request)
@@ -30,13 +30,10 @@ class PermissionRolesController(CustomController):
                 if "related" in request.GET:
                     rList = request.GET.getlist('related')
                     if "privileges" in rList:
-                        showPrivileges = True
+                        loadPrivilege = True
 
-                if showPrivileges:
-                    itemData["data"]["items"] = Role.listWithPrivileges()
-                else:
-                    itemData["data"]["items"] = Role.list()
-                data["data"] = Serializer(itemData).data["data"]
+                itemData["items"] = Role.dataList(loadPrivilege=loadPrivilege)
+                data["data"] = Serializer(itemData).data
                 data["href"] = request.get_full_path()
 
                 # Check the response's ETag validity (against client request).
