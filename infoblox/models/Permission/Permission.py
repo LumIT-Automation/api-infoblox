@@ -29,7 +29,7 @@ class Permission:
                 networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
 
             # RoleId.
-            roleId = Role(roleName=role).id
+            roleId = Role(role=role).id
 
             # Network id.
             networkId = Permission.__getNetwork(assetId, networkName)
@@ -84,7 +84,7 @@ class Permission:
                 networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
 
             # RoleId.
-            roleId = Role(roleName=role).id
+            roleId = Role(role=role).id
 
             # Network id.
             networkId = Permission.__getNetwork(assetId, networkName)
@@ -101,9 +101,9 @@ class Permission:
 
     @staticmethod
     def __getNetwork(assetId: int, networkName: str):
-        p = Network(assetId=assetId, networkName=networkName)
+        p = Network(assetId=assetId, network=networkName)
         if p.exists():
-            networkId = p.info()["id"]
+            networkId = p.id
         else:
             # If partition does not exist, create it (on Permissions database, not F5 endpoint).
             networkId = p.add(assetId, networkName)
