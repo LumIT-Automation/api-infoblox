@@ -1,6 +1,5 @@
 from django.db import connection
 
-from infoblox.helpers.Log import Log
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
 
@@ -29,7 +28,24 @@ class Permission:
     ####################################################################################################################
 
     @staticmethod
-    def modify(identityGroupId: int, roleId: int, networkId: int, permissionId: int) -> None:
+    def get(permissionId: int) -> dict:
+        c = connection.cursor()
+
+        try:
+            c.execute("SELECT * FROM group_role_network WHERE id=%s", [permissionId])
+
+            return DBHelper.asDict(c)[0]
+        except IndexError:
+            raise CustomException(status=404, payload={"database": "non existent permission"})
+        except Exception as e:
+            raise CustomException(status=400, payload={"database": e.__str__()})
+        finally:
+            c.close()
+
+
+
+    @staticmethod
+    def modify(permissionId: int, identityGroupId: int, roleId: int, networkId: int) -> None:
         c = connection.cursor()
 
         if permissionId:
@@ -40,9 +56,12 @@ class Permission:
                     networkId,
                     permissionId
                 ])
-
             except Exception as e:
-                raise CustomException(status=400, payload={"database": e.__str__()})
+                if e.__class__.__name__ == "IntegrityError" \
+                        and e.args and e.args[0] and e.args[0] == 1062:
+                            raise CustomException(status=400, payload={"database": "duplicated entry"})
+                else:
+                    raise CustomException(status=400, payload={"database": e.__str__()})
             finally:
                 c.close()
 
@@ -53,10 +72,7 @@ class Permission:
         c = connection.cursor()
 
         try:
-            c.execute("DELETE FROM group_role_network WHERE id = %s", [
-                permissionId
-            ])
-
+            c.execute("DELETE FROM group_role_network WHERE id = %s", [permissionId])
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -166,8 +182,11 @@ class Permission:
                 roleId,
                 networkId
             ])
-
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
+            if e.__class__.__name__ == "IntegrityError" \
+                    and e.args and e.args[0] and e.args[0] == 1062:
+                        raise CustomException(status=400, payload={"database": "duplicated entry"})
+            else:
+                raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
             c.close()

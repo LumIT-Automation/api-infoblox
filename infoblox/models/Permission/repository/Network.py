@@ -34,7 +34,7 @@ class Network:
 
             return DBHelper.asDict(c)[0]
         except IndexError:
-            raise CustomException(status=404, payload={"database": "non existent domain"})
+            raise CustomException(status=404, payload={"database": "non existent network"})
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:

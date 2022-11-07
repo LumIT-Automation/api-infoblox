@@ -1,44 +1,31 @@
+from infoblox.models.Permission.IdentityGroup import IdentityGroup
 from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Network import Network
 
 from infoblox.models.Permission.repository.Permission import Permission as Repository
+
+from infoblox.helpers.Exception import CustomException
 
 
 class Permission:
 
     # IdentityGroupRoleNetwork
 
-    def __init__(self, id: int, groupId: int = 0, roleId: int = 0, partitionId: int = 0, *args, **kwargs):
+    def __init__(self, permissionId: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.id = id
+        self.id: int = int(permissionId)
+        self.identityGroup: IdentityGroup
+        self.role: Role
+        self.network: Network
 
-        self.id_group = groupId
-        self.id_role = roleId
-        self.id_partition = partitionId
+        self.__load()
 
 
 
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
-
-    def modify(self, identityGroupId: int, role: str, assetId: int, networkName: str) -> None:
-        try:
-            if role == "admin":
-                networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
-
-            # RoleId.
-            roleId = Role(role=role).id
-
-            # Network id.
-            networkId = Permission.__getNetwork(assetId, networkName)
-
-            Repository.modify(identityGroupId, roleId, networkId, self.id)
-        except Exception as e:
-            raise e
-
-
 
     def delete(self) -> None:
         try:
@@ -78,18 +65,72 @@ class Permission:
 
 
     @staticmethod
-    def add(identityGroupId: int, role: str, assetId: int, networkName: str) -> None:
+    def addFacade(identityGroupIdentifier: str, role: str, networkInfo: dict) -> None:
+        networkAssetId = networkInfo.get("assetId", "")
+        networkName = networkInfo.get("name", "")
+
         try:
+            # Get existent or new network (permissions database).
             if role == "admin" or role == "workflow":
-                networkName = "any" # if admin: "any" is the only valid choice (on selected assetId).
+                # Role admin -> "any" network, which always exists.
+                network = Network(assetId=networkAssetId, network="any")
+            else:
+                try:
+                    # Try retrieving network.
+                    network = Network(assetId=networkAssetId, network=networkName)
+                except CustomException as e:
+                    if e.status == 404:
+                        try:
+                            # If domain does not exist, create it (permissions database).
+                            network = Network(
+                                id=Network.add(networkAssetId, networkName)
+                            )
+                        except Exception:
+                            raise e
+                    else:
+                        raise e
 
-            # RoleId.
-            roleId = Role(role=role).id
+            Permission.__add(
+                identityGroup=IdentityGroup(identityGroupIdentifier=identityGroupIdentifier),
+                role=Role(role=role),
+                network=network
+            )
+        except Exception as e:
+            raise e
 
-            # Network id.
-            networkId = Permission.__getNetwork(assetId, networkName)
 
-            Repository.add(identityGroupId, roleId, networkId)
+
+    @staticmethod
+    def modifyFacade(permissionId: int, identityGroupIdentifier: str, role: str, networkInfo: dict) -> None:
+        networkAssetId = networkInfo.get("assetId", "")
+        networkName = networkInfo.get("name", "")
+
+        try:
+            # Get existent or new network (permissions database).
+            if role == "admin" or role == "workflow":
+                # Role admin -> "any" network, which always exists.
+                network = Network(assetId=networkAssetId, network="any")
+            else:
+                try:
+                    # Try retrieving network.
+                    network = Network(assetId=networkAssetId, network=networkName)
+                except CustomException as e:
+                    if e.status == 404:
+                        try:
+                            # If domain does not exist, create it (permissions database).
+                            network = Network(
+                                id=Network.add(networkAssetId, networkName)
+                            )
+                        except Exception:
+                            raise e
+                    else:
+                        raise e
+
+            Permission(permissionId).__modify(
+                identityGroup=IdentityGroup(identityGroupIdentifier=identityGroupIdentifier),
+                role=Role(role=role),
+                network=network
+            )
         except Exception as e:
             raise e
 
@@ -99,13 +140,42 @@ class Permission:
     # Private methods
     ####################################################################################################################
 
-    @staticmethod
-    def __getNetwork(assetId: int, networkName: str):
-        p = Network(assetId=assetId, network=networkName)
-        if p.exists():
-            networkId = p.id
-        else:
-            # If partition does not exist, create it (on Permissions database, not F5 endpoint).
-            networkId = p.add(assetId, networkName)
+    def __load(self) -> None:
+        try:
+            info = Repository.get(self.id)
 
-        return networkId
+            self.identityGroup = IdentityGroup(id=info["id_group"])
+            self.role = Role(id=info["id_role"])
+            self.network = Network(id=info["id_network"])
+        except Exception as e:
+            raise e
+
+
+
+    def __modify(self, identityGroup: IdentityGroup, role: Role, network: Network) -> None:
+        try:
+            Repository.modify(
+                self.id,
+                identityGroupId=identityGroup.id,
+                roleId=role.id,
+                networkId=network.id
+            )
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private static methods
+    ####################################################################################################################
+
+    @staticmethod
+    def __add(identityGroup: IdentityGroup, role: Role, network: Network) -> None:
+        try:
+            Repository.add(
+                identityGroupId=identityGroup.id,
+                roleId=role.id,
+                networkId=network.id
+            )
+        except Exception as e:
+            raise e

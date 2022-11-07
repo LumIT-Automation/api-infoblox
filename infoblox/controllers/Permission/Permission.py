@@ -2,12 +2,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Permission.IdentityGroup import IdentityGroup
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Permission.Permission import PermissionSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
+
 from infoblox.helpers.Log import Log
 
 
@@ -51,14 +51,14 @@ class PermissionController(CustomController):
                 if serializer.is_valid():
                     data = serializer.validated_data["data"]
 
-                    identityGroupId = IdentityGroup(identityGroupIdentifier=data["identity_group_identifier"]).id
-
-                    p = Permission(permissionId)
-                    p.modify(
-                        identityGroupId,
-                        data["role"],
-                        data["network"]["id_asset"],
-                        data["network"]["name"]
+                    Permission.modifyFacade(
+                        permissionId=permissionId,
+                        identityGroupIdentifier=data["identity_group_identifier"],
+                        role=data["role"],
+                        networkInfo={
+                            "assetId": data["network"]["id_asset"],
+                            "name": data["network"]["name"]
+                        }
                     )
 
                     httpStatus = status.HTTP_200_OK
