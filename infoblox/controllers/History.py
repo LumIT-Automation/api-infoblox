@@ -28,10 +28,10 @@ class HistoryLogsController(CustomController):
 
             Log.actionLog("History log", user)
 
-            itemData["data"]["items"] = History.list(user["username"], allUsersHistory)
-            serializer = Serializer(data=itemData)
+            itemData["items"] = History.list(user["username"], allUsersHistory)
+            serializer = Serializer(data=itemData, partial=True)
             if serializer.is_valid():
-                data["data"] = serializer.validated_data["data"]
+                data["data"] = serializer.validated_data
                 data["href"] = request.get_full_path()
 
                 # Check the response's ETag validity (against client request).
