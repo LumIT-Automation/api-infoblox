@@ -1,12 +1,16 @@
 from infoblox.models.Permission.repository.IdentityGroup import IdentityGroup as Repository
+from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
 
 class IdentityGroup:
-    def __init__(self, identityGroupIdentifier: str,  *args, **kwargs):
+    def __init__(self, id: int = 0, identityGroupIdentifier: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.identity_group_identifier = identityGroupIdentifier
-        self.name = ""
+        self.id: int = int(id)
+        self.name: str = ""
+        self.identity_group_identifier: str = identityGroupIdentifier
+
+        self.__load()
 
 
 
@@ -14,17 +18,9 @@ class IdentityGroup:
     # Public methods
     ####################################################################################################################
 
-    def info(self) -> dict:
-        try:
-            return Repository.get(self.identity_group_identifier)
-        except Exception as e:
-            raise e
-
-
-
     def modify(self, data: dict) -> None:
         try:
-            Repository.modify(self.identity_group_identifier, data)
+            Repository.modify(self.id, data)
         except Exception as e:
             raise e
 
@@ -32,7 +28,7 @@ class IdentityGroup:
 
     def delete(self) -> None:
         try:
-            Repository.delete(self.identity_group_identifier)
+            Repository.delete(self.id)
         except Exception as e:
             raise e
 
@@ -43,7 +39,7 @@ class IdentityGroup:
     ####################################################################################################################
 
     @staticmethod
-    def list() -> list:
+    def dataList() -> list:
         try:
             return Repository.list()
         except Exception as e:
@@ -52,120 +48,13 @@ class IdentityGroup:
 
 
     @staticmethod
-    def listWithRelated(showPrivileges: bool = False) -> dict:
-        # List identity groups with related information regarding the associated roles on networks
+    def listWithPermissionsPrivileges(showPrivileges: bool = False, filterGroups: list = None) -> list:
+        # List identity groups with related information regarding the associated roles on domains,
         # and optionally detailed privileges' descriptions.
-        j = 0
+        filterGroups = filterGroups or []
 
         try:
-            items = Repository.list()
-
-            # "items": [
-            # ...,
-            # {
-            #    "id": 2,
-            #    "name": "groupStaff",
-            #    "identity_group_identifier": "cn=groupStaff,cn=users,dc=lab,dc=local",
-            #    "roles_network": "staff::1::Common",
-            #    "privileges_network": "certificates_post::1::Common::1::0,poolMember_get::1::Common::0::0,poolMember_patch::1::Common::0::0,poolMembers_get::1::Common::0::0,poolMemberStats_get::1::Common::0::0,pools_get::1::Common::0::0,networks_get::1::Common::1::1"
-            # },
-            # ...
-            # ]
-
-            for ln in items:
-                if "roles_network" in items[j]:
-                    if "," in ln["roles_network"]:
-                        items[j]["roles_network"] = ln["roles_network"].split(",") # "staff::1::network,...,readonly::2::network" string to list value: replace into original data structure.
-                    else:
-                        items[j]["roles_network"] = [ ln["roles_network"] ] # simple string to list.
-
-                    # "roles_network": [
-                    #    "admin::1::any",
-                    #    "staff::1::PARTITION1",
-                    #    "staff::2::PARTITION2"
-                    # ]
-
-                    rolesStructure = dict()
-                    for rls in items[j]["roles_network"]:
-                        if "::" in rls:
-                            rlsList = rls.split("::")
-                            if not str(rlsList[0]) in rolesStructure:
-                                # Initialize list if not already done.
-                                rolesStructure[rlsList[0]] = list()
-
-                            rolesStructure[rlsList[0]].append({
-                                "assetId": rlsList[1],
-                                "network": rlsList[2]
-                            })
-
-                    items[j]["roles_network"] = rolesStructure
-
-                    #"roles_network": {
-                    #    "staff": [
-                    #        {
-                    #            "assetId": 1
-                    #            "network": "PARTITION1"
-                    #        },
-                    #        {
-                    #            "assetId": 2
-                    #            "network": "PARTITION2"
-                    #        },
-                    #    ],
-                    #    "admin": [
-                    #        {
-                    #            "assetId": 1
-                    #            "network": "any"
-                    #        },
-                    #    ]
-                    #}
-
-                if showPrivileges:
-                    # Add detailed privileges' descriptions to the output.
-                    if "privileges_network" in items[j]:
-                        if "," in ln["privileges_network"]:
-                            items[j]["privileges_network"] = ln["privileges_network"].split(",")
-                        else:
-                            items[j]["privileges_network"] = [ ln["privileges_network"] ]
-
-                        ppStructure = dict()
-                        for pls in items[j]["privileges_network"]:
-                            if "::" in pls:
-                                pList = pls.split("::")
-                                if not str(pList[0]) in ppStructure:
-                                    ppStructure[pList[0]] = list()
-
-                                # Differentiate permission type:
-                                # global:
-                                #     a privilege does not require the asset to be specified <--> it's valid for all assets;
-                                #     set "any" for assets value.
-
-                                # asset:
-                                #    a privilege does not require the networks to be specified <--> it's valid for all networks within the asset;
-                                #    set "any" for networks value.
-                                #
-                                # object:
-                                #     standard.
-
-                                if pList[3]:
-                                    if pList[3] == "global":
-                                        pList[1] = 0
-                                        pList[2] = "any"
-                                    if pList[3] == "asset":
-                                        pList[2] = "any"
-
-                                if not any(v['assetId'] == 0 for v in ppStructure[pList[0]]): # insert value only if not already present (applied to assetId "0").
-                                    ppStructure[pList[0]].append({
-                                        "assetId": pList[1],
-                                        "network": pList[2],
-                                    })
-
-                        items[j]["privileges_network"] = ppStructure
-                else:
-                    del items[j]["privileges_network"]
-
-                j = j+1
-
-            return items
+            return PermissionPrivilegeRepository.list(filterGroups, showPrivileges)
         except Exception as e:
             raise e
 
@@ -175,5 +64,21 @@ class IdentityGroup:
     def add(data: dict) -> None:
         try:
             Repository.add(data)
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __load(self) -> None:
+        try:
+            info = Repository.get(self.id, self.identity_group_identifier)
+
+            # Set attributes.
+            for k, v in info.items():
+                setattr(self, k, v)
         except Exception as e:
             raise e

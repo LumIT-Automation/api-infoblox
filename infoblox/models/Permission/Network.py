@@ -21,26 +21,9 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def exists(self) -> bool:
-        try:
-            pid = self.info()["id"] # just a probe.
-            return True
-        except Exception:
-            return False
-
-
-
-    def info(self) -> dict:
-        try:
-            return Repository.get(self.id, self.id_asset, self.network)
-        except Exception as e:
-            raise e
-
-
-
     def delete(self) -> None:
         try:
-            Repository.delete(self.id_asset, self.network)
+            Repository.delete(self.id)
         except Exception as e:
             raise e
 
@@ -51,7 +34,7 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def add(assetId, network) -> int:
+    def add(assetId: int, network: str) -> int:
         if network == "any":
             try:
                 return Repository.add(assetId, network)

@@ -78,7 +78,7 @@ class Asset:
 
             # Also, add a "*" permission for the workflow.local system user.
             Permission.add(
-                identityGroupId=IdentityGroup("workflow.local").info()["id"], # get the identityGroupId of the workflow system user.
+                identityGroupId=IdentityGroup(identityGroupIdentifier="workflow.local").id, # get the identityGroupId of the workflow system user.
                 role="workflow",
                 assetId=aid,
                 networkName="any"

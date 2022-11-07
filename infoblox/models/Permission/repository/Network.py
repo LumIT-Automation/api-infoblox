@@ -43,14 +43,11 @@ class Network:
 
 
     @staticmethod
-    def delete(assetId: int, networkName: str) -> None:
+    def delete(id: int) -> None:
         c = connection.cursor()
 
         try:
-            c.execute("DELETE FROM `network` WHERE `network` = %s AND id_asset = %s", [
-                networkName,
-                assetId
-            ])
+            c.execute("DELETE FROM `network` WHERE `id` = %s", [id])
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
