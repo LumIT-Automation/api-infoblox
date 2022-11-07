@@ -33,19 +33,29 @@ class PermissionIdentityGroupsController(CustomController):
                     if "privileges" in rList:
                         showPrivileges = True
 
-                itemData["data"]["items"] = IdentityGroup.listWithPermissionsPrivileges(showPrivileges=showPrivileges)
-                data["data"] = GroupsSerializer(itemData).data["data"]
-                data["href"] = request.get_full_path()
+                itemData["items"] = IdentityGroup.listWithPermissionsPrivileges(showPrivileges=showPrivileges)
+                serializer = GroupsSerializer(data=itemData)
+                if serializer.is_valid():
+                    data["data"] = serializer.validated_data
+                    data["href"] = request.get_full_path()
 
-                # Check the response's ETag validity (against client request).
-                conditional = Conditional(request)
-                etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                if etagCondition["state"] == "fresh":
-                    data = None
-                    httpStatus = status.HTTP_304_NOT_MODIFIED
+                    # Check the response's ETag validity (against client request).
+                    conditional = Conditional(request)
+                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                    if etagCondition["state"] == "fresh":
+                        data = None
+                        httpStatus = status.HTTP_304_NOT_MODIFIED
+                    else:
+                        httpStatus = status.HTTP_200_OK
                 else:
-                    httpStatus = status.HTTP_200_OK
+                    httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+                    data = {
+                        "Infoblox": "upstream data mismatch."
+                    }
+
+                    Log.log("Upstream data incorrect: "+str(serializer.errors))
             else:
+                data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
 
         except Exception as e:
@@ -69,9 +79,9 @@ class PermissionIdentityGroupsController(CustomController):
                 Log.actionLog("Identity group addition", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                serializer = GroupSerializer(data=request.data)
+                serializer = GroupSerializer(data=request.data["data"])
                 if serializer.is_valid():
-                    data = serializer.validated_data["data"]
+                    data = serializer.validated_data
                     IdentityGroup.add(data)
 
                     httpStatus = status.HTTP_201_CREATED
@@ -86,7 +96,6 @@ class PermissionIdentityGroupsController(CustomController):
                     Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

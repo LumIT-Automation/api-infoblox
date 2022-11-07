@@ -26,21 +26,30 @@ class PermissionsController(CustomController):
             if Permission.hasUserPermission(groups=user["groups"], action="permission_identityGroups_get") or user["authDisabled"]:
                 Log.actionLog("Permissions list", user)
 
-                itemData["data"]["items"] = Permission.permissionsDataList()
-                data["data"] = PermissionsSerializer(itemData).data["data"]
-                data["href"] = request.get_full_path()
+                itemData["items"] = Permission.permissionsDataList()
+                serializer = PermissionsSerializer(data=itemData)
+                if serializer.is_valid():
+                    data["data"] = serializer.validated_data
+                    data["href"] = request.get_full_path()
 
-                # Check the response's ETag validity (against client request).
-                conditional = Conditional(request)
-                etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                if etagCondition["state"] == "fresh":
-                    data = None
-                    httpStatus = status.HTTP_304_NOT_MODIFIED
+                    # Check the response's ETag validity (against client request).
+                    conditional = Conditional(request)
+                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                    if etagCondition["state"] == "fresh":
+                        data = None
+                        httpStatus = status.HTTP_304_NOT_MODIFIED
+                    else:
+                        httpStatus = status.HTTP_200_OK
                 else:
-                    httpStatus = status.HTTP_200_OK
-            else:
-                httpStatus = status.HTTP_403_FORBIDDEN
+                    httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+                    data = {
+                        "Infoblox": "upstream data mismatch."
+                    }
 
+                    Log.log("Upstream data incorrect: "+str(serializer.errors))
+            else:
+                data = None
+                httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
@@ -62,9 +71,9 @@ class PermissionsController(CustomController):
                 Log.actionLog("Permission addition", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                serializer = PermissionSerializer(data=request.data)
+                serializer = PermissionSerializer(data=request.data["data"])
                 if serializer.is_valid():
-                    data = serializer.validated_data["data"]
+                    data = serializer.validated_data
 
                     Permission.addFacade(
                         identityGroupIdentifier=data["identity_group_identifier"],
@@ -87,7 +96,6 @@ class PermissionsController(CustomController):
                     Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

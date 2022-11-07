@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from infoblox.models.Permission.Privilege import Privilege
 from infoblox.models.Permission.Role import Role
 
 
@@ -20,9 +21,24 @@ class IdentityGroupsAssestRolesItems(serializers.Serializer):
         for af in additionalFields:
             self.fields[af] = IdentityGroupsAssestRolesSubItems(many=True, required=False)
 
-class IdentityGroupSerializer(serializers.Serializer):
-    class IdentityGroupAssestItems(serializers.Serializer):
-        name = serializers.CharField(max_length=64, required=True)
-        identity_group_identifier = serializers.CharField(max_length=255, required=True)
+class IdentityGroupsAssestPrivilegeItems(serializers.Serializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    data = IdentityGroupAssestItems(required=True)
+        # Adding dynamic fields as taken from the Privilege model.
+        additionalFields = []
+        r = Privilege.dataList()
+        for additionalField in r:
+            if "privilege" in additionalField:
+                additionalFields.append(additionalField["privilege"])
+
+        for af in additionalFields:
+            self.fields[af] = IdentityGroupsAssestRolesSubItems(many=True, required=False)
+
+class IdentityGroupSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    name = serializers.CharField(max_length=64, required=True)
+    identity_group_identifier = serializers.CharField(max_length=255, required=True)
+
+    roles_network = IdentityGroupsAssestRolesItems(required=False)
+    privileges_network = IdentityGroupsAssestPrivilegeItems(required=False)

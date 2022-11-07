@@ -20,13 +20,11 @@ class PermissionIdentityGroupController(CustomController):
             if Permission.hasUserPermission(groups=user["groups"], action="permission_identityGroup_delete") or user["authDisabled"]:
                 Log.actionLog("Identity group deletion", user)
 
-                ig = IdentityGroup(identityGroupIdentifier=identityGroupIdentifier)
-                ig.delete()
+                IdentityGroup(identityGroupIdentifier=identityGroupIdentifier).delete()
 
                 httpStatus = status.HTTP_200_OK
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
@@ -47,9 +45,9 @@ class PermissionIdentityGroupController(CustomController):
                 Log.actionLog("Identity group modification", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                serializer = GroupSerializer(data=request.data, partial=True)
+                serializer = GroupSerializer(data=request.data["data"], partial=True)
                 if serializer.is_valid():
-                    data = serializer.validated_data["data"]
+                    data = serializer.validated_data
 
                     ig = IdentityGroup(identityGroupIdentifier=identityGroupIdentifier)
                     ig.modify(data)
@@ -66,7 +64,6 @@ class PermissionIdentityGroupController(CustomController):
                     Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

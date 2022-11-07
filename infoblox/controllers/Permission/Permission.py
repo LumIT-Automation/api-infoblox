@@ -20,13 +20,11 @@ class PermissionController(CustomController):
             if Permission.hasUserPermission(groups=user["groups"], action="permission_identityGroup_delete") or user["authDisabled"]:
                 Log.actionLog("Permission deletion", user)
 
-                p = Permission(permissionId)
-                p.delete()
+                Permission(permissionId).delete()
 
                 httpStatus = status.HTTP_200_OK
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
@@ -47,9 +45,9 @@ class PermissionController(CustomController):
                 Log.actionLog("Permission modification", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                serializer = Serializer(data=request.data, partial=True)
+                serializer = Serializer(data=request.data["data"], partial=True)
                 if serializer.is_valid():
-                    data = serializer.validated_data["data"]
+                    data = serializer.validated_data
 
                     Permission.modifyFacade(
                         permissionId=permissionId,
@@ -73,7 +71,6 @@ class PermissionController(CustomController):
                     Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
-
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
