@@ -3,7 +3,6 @@ from django.db import connection
 from django.db import transaction
 from django.core.cache import cache
 
-from infoblox.helpers.Log import Log
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
 
