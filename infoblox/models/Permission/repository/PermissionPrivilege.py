@@ -148,8 +148,8 @@ class PermissionPrivilege:
                                 #     set "any" for assets value.
 
                                 # asset:
-                                #    a privilege does not require the partitions to be specified <--> it's valid for all partitions within the asset;
-                                #    set "any" for partitions value.
+                                #    a privilege does not require the networks to be specified <--> it's valid for all networks within the asset;
+                                #    set "any" for networks value.
                                 #
                                 # object:
                                 #     standard.
@@ -178,6 +178,120 @@ class PermissionPrivilege:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
             c.close()
+
+
+
+    @staticmethod
+    def authorizationsList(groups: list) -> dict:
+        permissions = list()
+        combinedPermissions = dict()
+
+        try:
+            o = PermissionPrivilege.list(filterGroups=groups, showPrivileges=True)
+
+            # [
+            #   {
+            #     "id": 3,
+            #     "name": "groupStaff",
+            #     "identity_group_identifier": "cn=groupstaff,cn=users,dc=lab,dc=local",
+            #     "roles_network": { ... },
+            #     "privileges_network": { ... }
+            #   },
+            #   ...
+            # ]
+
+            # Collect every permission related to the group in groups.
+            for identityGroup in groups:
+                for el in o:
+                    if "identity_group_identifier" in el:
+                        if el["identity_group_identifier"].lower() == identityGroup.lower():
+                            permissions.append(el["privileges_network"])
+
+            # [
+            #    {
+            #        "assets_get": [
+            #            {
+            #                "assetId": "1",
+            #                "network": "any"
+            #            }
+            #        ],
+            #        ...
+            #    },
+            #    {
+            #        "assets_get": [
+            #            {
+            #                "assetId": "1",
+            #                "network": "Common"
+            #            }
+            #        ],
+            #        ...
+            #    }
+            # ]
+
+            # Clean up structure.
+            for el in permissions:
+                for k, v in el.items():
+
+                    # Initialize list if not already done.
+                    if not str(k) in combinedPermissions:
+                        combinedPermissions[k] = list()
+
+                    for innerEl in v:
+                        if innerEl not in combinedPermissions[k]:
+                            combinedPermissions[k].append(innerEl)
+
+            # {
+            #    ...
+            #    "assets_get": [
+            #        {
+            #            "assetId": "1",
+            #            "network": "any"
+            #        },
+            #        {
+            #            "assetId": "1",
+            #            "network": "Common"
+            #        },
+            #        {
+            #            "assetId": "2",
+            #            "network": "Common"
+            #        }
+            #    ],
+            #    ...
+            # }
+
+            # Clean up structure.
+            for k, v in combinedPermissions.items():
+                asset = 0
+                for el in v:
+                    if el["network"] == "any":
+                        asset = el["assetId"] # assetId for network "any".
+
+                if asset:
+                    for j in range(len(v)):
+                        try:
+                            if v[j]["assetId"] == asset and v[j]["network"] != "any":
+                                del v[j]
+                        except Exception:
+                            pass
+
+            # {
+            #    ...
+            #    "assets_get": [
+            #        {
+            #            "assetId": "1",
+            #            "network": "any"
+            #        },
+            #        {
+            #            "assetId": "2",
+            #            "network": "Common"
+            #        }
+            #    ],
+            #    ...
+            # }
+        except Exception as e:
+            raise e
+
+        return combinedPermissions
 
 
 

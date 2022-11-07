@@ -1,11 +1,11 @@
-from django.conf import settings
-
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Permission.Authorization import Authorization
+from infoblox.models.Permission.Permission import Permission
+
 from infoblox.controllers.CustomController import CustomController
+
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
@@ -23,7 +23,7 @@ class AuthorizationsController(CustomController):
             if not user["authDisabled"]:
                 Log.actionLog("Permissions' list", user)
 
-                data["data"]["items"] = Authorization.list(user["groups"])
+                data["data"]["items"] = Permission.authorizationsList(user["groups"])
                 data["href"] = request.get_full_path()
 
                 # Check the response's ETag validity (against client request).

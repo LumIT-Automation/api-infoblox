@@ -49,7 +49,7 @@ class IdentityGroup:
 
     @staticmethod
     def listWithPermissionsPrivileges(showPrivileges: bool = False, filterGroups: list = None) -> list:
-        # List identity groups with related information regarding the associated roles on domains,
+        # List identity groups with related information regarding the associated roles on networks,
         # and optionally detailed privileges' descriptions.
         filterGroups = filterGroups or []
 

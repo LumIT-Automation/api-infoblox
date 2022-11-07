@@ -58,10 +58,63 @@ class Permission:
 
     @staticmethod
     def permissionsDataList() -> list:
+
+        #         "id": 4,
+        #         "identity_group_name": "groupStaff",
+        #         "identity_group_identifier": "cn=groupstaff,cn=users,dc=lab,dc=local",
+        #         "role": "staff",
+        #         "network": {
+        #             "name": "10.8.0.0/17",
+        #             "asset_id": 1
+        #         }
+
         try:
             return Repository.list()
         except Exception as e:
             raise e
+
+
+
+    @staticmethod
+    def authorizationsList(groups: list) -> dict:
+
+        #     "assets_get": [
+        #         {
+        #             "assetId": "1",
+        #             "network": "any"
+        #         }
+        #     ],
+        #     "networks_get": [
+        #         {
+        #             "assetId": "1",
+        #             "network": "any"
+        #         }
+        #     ],
+        #     ...
+
+        superadmin = False
+        for gr in groups:
+            if gr.lower() == "automation.local":
+                superadmin = True
+                break
+
+        if superadmin:
+            # Superadmin's permissions override.
+            authorizations = {
+                "any": [
+                    {
+                        "assetId": 0,
+                        "network": "any"
+                    }
+                ]
+            }
+        else:
+            try:
+                authorizations = PermissionPrivilegeRepository.authorizationsList(groups)
+            except Exception as e:
+                raise e
+
+        return authorizations
 
 
 
@@ -82,7 +135,7 @@ class Permission:
                 except CustomException as e:
                     if e.status == 404:
                         try:
-                            # If domain does not exist, create it (permissions database).
+                            # If network does not exist, create it (permissions database).
                             network = Network(
                                 id=Network.add(networkAssetId, networkName)
                             )
@@ -118,7 +171,7 @@ class Permission:
                 except CustomException as e:
                     if e.status == 404:
                         try:
-                            # If domain does not exist, create it (permissions database).
+                            # If network does not exist, create it (permissions database).
                             network = Network(
                                 id=Network.add(networkAssetId, networkName)
                             )
