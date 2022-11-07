@@ -3,6 +3,7 @@ from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Network import Network
 
 from infoblox.models.Permission.repository.Permission import Permission as Repository
+from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
 from infoblox.helpers.Exception import CustomException
 
@@ -48,7 +49,7 @@ class Permission:
 
         try:
             return bool(
-                Repository.countUserPermissions(groups, action, assetId, networkName)
+                PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, networkName)
             )
         except Exception as e:
             raise e
@@ -56,7 +57,7 @@ class Permission:
 
 
     @staticmethod
-    def listIdentityGroupsRolesPartitions() -> list:
+    def permissionsDataList() -> list:
         try:
             return Repository.list()
         except Exception as e:
