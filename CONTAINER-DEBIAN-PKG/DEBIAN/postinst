@@ -24,7 +24,6 @@ if [ "$1" == "configure" ]; then
 
     podman exec api-infoblox chown -R www-data:www-data /var/www/api/api # within container.
     podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql; podman exec api-infoblox systemctl restart mariadb # within container.
-    podman exec api-infoblox systemctl restart mysql
 
     printf "\n* Starting Container Service on HOST...\n"
     systemctl daemon-reload
