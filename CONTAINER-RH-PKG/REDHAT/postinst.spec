@@ -22,7 +22,7 @@ function containerSetup()
 
     # First container run: associate name, bind ports, bind fs volume, define init process, ...
     # api-infoblox folder will be bound to /var/lib/containers/storage/volumes/.
-    podman run --name api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /sbin/init
+    podman run --name api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /lib/systemd/systemd
 
     podman exec api-infoblox chown -R www-data:www-data /var/www/api/api # within container.
     podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql # within container.
@@ -80,9 +80,6 @@ function containerSetup()
         # Database update via diff.sql (migrations).
         echo "Applying migrations..."
         podman exec api-infoblox bash /var/www/api/infoblox/sql/migrate.sh
-
-        # Activate mysql audit plugin.
-        podman exec api-infoblox bash -c "cp -p /usr/share/automation-interface-api/51-mariadb.cnf /etc/mysql/mariadb.conf.d"
     else
         echo "Failed to access MariaDB RDBMS, auth_socket plugin must be enabled for the database root user. Quitting."
         exit 1
