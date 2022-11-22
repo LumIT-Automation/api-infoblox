@@ -25,7 +25,7 @@ function containerSetup()
     podman run --name api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /lib/systemd/systemd
 
     podman exec api-infoblox chown -R www-data:www-data /var/www/api/api # within container.
-    podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql # within container.
+    podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql
     podman exec api-infoblox systemctl restart mysql
 
     printf "$wallBanner Starting Container Service on HOST..." | wall -n
