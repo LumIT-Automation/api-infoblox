@@ -1,6 +1,7 @@
 import socket
 import re
 import ipaddress
+from datetime import datetime
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
 
@@ -421,6 +422,11 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 extattrs = self.data["extattrs"][j]
             except Exception:
                 extattrs = self.data["extattrs"][0]
+
+            # Override Reference extattr.
+            extattrs["Reference"] = {
+                "value": self.username + ", " + str(datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+            }
 
             try:
                 r = Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac) # {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}
