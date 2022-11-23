@@ -45,7 +45,8 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (17, 'permission_roles_get', 'global', NULL),
 (18, 'permission_identityGroup_patch', 'global', NULL),
 (19, 'permission_identityGroup_delete', 'global', NULL),
-(20, 'historyComplete_get', 'global', NULL);
+(20, 'historyComplete_get', 'global', NULL),
+(21, 'full_visibility', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -79,6 +80,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 18),
 (1, 19),
 (1, 20),
+(1, 21),
 (2, 3),
 (2, 5),
 (2, 6),
