@@ -68,7 +68,7 @@ class History:
 
         try:
             with transaction.atomic():
-                c.execute("INSERT INTO "+table+" "+keys+" VALUES ("+s[:-1]+")",
+                c.execute("INSERT INTO "+table+" "+keys+" VALUES ("+s[:-1]+")", # user data are filtered by the serializer.
                     values
                 )
 

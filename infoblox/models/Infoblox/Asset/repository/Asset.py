@@ -65,7 +65,7 @@ class Asset:
                 values.append(strip_tags(v)) # no HTML allowed.
 
             try:
-                c.execute("UPDATE asset SET "+sql[:-1]+" WHERE id = "+str(assetId),
+                c.execute("UPDATE asset SET "+sql[:-1]+" WHERE id = "+str(assetId), # user data are filtered by the serializer.
                     values
                 )
             except Exception as e:
@@ -133,7 +133,7 @@ class Asset:
 
         try:
             with transaction.atomic():
-                c.execute("INSERT INTO asset "+keys+" VALUES ("+s[:-1]+")",
+                c.execute("INSERT INTO asset "+keys+" VALUES ("+s[:-1]+")", # user data are filtered by the serializer.
                     values
                 )
                 return c.lastrowid
