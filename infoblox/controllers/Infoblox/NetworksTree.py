@@ -39,7 +39,7 @@ class InfobloxNetworksTreeController(CustomController):
 
                 # Add only allowed leaves to the tree data structure.
                 if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"]) or user["authDisabled"]:
-                    el["key"] = hashlib.md5(el["_ref"].encode('utf-8')).hexdigest()
+                    el["key"] = hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest()
                     el["children"] = []
 
                     del(el["_ref"])
@@ -58,7 +58,7 @@ class InfobloxNetworksTreeController(CustomController):
                         if father:
                             nc = {
                                 "title": el["network"],
-                                "key": hashlib.md5(el["_ref"].encode('utf-8')).hexdigest(),
+                                "key": hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest(),
                                 "type": "container",
                                 "extattrs": el["extattrs"],
                                 "children": tree[el["network"]]
