@@ -2,6 +2,11 @@ from rest_framework import serializers
 
 
 class InfobloxNetworkSerializer(serializers.Serializer):
+    class InfobloxNetworkVlansSerializer(serializers.Serializer):
+        id = serializers.IntegerField(required=True)
+        name = serializers.CharField(max_length=255, required=False)
+        vlan = serializers.CharField(max_length=255, required=False)
+
     class InfobloxNetworkInnerExtattrsSerializer(serializers.Serializer):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -17,8 +22,10 @@ class InfobloxNetworkSerializer(serializers.Serializer):
             self.fields["Mask"] = InfobloxNetworkInnerExtattrsValueAddressSerializer(required=False)
             self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
-    _ref = serializers.CharField(max_length=255)
+    _ref = serializers.CharField(max_length=255, required=False)
     network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
-    network_container = serializers.CharField(max_length=255)
-    network_view = serializers.CharField(max_length=255)
+    network_container = serializers.CharField(max_length=255, required=False)
+    network_view = serializers.CharField(max_length=255, required=False)
+    vlans = InfobloxNetworkVlansSerializer(many=True,required=False)
     extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
+    comment = serializers.CharField(max_length=255, required=False)

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "32d86a47-1074-4bbb-9258-518af995d9d3",
+		"_postman_id": "4e5eeae2-43e1-42f6-a51a-4397ab08b462",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -725,6 +725,55 @@
 					"response": []
 				},
 				{
+					"name": "networks",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "851847cbe30d3d64e74703cac5fa8992",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"network\": \"192.168.21.0/24\",\n        \"comment\": \"nella vecchia fattoria\",\n        \"extattrs\": {\n            \"Gateway\": {\n                \"value\": \"192.168.21.11\"\n            },\n            \"Mask\": {\n                \"value\": \"255.255.255.0\"\n            },\n            \"Real Network\": {\n                \"value\": \"yes\"\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"1",
+								"networks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "network",
 					"request": {
 						"auth": {
@@ -749,7 +798,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.8.1.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/192.168.21.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -763,7 +812,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.8.1.0",
+								"192.168.21.0",
 								""
 							]
 						}

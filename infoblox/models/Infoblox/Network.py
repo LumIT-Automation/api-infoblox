@@ -78,6 +78,15 @@ class Network:
 
 
 
+    @staticmethod
+    def add(assetId: int, data) -> dict:
+        try:
+            return Connector.add(assetId, data)
+        except Exception as e:
+            raise e
+
+
+
     ####################################################################################################################
     # Private methods
     ####################################################################################################################

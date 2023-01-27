@@ -1,3 +1,5 @@
+import json
+
 from infoblox.models.Infoblox.Asset.Asset import Asset
 
 from infoblox.helpers.ApiSupplicant import ApiSupplicant
@@ -18,7 +20,7 @@ class Network:
             apiParams = {
                 "network": network,
                 "_max_results": 65535,
-                "_return_fields+": "network,network_container,extattrs"
+                "_return_fields+": "network,network_container,vlans,extattrs"
             }
 
             if filter:
@@ -78,7 +80,7 @@ class Network:
         try:
             apiParams = {
                 "_max_results": 65535,
-                "_return_fields+": "network,network_container,extattrs"
+                "_return_fields+": "network,network_container,vlans,extattrs"
             }
 
             infoblox = Asset(assetId)
@@ -92,3 +94,34 @@ class Network:
             return api.get()
         except Exception as e:
             raise e
+
+
+
+    @staticmethod
+    def add(assetId, data: dict, silent: bool = False) -> dict:
+
+        try:
+            apiParams = {
+                "_max_results": 65535,
+                "_return_fields+": "network,network_container,extattrs"
+            }
+
+            infoblox = Asset(assetId)
+            api = ApiSupplicant(
+                endpoint=infoblox.baseurl+"/network",
+                params=apiParams,
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
+                silent=silent
+            )
+
+            o = api.post(
+                additionalHeaders={
+                    "Content-Type": "application/json",
+                },
+                data=json.dumps(data)
+            )
+        except Exception as e:
+            raise e
+
+        return o
