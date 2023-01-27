@@ -6,6 +6,7 @@ from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.NetworkContainer import InfobloxNetworkContainerNetworksSerializer as Serializer
+from infoblox.serializers.Infoblox.NetworkContainers import InfobloxNetworkContainerAddNetworkSerializer as AddNetworkSerializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -74,3 +75,53 @@ class InfobloxNetworkContainerNetworksController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
+
+
+
+    @staticmethod
+    def post(request: Request,  assetId: int, networkAddress: str, mask: str) -> Response:
+        response = None
+        user = CustomController.loggedUser(request)
+
+        try:
+            if Permission.hasUserPermission(groups=user["groups"], action="network_container_post", assetId=assetId) or user["authDisabled"]:
+                Log.actionLog("Network addition in container", user)
+                Log.actionLog("User data: "+str(request.data), user)
+
+                serializer = AddNetworkSerializer(data=request.data["data"])
+                if serializer.is_valid():
+                    data = request.data["data"]
+
+                    lock = Lock("networkContainer", locals(), networkAddress)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        c = NetworkContainer(assetId, networkAddress + "/" + mask)
+                        response = c.addNextAvailableNetwork(data)
+
+                        httpStatus = status.HTTP_201_CREATED
+                        lock.release()
+                    else:
+                        httpStatus = status.HTTP_423_LOCKED
+                else:
+                    httpStatus = status.HTTP_400_BAD_REQUEST
+                    response = {
+                        "Infoblox": {
+                            "error": str(serializer.errors)
+                        }
+                    }
+
+                    Log.actionLog("User data incorrect: "+str(response), user)
+            else:
+                httpStatus = status.HTTP_403_FORBIDDEN
+        except Exception as e:
+            if "serializer" in locals():
+                Lock("networkContainer", locals(), locals()["serializer"].data["networkAddress"]).release()
+
+            data, httpStatus, headers = CustomController.exceptionHandler(e)
+            return Response(data, status=httpStatus, headers=headers)
+
+        return Response(response, status=httpStatus, headers={
+            "Cache-Control": "no-cache"
+        })
+

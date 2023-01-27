@@ -52,6 +52,18 @@ class NetworkContainer:
 
 
 
+    def addNextAvailableNetwork(self, data: dict) -> dict:
+        data = {
+            "network": "func:nextavailablenetwork:" + self.network_container + ", " + data["subnetMask"],
+        }
+
+        try:
+            return Connector.addNetwork(self.asset_id, data)
+        except Exception as e:
+            raise e
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################

@@ -965,6 +965,58 @@
 					"response": []
 				},
 				{
+					"name": "network-container-networks Copy",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "851847cbe30d3d64e74703cac5fa8992",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"subnetMask\": \"24\"\n    }\n}"
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.9.0.0/16/networks/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"1",
+								"network-container",
+								"10.9.0.0",
+								"16",
+								"networks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "tree",
 					"request": {
 						"auth": {
