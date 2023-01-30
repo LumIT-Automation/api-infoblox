@@ -2,6 +2,7 @@ from typing import Dict
 
 from infoblox.helpers.Exception import CustomException
 
+from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
@@ -47,7 +48,7 @@ class NetworkContainer:
 
     def addNextAvailableNetwork(self, subnetMask: str) -> dict:
         try:
-            return Connector.addNetwork(assetId=self.asset_id, data={
+            return Network.add(assetId=self.asset_id, data={
                 "network": "func:nextavailablenetwork:" + self.network + ", " + str(subnetMask),
             })
         except Exception as e:
@@ -61,6 +62,8 @@ class NetworkContainer:
 
     @staticmethod
     def list(assetId: int, filters: dict = None) -> dict:
+        filters = filters or {}
+
         try:
             return Connector.list(assetId, filters)
         except Exception as e:
