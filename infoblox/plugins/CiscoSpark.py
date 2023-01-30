@@ -16,6 +16,11 @@ class CiscoSpark:
     def send(user: dict, message: str) -> None:
         responseObject = {}
 
+        try:
+            concertoEnvironment = settings.CONCERTO_ENVIRONMENT
+        except Exception:
+            concertoEnvironment = "Development"
+
         # In the event of a network problem (e.g. DNS failure, refused connection, etc), Requests will raise a ConnectionError exception.
         # If a request times out, a Timeout exception is raised.
         # If a request exceeds the configured number of maximum redirections, a TooManyRedirects exception is raised.
@@ -38,7 +43,7 @@ class CiscoSpark:
                 params=None,
                 data=json.dumps({
                     "roomId": settings.CISCO_SPARK_ROOM_ID,
-                    "text": f"[Concerto Orchestration, Infoblox][{settings.CONCERTO_ENVIRONMENT}]\n"+str(message)
+                    "text": f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\n"+str(message)
                 })
             )
 
