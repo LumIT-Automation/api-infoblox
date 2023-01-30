@@ -1,3 +1,5 @@
+CONCERTO_ENVIRONMENT = "Development"
+
 CISCO_SPARK_URL = "https://webexapis.com/v1"
 CISCO_SPARK_TOKEN = ""
 
