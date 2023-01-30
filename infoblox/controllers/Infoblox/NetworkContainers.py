@@ -24,15 +24,26 @@ class InfobloxNetworkContainersController(CustomController):
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
+        fk = list()
+        fv = list()
+        filters = dict()
+
         try:
             if Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("NetworkContainers list", user)
+
+                if 'fby' in request.GET and 'fval' in request.GET:
+                    for f in dict(request.GET)["fby"]:
+                        fk.append(f)
+                    for v in dict(request.GET)["fval"]:
+                        fv.append(v)
+                    filters = dict(zip(fk, fv))
 
                 lock = Lock("networkContainer", locals())
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = NetworkContainer.listData(assetId)
+                    itemData = NetworkContainer.list(assetId, filters)
 
                     # Filter network containers' list basing on permissions.
                     for p in itemData:

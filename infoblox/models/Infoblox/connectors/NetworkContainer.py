@@ -14,7 +14,7 @@ class NetworkContainer:
 
     @staticmethod
     def get(assetId: int, container: str, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
+        filter = filter or {}
 
         apiParams = {
             "network": container,
@@ -41,7 +41,7 @@ class NetworkContainer:
 
     @staticmethod
     def networks(assetId: int, container: str, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
+        filter = filter or {}
 
         apiParams = {
             "network_container": container,
@@ -67,15 +67,22 @@ class NetworkContainer:
 
 
     @staticmethod
-    def list(assetId: int) -> dict:
+    def list(assetId: int, filter: dict = None) -> dict:
+        filter = filter or {}
+
+        apiParams = {
+            "_max_results": 65535,
+            "_return_fields+": "network,network_container,extattrs"
+        }
+
+        if filter:
+            apiParams.update(filter)
+
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/networkcontainer",
-                params={
-                    "_max_results": 65535,
-                    "_return_fields+": "network,network_container,extattrs"
-                },
+                params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )

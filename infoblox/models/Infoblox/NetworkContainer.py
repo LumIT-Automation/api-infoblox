@@ -60,9 +60,9 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def listData(assetId: int) -> dict:
+    def list(assetId: int, filters: dict = None) -> dict:
         try:
-            return Connector.list(assetId)
+            return Connector.list(assetId, filters)
         except Exception as e:
             raise e
 
