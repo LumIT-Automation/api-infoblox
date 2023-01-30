@@ -37,20 +37,19 @@ class NetworkContainer:
         filter = filter or {}
 
         try:
-            # Data list, not using composition.
+            # Data list.
+            # Not using composition because of filtering capabilities.
             return Connector.networks(self.asset_id, self.network, filter)
         except Exception as e:
             raise e
 
 
 
-    def addNextAvailableNetwork(self, data: dict) -> dict:
-        data = {
-            "network": "func:nextavailablenetwork:" + self.network_container + ", " + data["subnetMask"],
-        }
-
+    def addNextAvailableNetwork(self, subnetMask: str) -> dict:
         try:
-            return Connector.addNetwork(self.asset_id, data)
+            return Connector.addNetwork(assetId=self.asset_id, data={
+                "network": "func:nextavailablenetwork:" + self.network + ", " + str(subnetMask),
+            })
         except Exception as e:
             raise e
 

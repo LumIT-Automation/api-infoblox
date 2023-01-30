@@ -88,7 +88,6 @@ class NetworkContainer:
 
     @staticmethod
     def addNetwork(assetId, data: dict, silent: bool = False) -> dict:
-
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(

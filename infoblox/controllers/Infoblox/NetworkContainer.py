@@ -31,8 +31,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    p = NetworkContainer(assetId, networkAddress+"/"+mask)
-                    itemData["items"] = p.networks()
+                    itemData["items"] = NetworkContainer(assetId, networkAddress+"/"+mask).networks()
 
                     serializer = Serializer(data=itemData)
                     if serializer.is_valid():
@@ -80,7 +79,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
 
     @staticmethod
     def post(request: Request,  assetId: int, networkAddress: str, mask: str) -> Response:
-        response = None
+        response = dict()
         user = CustomController.loggedUser(request)
 
         try:
@@ -96,8 +95,9 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        c = NetworkContainer(assetId, networkAddress + "/" + mask)
-                        response = c.addNextAvailableNetwork(data)
+                        response["data"] = NetworkContainer(assetId, networkAddress + "/" + mask).addNextAvailableNetwork(
+                            subnetMask=data["next_available"]["subnet_mask"]
+                        )
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
@@ -116,7 +116,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
             if "serializer" in locals():
-                Lock("networkContainer", locals(), locals()["serializer"].data["networkAddress"]).release()
+                Lock("networkContainer", locals(), networkAddress).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
@@ -124,4 +124,3 @@ class InfobloxNetworkContainerNetworksController(CustomController):
         return Response(response, status=httpStatus, headers={
             "Cache-Control": "no-cache"
         })
-

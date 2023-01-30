@@ -126,4 +126,3 @@ class InfobloxNetworkController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
-
