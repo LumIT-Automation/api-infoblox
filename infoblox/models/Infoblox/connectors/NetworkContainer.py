@@ -69,15 +69,13 @@ class NetworkContainer:
     @staticmethod
     def list(assetId: int) -> dict:
         try:
-            apiParams = {
-                "_max_results": 65535,
-                "_return_fields+": "network,network_container,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/networkcontainer",
-                params=apiParams,
+                params={
+                    "_max_results": 65535,
+                    "_return_fields+": "network,network_container,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )
@@ -92,15 +90,13 @@ class NetworkContainer:
     def addNetwork(assetId, data: dict, silent: bool = False) -> dict:
 
         try:
-            apiParams = {
-                "_max_results": 65535,
-                "_return_fields+": "network,network_container,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
+                params={
+                    "_max_results": 65535,
+                    "_return_fields+": "network,network_container,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
                 silent=silent

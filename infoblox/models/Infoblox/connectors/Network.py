@@ -78,15 +78,13 @@ class Network:
     @staticmethod
     def list(assetId: int) -> dict:
         try:
-            apiParams = {
-                "_max_results": 65535,
-                "_return_fields+": "network,network_container,vlans,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
+                params={
+                    "_max_results": 65535,
+                    "_return_fields+": "network,network_container,vlans,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )
@@ -101,15 +99,13 @@ class Network:
     def add(assetId, data: dict, silent: bool = False) -> dict:
 
         try:
-            apiParams = {
-                "_max_results": 65535,
-                "_return_fields+": "network,network_container,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
-                params=apiParams,
+                params={
+                    "_max_results": 65535,
+                    "_return_fields+": "network,network_container,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
                 silent=silent

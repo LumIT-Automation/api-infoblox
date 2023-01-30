@@ -32,7 +32,7 @@ class InfobloxNetworkContainersController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = NetworkContainer.list(assetId)
+                    itemData = NetworkContainer.listData(assetId)
 
                     # Filter network containers' list basing on permissions.
                     for p in itemData:

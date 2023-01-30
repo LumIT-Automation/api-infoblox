@@ -9,8 +9,7 @@ Value: Dict[str, str] = {"value": ""}
 
 class Network:
     def __init__(self, assetId: int, network: str, filter: dict = None, *args, **kwargs):
-        filter = {} if filter is None \
-            else filter
+        filter = filter or {}
 
         super().__init__(*args, **kwargs)
 
@@ -34,9 +33,9 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def ipv4sQuick(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
+    def ipv4sData(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
         try:
-            # Quick list.
+            # Data list.
             # Not using composition for possible huge dataset.
             return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
@@ -57,7 +56,7 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def listQuick(assetId: int) -> dict:
+    def listData(assetId: int) -> dict:
         try:
             o = Connector.list(assetId)
             for i, v in enumerate(o):

@@ -15,15 +15,13 @@ class Ipv4:
     @staticmethod
     def get(assetId, address) -> dict:
         try:
-            apiParams = {
-                "ip_address": address,
-                "_return_fields+": "network,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/ipv4address",
-                params=apiParams,
+                params={
+                    "ip_address": address,
+                    "_return_fields+": "network,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )
@@ -37,15 +35,13 @@ class Ipv4:
     @staticmethod
     def delete(assetId, ref) -> None:
         try:
-            apiParams = {
-                "_return_as_object": 1
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/"+ref,
                 auth=(infoblox.username, infoblox.password),
-                params=apiParams,
+                params={
+                    "_return_as_object": 1
+                },
                 tlsVerify=infoblox.tlsverify
             )
 

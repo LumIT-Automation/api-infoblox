@@ -162,8 +162,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
             try:
                 oNetwork = Network(self.assetId, networkInformation.network, filter={
-                        "*Real Network": "yes"
-                    })
+                    "*Real Network": "yes"
+                })
 
                 # {
                 # '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
@@ -184,7 +184,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
                     try:
                         g = oNetwork.extattrs["Gateway"]["value"]
-                    except Exception:
+                    except KeyError:
                         g = ""
 
                     o = {
@@ -210,43 +210,48 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 if "/" in networkInformation.network_container:
                     n, m = networkInformation.network_container.split("/")
 
-                    networkContainerInfo = NetworkContainer(self.assetId, n+"/"+m).info(
-                        filter={
+                    try:
+                        oNetworkContainer = NetworkContainer(self.assetId, n+"/"+m, filter={
                             "*Real Network": "yes"
                         })
 
-                    # {
-                    #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
-                    #     'extattrs': {
-                    #         'Gateway': {'value': '10.8.1.1'},
-                    #         'Mask': {'value': '255.255.128.0'},
-                    #         'Real Network': {'value': 'yes'}
-                    #         },
-                    #     'network': '10.8.0.0/17',
-                    #     'network_container': '/',
-                    #     'network_view': 'default'
-                    # ]
+                        # {
+                        #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
+                        #     'extattrs': {
+                        #         'Gateway': {'value': '10.8.1.1'},
+                        #         'Mask': {'value': '255.255.128.0'},
+                        #         'Real Network': {'value': 'yes'}
+                        #         },
+                        #     'network': '10.8.0.0/17',
+                        #     'network_container': '/',
+                        #     'network_view': 'default'
+                        # ]
 
-                    if "network" in networkContainerInfo and networkContainerInfo["network"]:
-                        try:
-                            m = networkContainerInfo["extattrs"]["Mask"]["value"]
-                        except Exception:
-                            raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
+                        if oNetworkContainer.network:
+                            try:
+                                m = oNetworkContainer.extattrs["Mask"]["value"]
+                            except Exception:
+                                raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
 
-                        try:
-                            g = networkContainerInfo["extattrs"]["Gateway"]["value"]
-                        except Exception:
-                            g = ""
+                            try:
+                                g = oNetworkContainer.extattrs["Gateway"]["value"]
+                            except KeyError:
+                                g = ""
 
-                        o = {
-                            "networkLogic": "container",
-                            "mask": m,
-                            "gateway": g,
-                            "network_container": networkInformation.network_container
-                        }
+                            o = {
+                                "networkLogic": "container",
+                                "mask": m,
+                                "gateway": g,
+                                "network_container": networkInformation.network_container
+                            }
 
-                        Log.log("Network information: "+str(o))
-                        return o
+                            Log.log("Network information: "+str(o))
+                            return o
+                    except CustomException as e:
+                        if e.status == 404:
+                            pass
+                        else:
+                            raise e
 
             raise CustomException(status=400, payload={"message": "Cannot discriminate network."})
         except Exception as e:
@@ -275,11 +280,10 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
             if networkLogic == "container":
                 if objectType:
+
                     # Get all networks in the network container.
                     n, m = networkContainer.split('/')
-
-                    netContainer = NetworkContainer(assetId, n+"/"+m)
-                    subnetworks = netContainer.networks(
+                    subnetworks = NetworkContainer(assetId, n+"/"+m).networks(
                         filter={
                             "*Object Type": objectType
                         }
@@ -340,7 +344,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = Network(assetId, network).ipv4sQuick(maxResults=100, fromIp=startIp, toIp=endIp)
+                addresses = Network(assetId, network).ipv4sData(maxResults=100, fromIp=startIp, toIp=endIp)
 
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 

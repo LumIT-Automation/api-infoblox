@@ -1,12 +1,16 @@
 from typing import Dict
 
+from infoblox.helpers.Exception import CustomException
+
 from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
 
 
 Value: Dict[str, str] = {"value": ""}
 
 class NetworkContainer:
-    def __init__(self, assetId: int, container: str, *args, **kwargs):
+    def __init__(self, assetId: int, container: str, filter: dict = None, *args, **kwargs):
+        filter = filter or {}
+
         super().__init__(*args, **kwargs)
 
         self.asset_id: int = int(assetId)
@@ -21,32 +25,20 @@ class NetworkContainer:
             "Real Network": Value,
         }
 
+        self.__load(filter=filter)
+
 
 
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
 
-    def info(self, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
-
-        try:
-            o = Connector.get(self.asset_id, self.network_container, filter)
-            if o:
-                o[0]["asset_id"] = self.asset_id
-        except Exception as e:
-            raise e
-
-        return o[0]
-
-
-
     def networks(self, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
+        filter = filter or {}
 
         try:
-            # Quick list, do not using composition.
-            return Connector.networks(self.asset_id, self.network_container, filter)
+            # Data list, not using composition.
+            return Connector.networks(self.asset_id, self.network, filter)
         except Exception as e:
             raise e
 
@@ -69,8 +61,25 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int) -> dict:
+    def listData(assetId: int) -> dict:
         try:
             return Connector.list(assetId)
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __load(self, filter: dict) -> None:
+        try:
+            data = Connector.get(self.asset_id, self.network_container, filter)
+            if data:
+                for k, v in data[0].items(): # a list is returned for one only object.
+                    setattr(self, k, v)
+            else:
+                raise CustomException(status=404)
         except Exception as e:
             raise e
