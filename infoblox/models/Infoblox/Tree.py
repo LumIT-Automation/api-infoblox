@@ -93,7 +93,7 @@ class Tree:
             # }
 
         # Add networks information to the containers' data structure.
-        l = Network.list(assetId)
+        l = Network.listQuick(assetId)
         for network in l:
             c = network["network_container"]
 

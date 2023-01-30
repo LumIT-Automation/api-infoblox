@@ -34,7 +34,7 @@ class InfobloxIpv4Controller(CustomController):
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
 
-                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
+                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 
@@ -103,7 +103,7 @@ class InfobloxIpv4Controller(CustomController):
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
 
-                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
+                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 
@@ -155,7 +155,7 @@ class InfobloxIpv4Controller(CustomController):
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
 
-                networkContainerCidr = Network(assetId, networkCidr).info()["network_container"]
+                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 

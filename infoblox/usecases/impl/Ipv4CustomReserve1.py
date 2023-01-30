@@ -160,89 +160,93 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             # Try networkLogic: "network" first.
             ####################################
 
-            networkInfo = Network(self.assetId, networkInformation.network).info(
-                filter={
-                    "*Real Network": "yes"
-                })
+            try:
+                oNetwork = Network(self.assetId, networkInformation.network, filter={
+                        "*Real Network": "yes"
+                    })
 
-            # {
-            # '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
-            # 'extattrs': {
-            #     'Gateway': {'value': '10.8.128.1'},
-            #     'Mask': {'value': '255.255.128.0'},
-            #     'Real Network': {'value': 'yes'}
-            #     },
-            # 'network': '10.8.128.0/17',
-            # 'network_view': 'default'
-            # }
+                # {
+                # '_ref': 'network/ZG5zLm5ldHdvcmskMTAuOC4xMjguMC8xNy8w:10.8.128.0/17/default',
+                # 'extattrs': {
+                #     'Gateway': {'value': '10.8.128.1'},
+                #     'Mask': {'value': '255.255.128.0'},
+                #     'Real Network': {'value': 'yes'}
+                #     },
+                # 'network': '10.8.128.0/17',
+                # 'network_view': 'default'
+                # }
 
-            if "network" in networkInfo and networkInfo["network"]:
-                try:
-                    m = networkInfo["extattrs"]["Mask"]["value"]
-                except Exception:
-                    raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
+                if oNetwork.network:
+                    try:
+                        m = oNetwork.extattrs["Mask"]["value"]
+                    except Exception:
+                        raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
 
-                try:
-                    g = networkInfo["extattrs"]["Gateway"]["value"]
-                except Exception:
-                    g = ""
+                    try:
+                        g = oNetwork.extattrs["Gateway"]["value"]
+                    except Exception:
+                        g = ""
 
-                o = {
-                    "networkLogic": "network",
-                    "targetNetwork": networkInfo["network"],
-                    "mask": m,
-                    "gateway": g
-                }
+                    o = {
+                        "networkLogic": "network",
+                        "targetNetwork": oNetwork.network,
+                        "mask": m,
+                        "gateway": g
+                    }
 
-                Log.log("Network information: "+str(o))
-                return o
+                    Log.log("Network information: "+str(o))
+                    return o
+            except CustomException as e:
+                if e.status == 404:
+                    pass
+                else:
+                    raise e
 
             # Try networkLogic: "container".
             ################################
 
-            else:
-                # Is container logic?
-                if networkInformation.network_container != "/":
-                    if "/" in networkInformation.network_container:
-                        n, m = networkInformation.network_container.split("/")
+            # Is container logic?
+            if networkInformation.network_container != "/":
+                if "/" in networkInformation.network_container:
+                    n, m = networkInformation.network_container.split("/")
 
-                        networkContainerInfo = NetworkContainer(self.assetId, n+"/"+m).info(
-                            filter={
-                                "*Real Network": "yes"
-                            })
+                    networkContainerInfo = NetworkContainer(self.assetId, n+"/"+m).info(
+                        filter={
+                            "*Real Network": "yes"
+                        })
 
-                        # {
-                        #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
-                        #     'extattrs': {
-                        #         'Gateway': {'value': '10.8.1.1'},
-                        #         'Mask': {'value': '255.255.128.0'},
-                        #         'Real Network': {'value': 'yes'}
-                        #         },
-                        #     'network': '10.8.0.0/17',
-                        #     'network_container': '/',
-                        #     'network_view': 'default'
-                        # ]
+                    # {
+                    #     '_ref': 'networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMC4wLzE3LzA:10.8.0.0/17/default',
+                    #     'extattrs': {
+                    #         'Gateway': {'value': '10.8.1.1'},
+                    #         'Mask': {'value': '255.255.128.0'},
+                    #         'Real Network': {'value': 'yes'}
+                    #         },
+                    #     'network': '10.8.0.0/17',
+                    #     'network_container': '/',
+                    #     'network_view': 'default'
+                    # ]
 
-                        if "network" in networkContainerInfo and networkContainerInfo["network"]:
-                            try:
-                                m = networkContainerInfo["extattrs"]["Mask"]["value"]
-                            except Exception:
-                                raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
+                    if "network" in networkContainerInfo and networkContainerInfo["network"]:
+                        try:
+                            m = networkContainerInfo["extattrs"]["Mask"]["value"]
+                        except Exception:
+                            raise CustomException(status=400, payload={"message": "Mask value not set in the Infoblox network's extensible attributes."})
 
-                            try:
-                                g = networkContainerInfo["extattrs"]["Gateway"]["value"]
-                            except Exception:
-                                g = ""
+                        try:
+                            g = networkContainerInfo["extattrs"]["Gateway"]["value"]
+                        except Exception:
+                            g = ""
 
-                            o = {
-                                "networkLogic": "container",
-                                "mask": m,
-                                "gateway": g,
-                                "network_container": networkInformation.network_container
-                            }
+                        o = {
+                            "networkLogic": "container",
+                            "mask": m,
+                            "gateway": g,
+                            "network_container": networkInformation.network_container
+                        }
 
-                            Log.log("Network information: "+str(o))
-                            return o
+                        Log.log("Network information: "+str(o))
+                        return o
 
             raise CustomException(status=400, payload={"message": "Cannot discriminate network."})
         except Exception as e:
@@ -336,7 +340,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = Network(assetId, network).ipv4s(maxResults=100, fromIp=startIp, toIp=endIp)
+                addresses = Network(assetId, network).ipv4sQuick(maxResults=100, fromIp=startIp, toIp=endIp)
 
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 

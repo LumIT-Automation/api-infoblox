@@ -33,7 +33,7 @@ class InfobloxNetworksController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = Network.list(assetId)
+                    itemData = Network.listQuick(assetId)
 
                     # Filter networks' list basing on permissions.
                     # This filter is strict: if you need to be able to read a network, that network must be enlisted in the permissions' table.

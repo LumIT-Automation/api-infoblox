@@ -1,12 +1,17 @@
 from typing import Dict
 
+from infoblox.helpers.Exception import CustomException
+
 from infoblox.models.Infoblox.connectors.Network import Network as Connector
 
 
 Value: Dict[str, str] = {"value": ""}
 
 class Network:
-    def __init__(self, assetId: int, network: str, *args, **kwargs):
+    def __init__(self, assetId: int, network: str, filter: dict = None, *args, **kwargs):
+        filter = {} if filter is None \
+            else filter
+
         super().__init__(*args, **kwargs)
 
         self.asset_id: int = int(assetId)
@@ -21,7 +26,7 @@ class Network:
             "Real Network": Value,
         }
 
-        self.__load()
+        self.__load(filter=filter)
 
 
 
@@ -29,23 +34,10 @@ class Network:
     # Public methods
     ####################################################################################################################
 
-    def info(self, filter: dict = None) -> dict:
-        filter = {} if filter is None else filter
-
+    def ipv4sQuick(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
         try:
-            data = Connector.get(self.asset_id, self.network, filter)
-            if data:
-                data["asset_id"] = self.asset_id
-        except Exception as e:
-            raise e
-
-        return data
-
-
-
-    def ipv4s(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
-        try:
-            # Quick list, do not using composition.
+            # Quick list.
+            # Not using composition for possible huge dataset.
             return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
@@ -65,10 +57,9 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int) -> dict:
+    def listQuick(assetId: int) -> dict:
         try:
             o = Connector.list(assetId)
-
             for i, v in enumerate(o):
                 o[i]["asset_id"] = assetId # add assetId information.
         except Exception as e:
@@ -91,10 +82,13 @@ class Network:
     # Private methods
     ####################################################################################################################
 
-    def __load(self) -> None:
+    def __load(self, filter: dict) -> None:
         try:
-            data = Connector.get(self.asset_id, self.network)
-            for k, v in data.items():
-                setattr(self, k, v)
+            data = Connector.get(self.asset_id, self.network, filter=filter)
+            if data:
+                for k, v in data.items():
+                    setattr(self, k, v)
+            else:
+                raise CustomException(status=404)
         except Exception as e:
             raise e

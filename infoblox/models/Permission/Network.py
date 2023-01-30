@@ -42,7 +42,7 @@ class Network:
                 raise e
         else:
             # Check if assetId/networkName is a valid Infoblox network (at the time of the insertion).
-            infobloxNetworks = InfobloxNetwork.list(assetId) + InfobloxNetworkContainer.list(assetId)
+            infobloxNetworks = InfobloxNetwork.listQuick(assetId) + InfobloxNetworkContainer.list(assetId)
             for v in infobloxNetworks:
                 if v["network"] == network:
                     try:
