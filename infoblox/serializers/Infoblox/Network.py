@@ -26,6 +26,6 @@ class InfobloxNetworkSerializer(serializers.Serializer):
     network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
     network_container = serializers.CharField(max_length=255, required=False)
     network_view = serializers.CharField(max_length=255, required=False)
-    vlans = InfobloxNetworkVlansSerializer(many=True,required=False)
+    vlans = InfobloxNetworkVlansSerializer(many=True, required=False)
     extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
     comment = serializers.CharField(max_length=255, required=False)

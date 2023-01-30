@@ -46,11 +46,12 @@ class NetworkContainer:
 
 
 
-    def addNextAvailableNetwork(self, subnetMask: str) -> dict:
+    def addNextAvailableNetwork(self, subnetMaskCidr: int, data: dict) -> dict:
         try:
-            return Network.add(assetId=self.asset_id, data={
-                "network": "func:nextavailablenetwork:" + self.network + ", " + str(subnetMask),
-            })
+            # Next available network in this container.
+            data["network"] = "func:nextavailablenetwork:" + self.network + ", " + str(subnetMaskCidr)
+
+            return Network.add(assetId=self.asset_id, data=data)
         except Exception as e:
             raise e
 

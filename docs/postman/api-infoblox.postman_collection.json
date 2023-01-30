@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b7ba1878-1981-49b5-9ea1-4ec9f0b45f0a",
+		"_postman_id": "f5ce7bca-d18b-43b1-ad2a-c181a48080b1",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1045,7 +1045,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"next_available\": {\n            \"subnet_mask\": \"24\"\n        }\n    }\n}"
+							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": \"24\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
 						},
 						"url": {
 							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.8.0.0/17/networks/",

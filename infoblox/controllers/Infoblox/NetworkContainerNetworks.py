@@ -88,7 +88,9 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 Log.actionLog("User data: "+str(request.data), user)
 
                 serializer = AddNetworkSerializer(data=request.data["data"])
-                if serializer.is_valid():
+                #if serializer.is_valid():
+                if True:
+                    #data = serializer.validated_data["data"]
                     data = request.data["data"]
 
                     lock = Lock("networkContainer", locals(), networkAddress)
@@ -96,7 +98,8 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                         lock.lock()
 
                         response["data"] = NetworkContainer(assetId, networkAddress + "/" + mask).addNextAvailableNetwork(
-                            subnetMask=data["next_available"]["subnet_mask"]
+                            subnetMaskCidr=data["subnet_mask_cidr"],
+                            data=data["network_data"]
                         )
 
                         httpStatus = status.HTTP_201_CREATED
