@@ -8,7 +8,5 @@ class InfobloxNetworkContainersSerializer(serializers.Serializer):
 
 
 class InfobloxNetworkContainerAddNetworkSerializer(serializers.Serializer):
-    class InfobloxNetworkContainerAddNetworkInnerSerializer(serializers.Serializer):
-        subnet_mask = serializers.CharField(max_length=2, required=True)
-
-    next_available = InfobloxNetworkContainerAddNetworkInnerSerializer(required=True)
+    subnet_mask_cidr = serializers.IntegerField(required=True)
+    network_data = InfobloxNetworkSerializer(required=False)

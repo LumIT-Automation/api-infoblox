@@ -23,7 +23,8 @@ class InfobloxNetworkSerializer(serializers.Serializer):
             self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
     _ref = serializers.CharField(max_length=255, required=False)
-    network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
+    #network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$') # @todo: restore this with OR "next-available".
+    network = serializers.CharField(max_length=255, required=True)
     network_container = serializers.CharField(max_length=255, required=False)
     network_view = serializers.CharField(max_length=255, required=False)
     vlans = InfobloxNetworkVlansSerializer(many=True, required=False)

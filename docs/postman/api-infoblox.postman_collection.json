@@ -996,7 +996,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.8.0.0/16/networks/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.8.0.0/17/networks/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1011,7 +1011,7 @@
 								"1",
 								"network-container",
 								"10.8.0.0",
-								"16",
+								"17",
 								"networks",
 								""
 							]
@@ -1045,7 +1045,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": \"24\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
+							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": 24,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
 						},
 						"url": {
 							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.8.0.0/17/networks/",

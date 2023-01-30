@@ -88,10 +88,8 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 Log.actionLog("User data: "+str(request.data), user)
 
                 serializer = AddNetworkSerializer(data=request.data["data"])
-                #if serializer.is_valid():
-                if True:
-                    #data = serializer.validated_data["data"]
-                    data = request.data["data"]
+                if serializer.is_valid():
+                    data = serializer.validated_data
 
                     lock = Lock("networkContainer", locals(), networkAddress)
                     if lock.isUnlocked():
