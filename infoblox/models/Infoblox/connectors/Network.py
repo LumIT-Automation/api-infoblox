@@ -76,15 +76,22 @@ class Network:
 
 
     @staticmethod
-    def list(assetId: int) -> dict:
+    def list(assetId: int, filter: dict = None) -> dict:
+        filter = filter or {}
+
+        apiParams = {
+            "_max_results": 65535,
+            "_return_fields+": "network,network_container,vlans,extattrs"
+        }
+
+        if filter:
+            apiParams.update(filter)
+
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/network",
-                params={
-                    "_max_results": 65535,
-                    "_return_fields+": "network,network_container,vlans,extattrs"
-                },
+                params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )

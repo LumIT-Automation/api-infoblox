@@ -56,9 +56,11 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def listData(assetId: int) -> dict:
+    def listData(assetId: int, filters: dict = None) -> dict:
+        filters = filters or {}
+
         try:
-            o = Connector.list(assetId)
+            o = Connector.list(assetId, filters)
             for i, v in enumerate(o):
                 o[i]["asset_id"] = assetId # add assetId information.
         except Exception as e:

@@ -25,15 +25,26 @@ class InfobloxNetworksController(CustomController):
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
+        fk = list()
+        fv = list()
+        filters = dict()
+
         try:
             if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("Get networks list", user)
+
+                if 'fby' in request.GET and 'fval' in request.GET:
+                    for f in dict(request.GET)["fby"]:
+                        fk.append(f)
+                    for v in dict(request.GET)["fval"]:
+                        fv.append(v)
+                    filters = dict(zip(fk, fv))
 
                 lock = Lock("network", locals())
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = Network.listData(assetId)
+                    itemData = Network.listData(assetId, filters)
 
                     # Filter networks' list basing on permissions.
                     # This filter is strict: if you need to be able to read a network, that network must be enlisted in the permissions' table.

@@ -29,7 +29,6 @@ class InfobloxNetworkSerializer(serializers.Serializer):
             self.fields["Name Server"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Region"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
-            self.fields["Color"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Country"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["CloudProviderRegion"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
