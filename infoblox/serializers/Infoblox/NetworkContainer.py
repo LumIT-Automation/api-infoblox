@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from infoblox.serializers.Infoblox.Network import InfobloxNetworkValueStringSerializer
 
 
 class InfobloxNetworkContainerExtattrsValueSerializer(serializers.Serializer):
@@ -27,6 +28,6 @@ class InfobloxNetworkContainerSerializer(serializers.Serializer):
 class InfobloxNetworkContainerNetworksSerializer(serializers.Serializer):
     class InfobloxNetworkContainerInnerNetworksSerializer(serializers.Serializer):
         _ref = serializers.CharField(max_length=255)
-        network = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$')
+        network = InfobloxNetworkValueStringSerializer(required=True)
 
     items = InfobloxNetworkContainerInnerNetworksSerializer(many=True, required=False)
