@@ -31,7 +31,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData["items"] = NetworkContainer(assetId, networkAddress+"/"+mask).networks()
+                    itemData["items"] = NetworkContainer(assetId, networkAddress+"/"+mask).networksData()
 
                     serializer = Serializer(data=itemData)
                     if serializer.is_valid():

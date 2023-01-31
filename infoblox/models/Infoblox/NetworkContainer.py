@@ -34,7 +34,7 @@ class NetworkContainer:
     # Public methods
     ####################################################################################################################
 
-    def networks(self, filter: dict = None) -> dict:
+    def networksData(self, filter: dict = None) -> dict:
         filter = filter or {}
 
         try:
@@ -62,7 +62,7 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def list(assetId: int, filters: dict = None) -> dict:
+    def listData(assetId: int, filters: dict = None) -> dict:
         filters = filters or {}
 
         try:

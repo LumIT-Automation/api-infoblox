@@ -21,7 +21,7 @@ class Tree:
         }
 
         # Get a containers' key/values structure.
-        l = NetworkContainer.list(assetId)
+        l = NetworkContainer.listData(assetId)
         for container in l:
             # {
             #      "_ref": "networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMTAuMC8yNC8w:10.8.10.0/24/default",

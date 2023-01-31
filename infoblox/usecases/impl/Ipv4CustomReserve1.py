@@ -283,7 +283,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
                     # Get all networks in the network container.
                     n, m = networkContainer.split('/')
-                    subnetworks = NetworkContainer(assetId, n+"/"+m).networks(
+                    subnetworks = NetworkContainer(assetId, n+"/"+m).networksData(
                         filter={
                             "*Object Type": objectType
                         }
