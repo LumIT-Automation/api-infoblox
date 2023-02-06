@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "561db161-a0e3-46ee-af20-f9bb6d573e34",
+		"_postman_id": "ea5340a1-1224-44e8-ae9f-cd78f5c3d414",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -749,7 +749,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/?fby=*Object Type&fval=Database",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -764,6 +764,16 @@
 								"1",
 								"networks",
 								""
+							],
+							"query": [
+								{
+									"key": "fby",
+									"value": "*Object Type"
+								},
+								{
+									"key": "fval",
+									"value": "Database"
+								}
 							]
 						}
 					},
@@ -986,7 +996,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-containers/?fby=CloudProviderRegion&fval=Italy",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-containers/?fby=*CloudEnvironment&fval=cloud&fby=*CloudCountry&fval=cloud-AWS&fby=*CloudCity&fval=aws-eu-west-1",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1005,11 +1015,27 @@
 							"query": [
 								{
 									"key": "fby",
-									"value": "CloudProviderRegion"
+									"value": "*CloudEnvironment"
 								},
 								{
 									"key": "fval",
-									"value": "Italy"
+									"value": "cloud"
+								},
+								{
+									"key": "fby",
+									"value": "*CloudCountry"
+								},
+								{
+									"key": "fval",
+									"value": "cloud-AWS"
+								},
+								{
+									"key": "fby",
+									"value": "*CloudCity"
+								},
+								{
+									"key": "fval",
+									"value": "aws-eu-west-1"
 								}
 							]
 						}
@@ -1090,10 +1116,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": 24,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
+							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": 24,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh 1\",\n            \"vlans\": [\n                {\n                    \"vlan\": \"vlan/ZG5zLnZsYW4kLmNvbS5pbmZvYmxveC5kbnMudmxhbl92aWV3JHZ2bGFuLjExLjIwLjEx:vvlan/vvlan0011/11\"\n                }\n            ],\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
 						},
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.8.0.0/17/networks/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.9.0.0/20/networks/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1107,8 +1133,8 @@
 								"infoblox",
 								"1",
 								"network-container",
-								"10.8.0.0",
-								"17",
+								"10.9.0.0",
+								"20",
 								"networks",
 								""
 							]

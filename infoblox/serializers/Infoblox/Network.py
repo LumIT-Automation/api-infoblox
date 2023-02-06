@@ -9,7 +9,7 @@ class InfobloxNetworkValueStringSerializer(serializers.RegexField):
 
 class InfobloxNetworkSerializer(serializers.Serializer):
     class InfobloxNetworkVlansSerializer(serializers.Serializer):
-        id = serializers.IntegerField(required=True)
+        id = serializers.IntegerField(required=False)
         name = serializers.CharField(max_length=255, required=False)
         vlan = serializers.CharField(max_length=255, required=False)
 
