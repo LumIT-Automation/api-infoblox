@@ -25,13 +25,13 @@ class InfobloxVlanController(CustomController):
             if Permission.hasUserPermission(groups=user["groups"], action="vlan_get", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("Vlan information", user)
 
-                lock = Lock("vlan", locals())
+                lock = Lock("vlan", locals(), str(vlanId))
                 if lock.isUnlocked():
                     lock.lock()
 
                     v = Vlan(assetId=assetId, id=vlanId)
                     data["data"] = v.repr()
-                    serializer = Serializer(data=v.repr())
+                    serializer = Serializer(data=data["data"])
 
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data
@@ -56,8 +56,6 @@ class InfobloxVlanController(CustomController):
                         }
 
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
-
-                        CustomController.plugins("vlan_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED
@@ -65,7 +63,7 @@ class InfobloxVlanController(CustomController):
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("vlan", locals()).release()
+            Lock("vlan", locals(), str(vlanId)).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)

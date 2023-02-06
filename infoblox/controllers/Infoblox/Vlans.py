@@ -6,7 +6,6 @@ from infoblox.models.Infoblox.Vlan import Vlan
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Vlans import InfobloxVlansSerializer as Serializer
-#from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer as NetworkAddSerializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -19,9 +18,7 @@ class InfobloVlansController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int) -> Response:
         data = dict()
-        allowedData = {
-            "data": []
-        }
+        itemData = dict()
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
@@ -44,14 +41,8 @@ class InfobloVlansController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = Vlan.listData(assetId, filters)
-
-                    # Filter vlans' list basing on permissions.
-                    for p in itemData:
-                        if Permission.hasUserPermission(groups=user["groups"], action="vlans_get", assetId=assetId) or user["authDisabled"]:
-                            allowedData["data"].append(p)
-
-                    serializer = Serializer(data=allowedData)
+                    itemData["data"] = Vlan.listData(assetId, filters)
+                    serializer = Serializer(data=itemData)
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data["data"]
                         data["href"] = request.get_full_path()
@@ -75,8 +66,6 @@ class InfobloVlansController(CustomController):
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
                     lock.release()
-
-                    CustomController.plugins("vlans_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED
@@ -93,52 +82,3 @@ class InfobloVlansController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
-
-
-    """
-    @staticmethod
-    def post(request: Request, assetId: int) -> Response:
-        response = None
-        user = CustomController.loggedUser(request)
-
-        try:
-            if Permission.hasUserPermission(groups=user["groups"], action="networks_post", assetId=assetId) or user["authDisabled"]:
-                Log.actionLog("Network addition", user)
-                Log.actionLog("User data: "+str(request.data), user)
-
-                serializer = NetworkAddSerializer(data=request.data["data"])
-                if serializer.is_valid():
-                    data = serializer.validated_data
-
-                    lock = Lock("network", locals(), data["network"])
-                    if lock.isUnlocked():
-                        lock.lock()
-
-                        Network.add(assetId, data)
-
-                        httpStatus = status.HTTP_201_CREATED
-                        lock.release()
-                    else:
-                        httpStatus = status.HTTP_423_LOCKED
-                else:
-                    httpStatus = status.HTTP_400_BAD_REQUEST
-                    response = {
-                        "Infoblox": {
-                            "error": str(serializer.errors)
-                        }
-                    }
-
-                    Log.actionLog("User data incorrect: "+str(response), user)
-            else:
-                httpStatus = status.HTTP_403_FORBIDDEN
-        except Exception as e:
-            if "serializer" in locals():
-                Lock("network", locals(), locals()["serializer"].data["network"]).release()
-
-            data, httpStatus, headers = CustomController.exceptionHandler(e)
-            return Response(data, status=httpStatus, headers=headers)
-
-        return Response(response, status=httpStatus, headers={
-            "Cache-Control": "no-cache"
-        })
-    """

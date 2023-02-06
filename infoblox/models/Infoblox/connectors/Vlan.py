@@ -15,7 +15,26 @@ class Vlan:
     @staticmethod
     def get(assetId, id: int, silent: bool = False) -> dict:
         try:
-            return Vlan.list(assetId=assetId, filter={"id": id}, silent=silent)[0]
+            apiParams = {
+                "id": id,
+                "_max_results": 65535,
+                "_return_fields+": "id,assigned_to,name,parent,reserved,status,description,comment,department,extattrs"
+            }
+
+            infoblox = Asset(assetId)
+            api = ApiSupplicant(
+                endpoint=infoblox.baseurl+"/vlan",
+                params=apiParams,
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
+                silent=silent
+            )
+
+            v = api.get()
+            if isinstance(v, list) and len(v) > 0:
+                return v[0]
+            else:
+                return v
         except Exception as e:
             raise e
 
@@ -46,33 +65,3 @@ class Vlan:
             return api.get()
         except Exception as e:
             raise e
-
-
-    """
-    @staticmethod
-    def add(assetId, data: dict, silent: bool = False) -> dict:
-
-        try:
-            infoblox = Asset(assetId)
-            api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
-                params={
-                    "_max_results": 65535,
-                    "_return_fields+": "network,network_container,extattrs"
-                },
-                auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify,
-                silent=silent
-            )
-
-            o = api.post(
-                additionalHeaders={
-                    "Content-Type": "application/json",
-                },
-                data=json.dumps(data)
-            )
-        except Exception as e:
-            raise e
-
-        return o
-    """
