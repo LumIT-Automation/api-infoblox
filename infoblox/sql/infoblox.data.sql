@@ -46,7 +46,9 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (18, 'permission_identityGroup_patch', 'global', NULL),
 (19, 'permission_identityGroup_delete', 'global', NULL),
 (20, 'historyComplete_get', 'global', NULL),
-(21, 'full_visibility', 'global', NULL);
+(21, 'full_visibility', 'global', NULL),
+(22, 'vlans_get', 'asset', NULL),
+(23, 'vlan_get', 'asset', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -81,6 +83,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 19),
 (1, 20),
 (1, 21),
+(1, 22),
+(1, 23),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -90,12 +94,16 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (2, 12),
 (2, 13),
 (2, 14),
+(2, 22),
+(2, 23),
 (3, 3),
 (3, 5),
 (3, 6),
 (3, 7),
 (3, 10),
 (3, 11),
+(3, 22),
+(3, 23),
 (4, 3),
 (4, 5),
 (4, 6),
@@ -106,7 +114,9 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 11),
 (4, 12),
 (4, 13),
-(4, 14);
+(4, 14),
+(4, 22),
+(4, 23);
 
 -- Dump dei dati per la tabella `identity_group`
 -- (Workflow system group)
