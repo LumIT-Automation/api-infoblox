@@ -14,7 +14,7 @@ from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
 
-class InfobloVlansController(CustomController):
+class InfobloxVlansController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int) -> Response:
         data = dict()

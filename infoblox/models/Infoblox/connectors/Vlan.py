@@ -1,5 +1,3 @@
-import json
-
 from infoblox.models.Infoblox.Asset.Asset import Asset
 
 from infoblox.helpers.ApiSupplicant import ApiSupplicant
@@ -15,16 +13,14 @@ class Vlan:
     @staticmethod
     def get(assetId, id: int, silent: bool = False) -> dict:
         try:
-            apiParams = {
-                "id": id,
-                "_max_results": 65535,
-                "_return_fields+": "id,assigned_to,name,parent,reserved,status,description,comment,department,extattrs"
-            }
-
             infoblox = Asset(assetId)
             api = ApiSupplicant(
                 endpoint=infoblox.baseurl+"/vlan",
-                params=apiParams,
+                params={
+                    "id": id,
+                    "_max_results": 65535,
+                    "_return_fields+": "id,assigned_to,name,parent,reserved,status,description,comment,department,extattrs"
+                },
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
                 silent=silent

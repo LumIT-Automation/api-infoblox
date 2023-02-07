@@ -18,7 +18,7 @@ class Vlan:
         self.reserved: bool = False
         self.status: str = ""
         self.extattrs: Dict[str, Dict[str, str]] = {}
-        self.parent: dict = {}
+        self.parent: Dict[str, str] = {}
         self.assigned_to: list = []
 
         self.__load()

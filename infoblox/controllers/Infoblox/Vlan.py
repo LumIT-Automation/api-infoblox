@@ -29,9 +29,9 @@ class InfobloxVlanController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    v = Vlan(assetId=assetId, id=vlanId)
-                    data["data"] = v.repr()
-                    serializer = Serializer(data=data["data"])
+                    serializer = Serializer(
+                        data=Vlan(assetId=assetId, id=vlanId).repr()
+                    )
 
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data

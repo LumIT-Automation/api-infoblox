@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('<int:assetId>/tree/', NetworksTree.InfobloxNetworksTreeController.as_view(), name='infoblox-network-tree'),
     path('<int:assetId>/vlan/<int:vlanId>/', Vlan.InfobloxVlanController.as_view(), name='infoblox-vlan'),
-    path('<int:assetId>/vlans/', Vlans.InfobloVlansController.as_view(), name='infoblox-vlans'),
+    path('<int:assetId>/vlans/', Vlans.InfobloxVlansController.as_view(), name='infoblox-vlans'),
     path('<int:assetId>/network/<str:networkAddress>/', Network.InfobloxNetworkController.as_view(), name='infoblox-network-info'),
     path('<int:assetId>/networks/', Networks.InfobloxNetworksController.as_view(), name='infoblox-networks'),
     path('<int:assetId>/network-container/<str:networkAddress>/<str:mask>/networks/', NetworkContainerNetworks.InfobloxNetworkContainerNetworksController.as_view(), name='infoblox-network-container-info'),
