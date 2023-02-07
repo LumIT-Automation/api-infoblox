@@ -17,6 +17,8 @@ class InfobloxAssignNetworkController(CustomController):
     @staticmethod
     def put(request: Request, assetId: int) -> Response:
         response = dict()
+        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+
         user = CustomController.loggedUser(request)
 
         try:
@@ -38,25 +40,33 @@ class InfobloxAssignNetworkController(CustomController):
                         "*CloudCity": data["region"]
                     })
 
-                    for container in containers:
-                        try:
-                            if Permission.hasUserPermission(groups=user["groups"], action="assign_network", assetId=assetId, networkName=container) or user["authDisabled"]:
-                                response["data"] = NetworkContainer(assetId, container["network"]).addNextAvailableNetwork(
-                                    subnetMaskCidr=24,
-                                    data=data["network_data"]
-                                )
+                    if containers:
+                        for container in containers:
+                            try:
+                                if Permission.hasUserPermission(groups=user["groups"], action="assign_network", assetId=assetId, networkName=container) or user["authDisabled"]:
+                                    response["data"] = NetworkContainer(assetId, container["network"]).addNextAvailableNetwork(
+                                        subnetMaskCidr=24,
+                                        data=data["network_data"]
+                                    )
 
-                                httpStatus = status.HTTP_201_CREATED
-                                break
-                            else:
-                                httpStatus = status.HTTP_403_FORBIDDEN
-                        except Exception: # @todo: only no network available.
-                            httpStatus = status.HTTP_400_BAD_REQUEST
-                            response = {
-                                "Infoblox": {
-                                    "error": "No network available"
+                                    httpStatus = status.HTTP_201_CREATED
+                                    break
+                                else:
+                                    httpStatus = status.HTTP_403_FORBIDDEN
+                            except Exception: # @todo: only no network available.
+                                httpStatus = status.HTTP_400_BAD_REQUEST
+                                response = {
+                                    "Infoblox": {
+                                        "error": "No network available"
+                                    }
                                 }
+                    else:
+                        httpStatus = status.HTTP_400_BAD_REQUEST
+                        response = {
+                            "Infoblox": {
+                                "error": "No container available"
                             }
+                        }
 
                     lock.release()
                 else:
