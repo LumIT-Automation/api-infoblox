@@ -3,6 +3,7 @@ from django.urls import path
 from .controllers import Root
 from .controllers.Infoblox.Asset import Asset, Assets
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan
+from .controllers.Infoblox.wrappers import AssignNetwork
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers import History
 
@@ -26,10 +27,13 @@ urlpatterns = [
     path('<int:assetId>/vlans/', Vlans.InfobloxVlansController.as_view(), name='infoblox-vlans'),
     path('<int:assetId>/network/<str:networkAddress>/', Network.InfobloxNetworkController.as_view(), name='infoblox-network-info'),
     path('<int:assetId>/networks/', Networks.InfobloxNetworksController.as_view(), name='infoblox-networks'),
-    path('<int:assetId>/network-container/<str:networkAddress>/<str:mask>/networks/', NetworkContainerNetworks.InfobloxNetworkContainerNetworksController.as_view(), name='infoblox-network-container-info'),
+    path('<int:assetId>/network-container/<str:networkAddress>/<str:mask>/networks/', NetworkContainerNetworks.InfobloxNetworkContainerNetworksController.as_view(), name='infoblox-network-container-networks'),
     path('<int:assetId>/network-containers/', NetworkContainers.InfobloxNetworkContainersController.as_view(), name='infoblox-network-containers'),
     path('<int:assetId>/ipv4/<str:ipv4address>/', Ipv4.InfobloxIpv4Controller.as_view(), name='infoblox-ipv4'),
     path('<int:assetId>/ipv4s/', Ipv4s.InfobloxIpv4sController.as_view(), name='infoblox-ipv4s'),
+
+    # Use cases.
+    path('<int:assetId>/assign-network/', AssignNetwork.InfobloxAssignNetworkController.as_view(), name='infoblox-network-assign-network'),
 
     # Log history.
     path('history/', History.HistoryLogsController.as_view(), name='f5-log-history'),

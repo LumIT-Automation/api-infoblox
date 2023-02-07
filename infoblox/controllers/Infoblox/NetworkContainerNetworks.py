@@ -78,7 +78,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
 
 
     @staticmethod
-    def post(request: Request,  assetId: int, networkAddress: str, mask: str) -> Response:
+    def post(request: Request, assetId: int, networkAddress: str, mask: str) -> Response:
         response = dict()
         user = CustomController.loggedUser(request)
 
