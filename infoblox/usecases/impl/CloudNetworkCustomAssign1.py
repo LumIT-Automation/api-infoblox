@@ -1,3 +1,4 @@
+from infoblox.usecases.impl.CloudNetworkAssign import CloudNetworkAssign
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Permission.Permission import Permission
 
@@ -5,9 +6,9 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class AssignCloudNetwork1:
+class CloudNetworkCustomAssign1(CloudNetworkAssign):
     def __init__(self, assetId: int, provider: str, region: str, user: dict, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(assetId, provider, region, user, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.provider: str = provider
@@ -20,7 +21,7 @@ class AssignCloudNetwork1:
     # Public methods
     ####################################################################################################################
 
-    def __call__(self, data, *args, **kwargs) -> dict:
+    def assignNetwork(self, data: dict, *args, **kwargs) -> dict:
         status = ""
 
         containers = self.__getContainers()

@@ -228,7 +228,7 @@ LOCK_MAX_VALIDITY = 30 # seconds.
 
 # Plugins and configuration.
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")
-CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.AssignCloudNetwork1", "AssignCloudNetwork1")
+CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomAssign1", "CloudNetworkCustomAssign1")
 
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'
