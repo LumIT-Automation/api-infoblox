@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "13f3d98b-d491-44eb-9dd1-d91bd30b10b6",
+		"_postman_id": "bf2c1d9a-74be-49ec-ac64-fc7964305f9b",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -680,6 +680,60 @@
 					]
 				},
 				{
+					"name": "Use cases",
+					"item": [
+						{
+							"name": "assign-cloud-network",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									},
+									{
+										"key": "If-None-Match",
+										"value": "851847cbe30d3d64e74703cac5fa8992",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"provider\": \"cloud-AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh 1\",\n            \"vlans\": [\n                {\n                    \"vlan\": \"vlan/ZG5zLnZsYW4kLmNvbS5pbmZvYmxveC5kbnMudmxhbl92aWV3JHZ2bGFuLjExLjIwLjEx:vvlan/vvlan0011/11\"\n                }\n            ],\n            \"extattrs\": {\n                \"Gateway\": {\n                    \"value\": \"111.111.111.111\"\n                },\n                \"Mask\": {\n                    \"value\": \"255.255.255.0\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"1",
+										"assign-cloud-network",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "vlan",
 					"request": {
 						"auth": {
@@ -1182,7 +1236,7 @@
 					"response": []
 				},
 				{
-					"name": "network-container-next-available-network",
+					"name": "network-container-next-available-networks",
 					"request": {
 						"auth": {
 							"type": "noauth"

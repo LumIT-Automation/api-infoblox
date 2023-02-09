@@ -76,7 +76,7 @@ class Network:
 
 
     @staticmethod
-    def list(assetId: int, filter: dict = None) -> dict:
+    def list(assetId: int, filter: dict = None) -> list:
         filter = filter or {}
 
         apiParams = {

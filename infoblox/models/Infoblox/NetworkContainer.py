@@ -62,7 +62,7 @@ class NetworkContainer:
     ####################################################################################################################
 
     @staticmethod
-    def listData(assetId: int, filters: dict = None) -> dict:
+    def listData(assetId: int, filters: dict = None) -> list:
         filters = filters or {}
 
         try:

@@ -37,7 +37,7 @@ class Vlan:
 
 
     @staticmethod
-    def list(assetId: int, filter: dict = None, silent: bool = False) -> dict:
+    def list(assetId: int, filter: dict = None, silent: bool = False) -> list:
         filter = filter or {}
 
         try:

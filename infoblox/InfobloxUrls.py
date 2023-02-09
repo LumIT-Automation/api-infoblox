@@ -3,7 +3,7 @@ from django.urls import path
 from .controllers import Root
 from .controllers.Infoblox.Asset import Asset, Assets
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan
-from .controllers.Infoblox.wrappers import AssignNetwork
+from .controllers.Infoblox.wrappers import AssignCloudNetwork
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers import History
 
@@ -33,7 +33,7 @@ urlpatterns = [
     path('<int:assetId>/ipv4s/', Ipv4s.InfobloxIpv4sController.as_view(), name='infoblox-ipv4s'),
 
     # Use cases.
-    path('<int:assetId>/assign-network/', AssignNetwork.InfobloxAssignNetworkController.as_view(), name='infoblox-network-assign-network'),
+    path('<int:assetId>/assign-cloud-network/', AssignCloudNetwork.InfobloxAssignCloudNetworkController.as_view(), name='infoblox-network-assign-network'),
 
     # Log history.
     path('history/', History.HistoryLogsController.as_view(), name='f5-log-history'),

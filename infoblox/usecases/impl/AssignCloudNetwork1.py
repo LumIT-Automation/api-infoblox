@@ -1,0 +1,66 @@
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+from infoblox.models.Permission.Permission import Permission
+
+from infoblox.helpers.Exception import CustomException
+from infoblox.helpers.Log import Log
+
+
+class AssignCloudNetwork1:
+    def __init__(self, assetId: int, provider: str, region: str, user: dict, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.assetId: int = int(assetId)
+        self.provider: str = provider
+        self.region: str = region
+        self.user = user
+
+
+
+    ####################################################################################################################
+    # Public methods
+    ####################################################################################################################
+
+    def __call__(self, data, *args, **kwargs) -> dict:
+        status = ""
+
+        containers = self.__getContainers()
+        if containers:
+            for container in containers:
+                try:
+                    Log.log(f"Trying {container}")
+
+                    if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, networkName=container) or self.user["authDisabled"]:
+                        return NetworkContainer(self.assetId, container["network"]).addNextAvailableNetwork(
+                            subnetMaskCidr=24,
+                            data=data
+                        )
+                    else:
+                        status = "forbidden"
+                except CustomException as e:
+                    status = e.payload.get("Infoblox", e.payload) # Infoblox error response, as full network.
+                except Exception as e:
+                    status = e.__str__()
+
+            if status == "forbidden":
+                raise CustomException(status=403)
+            elif status != "":
+                raise CustomException(status=400, payload={"Infoblox": status})
+        else:
+            raise CustomException(status=400, payload={"Infoblox": "no container network available with specified parameters"})
+
+
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __getContainers(self) -> list:
+        try:
+            # Eligible container networks.
+            return NetworkContainer.listData(self.assetId, {
+                "*CloudEnvironment": "cloud",
+                "*CloudCountry": self.provider,
+                "*CloudCity": self.region
+            })
+        except Exception as e:
+            raise e

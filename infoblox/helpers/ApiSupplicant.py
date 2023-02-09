@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 from base64 import b64encode
 import requests
 
@@ -29,7 +29,7 @@ class ApiSupplicant:
     # Public methods
     ####################################################################################################################
 
-    def get(self) -> dict:
+    def get(self) -> Union[dict, list]:
         try:
             Log.actionLog(
                 "[API Supplicant] Fetching remote: GET "+str(self.endpoint)+" with params: "+str(self.params)
