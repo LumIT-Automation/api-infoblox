@@ -4,7 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.impl.AssignCloudNetwork1 import AssignCloudNetwork1
+from infoblox.usecases.AssigncloudNetworkFactory import AssignCloudNetworkFactory
 
 from infoblox.serializers.Infoblox.wrappers.AssignNetwork import InfobloxAssignNetworkSerializer as Serializer
 
@@ -33,7 +33,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        response["data"] = AssignCloudNetwork1(assetId, data["provider"], data["region"], user)(data["network_data"])
+                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data["region"], user)()(data["network_data"])
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
