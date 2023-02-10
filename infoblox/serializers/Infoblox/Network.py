@@ -30,7 +30,8 @@ class InfobloxNetworkSerializer(serializers.Serializer):
             self.fields["Object Type"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Region"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Country"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
-            self.fields["CloudProviderRegion"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
+            self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
+            self.fields["VLAN"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
     _ref = serializers.CharField(max_length=255, required=False)
     network = InfobloxNetworkValueStringSerializer()

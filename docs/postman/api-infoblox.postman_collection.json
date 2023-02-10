@@ -708,7 +708,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"cloud-AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh 1\",\n            \"vlans\": [\n                {\n                    \"vlan\": \"vlan/ZG5zLnZsYW4kLmNvbS5pbmZvYmxveC5kbnMudmxhbl92aWV3JHZ2bGFuLjExLjIwLjEx:vvlan/vvlan0011/11\"\n                }\n            ],\n            \"extattrs\": {\n                \"Gateway\": {\n                    \"value\": \"111.111.111.111\"\n                },\n                \"Mask\": {\n                    \"value\": \"255.255.255.0\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"VLAN\": {\n                    \"value\": \"Vi Lan Su Chi\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
