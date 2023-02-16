@@ -66,7 +66,7 @@ INSERT INTO `role` (`id`, `role`, `description`) VALUES
 --
 
 INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
-1, 3),
+(1, 3),
 (1, 5),
 (1, 6),
 (1, 7),

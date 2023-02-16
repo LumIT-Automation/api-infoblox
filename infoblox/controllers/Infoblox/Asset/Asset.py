@@ -73,4 +73,3 @@ class InfobloxAssetController(CustomController):
         return Response(response, status=httpStatus, headers={
             "Cache-Control": "no-cache"
         })
-
