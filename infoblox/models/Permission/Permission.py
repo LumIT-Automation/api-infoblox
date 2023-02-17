@@ -31,6 +31,7 @@ class Permission:
     def delete(self) -> None:
         try:
             Repository.delete(self.id)
+            del self
         except Exception as e:
             raise e
 
@@ -214,6 +215,8 @@ class Permission:
                 roleId=role.id,
                 networkId=network.id
             )
+
+            self.__load()
         except Exception as e:
             raise e
 

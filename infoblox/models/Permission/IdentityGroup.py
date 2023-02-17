@@ -1,6 +1,8 @@
 from infoblox.models.Permission.repository.IdentityGroup import IdentityGroup as Repository
 from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
+from checkpoint.helpers.Misc import Misc
+
 
 class IdentityGroup:
     def __init__(self, id: int = 0, identityGroupIdentifier: str = "", *args, **kwargs):
@@ -21,6 +23,9 @@ class IdentityGroup:
     def modify(self, data: dict) -> None:
         try:
             Repository.modify(self.id, data)
+
+            for k, v in Misc.toDict(data).items():
+                setattr(self, k, v)
         except Exception as e:
             raise e
 
@@ -29,6 +34,7 @@ class IdentityGroup:
     def delete(self) -> None:
         try:
             Repository.delete(self.id)
+            del self
         except Exception as e:
             raise e
 

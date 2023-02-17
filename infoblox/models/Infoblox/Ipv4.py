@@ -71,6 +71,8 @@ class Ipv4:
                 })
 
                 raise e
+
+            self.__load()
         except Exception as e:
             raise e
 
@@ -97,6 +99,8 @@ class Ipv4:
                     ref = fixedaddress # release only the fixedaddress data.
 
                 Connector.delete(self.asset_id, ref)
+
+            self.__load()
         except Exception as e:
             raise e
 

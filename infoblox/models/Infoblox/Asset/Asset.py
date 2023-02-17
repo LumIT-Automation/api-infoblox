@@ -1,5 +1,7 @@
 from infoblox.models.Infoblox.Asset.repository.Asset import Asset as Repository
 
+from checkpoint.helpers.Misc import Misc
+
 
 class Asset:
     def __init__(self, assetId: int, *args, **kwargs):
@@ -28,6 +30,9 @@ class Asset:
     def modify(self, data: dict) -> None:
         try:
             Repository.modify(self.id, data)
+
+            for k, v in Misc.toDict(data).items():
+                setattr(self, k, v)
         except Exception as e:
             raise e
 
@@ -36,6 +41,7 @@ class Asset:
     def delete(self) -> None:
         try:
             Repository.delete(self.id)
+            del self
         except Exception as e:
             raise e
 
