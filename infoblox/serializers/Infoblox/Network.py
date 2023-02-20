@@ -8,6 +8,13 @@ class InfobloxNetworkValueStringSerializer(serializers.RegexField):
 
 
 class InfobloxNetworkSerializer(serializers.Serializer):
+    class InfobloxNetworkOptionsSerializer(serializers.Serializer):
+        name = serializers.CharField(max_length=255, required=False)
+        num = serializers.IntegerField(required=False)
+        value = serializers.CharField(max_length=255, required=False)
+        vendor_class = serializers.CharField(max_length=64, required=False)
+
+
     class InfobloxNetworkVlansSerializer(serializers.Serializer):
         id = serializers.IntegerField(required=False)
         name = serializers.CharField(max_length=255, required=False)
@@ -40,3 +47,4 @@ class InfobloxNetworkSerializer(serializers.Serializer):
     vlans = InfobloxNetworkVlansSerializer(many=True, required=False)
     extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
     comment = serializers.CharField(max_length=255, required=False)
+    options = InfobloxNetworkOptionsSerializer(many=True, required=False)

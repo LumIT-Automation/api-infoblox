@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bf2c1d9a-74be-49ec-ac64-fc7964305f9b",
+		"_postman_id": "cf3fbd9a-41de-4bab-9db2-271ac3f5594b",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -950,7 +950,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"192.168.21.0/24\",\n        \"comment\": \"nella vecchia fattoria\",\n        \"extattrs\": {\n            \"Gateway\": {\n                \"value\": \"192.168.21.11\"\n            },\n            \"Mask\": {\n                \"value\": \"255.255.255.0\"\n            },\n            \"Real Network\": {\n                \"value\": \"yes\"\n            }\n        }\n    }\n}"
+							"raw": "{\n    \"data\": {\n        \"network\": \"192.168.21.0/24\",\n        \"comment\": \"nella vecchia fattoria\",\n        \"extattrs\": {\n            \"Gateway\": {\n                \"value\": \"192.168.21.11\"\n            },\n            \"Mask\": {\n                \"value\": \"255.255.255.0\"\n            },\n            \"Real Network\": {\n                \"value\": \"yes\"\n            }\n        },\n        \"options\": [\n            {\n                \"name\": \"host-name\",\n                \"num\": 12,\n                \"value\": \"proa\",\n                \"vendor_class\": \"DHCP\"\n            }\n        ]\n    }\n}"
 						},
 						"url": {
 							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/",
@@ -1261,7 +1261,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": 24,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh 1\",\n            \"vlans\": [\n                {\n                    \"vlan\": \"vlan/ZG5zLnZsYW4kLmNvbS5pbmZvYmxveC5kbnMudmxhbl92aWV3JHZ2bGFuLjExLjIwLjEx:vvlan/vvlan0011/11\"\n                }\n            ],\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            }\n        }\n    }\n}"
+							"raw": "{\n    \"data\": {\n        \"subnet_mask_cidr\": 24,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh 1\",\n            \"vlans\": [\n                {\n                    \"vlan\": \"vlan/ZG5zLnZsYW4kLmNvbS5pbmZvYmxveC5kbnMudmxhbl92aWV3JHZ2bGFuLjExLjIwLjEx:vvlan/vvlan0011/11\"\n                }\n            ],\n            \"extattrs\": {\n                \"Real Network\": {\n                    \"value\": \"no\"\n                }\n            },\n            \"options\": [\n                {\n                    \"name\": \"host-name\",\n                    \"num\": 12,\n                    \"use_option\": true,\n                    \"value\": \"proa\",\n                    \"vendor_class\": \"DHCP\"\n                }\n            ]\n        }\n    }\n}"
 						},
 						"url": {
 							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-container/10.9.0.0/20/networks/",
