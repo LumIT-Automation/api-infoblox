@@ -1,6 +1,6 @@
 from infoblox.models.Infoblox.Asset.repository.Asset import Asset as Repository
 
-from checkpoint.helpers.Misc import Misc
+from infoblox.helpers.Misc import Misc
 
 
 class Asset:

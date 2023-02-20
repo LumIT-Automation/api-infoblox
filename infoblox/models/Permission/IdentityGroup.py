@@ -1,7 +1,7 @@
 from infoblox.models.Permission.repository.IdentityGroup import IdentityGroup as Repository
 from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
-from checkpoint.helpers.Misc import Misc
+from infoblox.helpers.Misc import Misc
 
 
 class IdentityGroup:
