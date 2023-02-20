@@ -11,6 +11,7 @@ class InfobloxNetworkSerializer(serializers.Serializer):
     class InfobloxNetworkOptionsSerializer(serializers.Serializer):
         name = serializers.CharField(max_length=255, required=False)
         num = serializers.IntegerField(required=False)
+        use_option = serializers.BooleanField(required=False)
         value = serializers.CharField(max_length=255, required=False)
         vendor_class = serializers.CharField(max_length=64, required=False)
 
