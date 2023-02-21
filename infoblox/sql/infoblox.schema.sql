@@ -89,7 +89,7 @@ CREATE TABLE `log` (
 
 CREATE TABLE `log_object` (
   `id` int(11) NOT NULL,
-  `type` enum('ipv4','') DEFAULT NULL,
+  `type` enum('ipv4','network','') DEFAULT NULL,
   `address` varchar(15) DEFAULT NULL,
   `network` varchar(18) DEFAULT NULL,
   `mask` varchar(15) DEFAULT NULL,

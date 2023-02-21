@@ -1,4 +1,5 @@
 from infoblox.models.History.repository.History import History as Repository
+from infoblox.helpers.Log import Log
 
 
 class History:
@@ -42,3 +43,14 @@ class History:
                 raise e
         else:
             return 0
+
+
+
+    @staticmethod
+    def add(data: dict) -> int:
+        try:
+            data["log"]["object_id"] = Repository.add(data["log_object"], "log_object")
+            return Repository.add(data["log"], "log")
+        except Exception as e:
+            raise e
+

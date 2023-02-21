@@ -214,10 +214,10 @@ class InfobloxNetworkController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        Network(assetId, networkAddress).modify(data)
+                        n = Network(assetId, networkAddress).modify(data)
                         httpStatus = status.HTTP_200_OK
                         lock.release()
-                        # historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress)
+                        historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress)
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:
@@ -246,30 +246,26 @@ class InfobloxNetworkController(CustomController):
     ####################################################################################################################
     # Helper methods
     ####################################################################################################################
-    """
+
     @staticmethod
-    def __historyLog(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
-        hId = 0
-
-        try:
-            oId = History.addByType({
-                "type": "ipv4",
-                "address": ipv4,
-                "network": network,
-                "mask": mask,
-                "gateway": gateway
-            }, "object")
-
-            hId = History.addByType({
+    def __historyLog(assetId, user, action, status, network: str = "") -> int:
+        data = {
+            "log": {
                 "username": user,
                 "action": action,
                 "asset_id": assetId,
-                "object_id": oId,
-                "status": s
-            }, "log")
+                "status": status
+            },
+            "log_object": {
+                "type": "network",
+                "address": network,
+                "network": network,
+                "mask": "",
+                "gateway": ""
+            }
+        }
 
+        try:
+            return History.add(data)
         except Exception:
             pass
-
-        return hId
-    """
