@@ -1025,6 +1025,52 @@
 						"auth": {
 							"type": "noauth"
 						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "851847cbe30d3d64e74703cac5fa8992",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.11.0/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"1",
+								"network",
+								"10.9.11.0",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "network",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "PATCH",
 						"header": [
 							{

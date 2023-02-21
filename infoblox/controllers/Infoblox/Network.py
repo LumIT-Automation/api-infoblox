@@ -133,12 +133,61 @@ class InfobloxNetworkController(CustomController):
 
 
     @staticmethod
+    def delete(request: Request, assetId: int, networkAddress: str) -> Response:
+        response = None
+        auth = False
+        data = dict()
+        permissionNetwork = list("none")
+        user = CustomController.loggedUser(request)
+
+        try:
+            # Find the network and the father-network-container (if any)
+            # in the form aaaa/m to check permissions against.
+            netInfo = Network(assetId, networkAddress)
+
+            permissionNetwork.append(netInfo.network)
+            if netInfo.network_container != "/":
+                permissionNetwork.append(netInfo.network_container)
+        except Exception:
+            pass
+
+        try:
+            for net in permissionNetwork:
+                if Permission.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, networkName=net) or user["authDisabled"]: # @todo: check also for permissions in containers of upper levels.
+                    auth = True
+            if auth:
+                Log.actionLog("Network deletion", user)
+
+                lock = Lock("network", locals(), networkAddress)
+                if lock.isUnlocked():
+                    lock.lock()
+
+                    Network(assetId, networkAddress).delete()
+                    httpStatus = status.HTTP_200_OK
+                    lock.release()
+                else:
+                    httpStatus = status.HTTP_423_LOCKED
+            else:
+                httpStatus = status.HTTP_403_FORBIDDEN
+        except Exception as e:
+            if "networkAddress" in locals():
+                Lock("network", locals(), locals()["networkAddress"]).release()
+
+            data, httpStatus, headers = CustomController.exceptionHandler(e)
+            return Response(data, status=httpStatus, headers=headers)
+
+        return Response(None, status=httpStatus, headers={
+            "Cache-Control": "no-cache"
+        })
+
+
+
+    @staticmethod
     def patch(request: Request, assetId: int, networkAddress: str) -> Response:
         response = None
         auth = False
         data = dict()
         permissionNetwork = list("none")
-
         user = CustomController.loggedUser(request)
 
         try:
@@ -168,9 +217,7 @@ class InfobloxNetworkController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        n = Network(assetId, networkAddress)
-                        n.modify(data) # address pass: data will be modified, using this for the logs.
-
+                        Network(assetId, networkAddress).modify(data)
                         httpStatus = status.HTTP_200_OK
                         lock.release()
                         # historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress)

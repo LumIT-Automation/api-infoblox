@@ -13,7 +13,7 @@ class Network:
     ####################################################################################################################
 
     @staticmethod
-    def get(assetId, network, filter: dict = None, silent: bool = False) -> dict:
+    def get(assetId: int, network: str, filter: dict = None, silent: bool = False) -> dict:
         filter = {} if filter is None else filter
 
         try:
@@ -74,7 +74,24 @@ class Network:
 
 
     @staticmethod
-    def addresses(assetId, network, maxResults, fromIp, toIp) -> dict:
+    def delete(assetId: int, _ref: str, silent: bool = False):
+        try:
+            infoblox = Asset(assetId)
+            api = ApiSupplicant(
+                endpoint=infoblox.baseurl + "/" + _ref,
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify=infoblox.tlsverify,
+                silent = silent
+            )
+
+            api.delete()
+        except Exception as e:
+            raise e
+
+
+
+    @staticmethod
+    def addresses(assetId: int, network: str, maxResults: int, fromIp: str, toIp: str) -> dict:
         try:
             apiParams = {
                 "network": network
@@ -131,7 +148,7 @@ class Network:
 
 
     @staticmethod
-    def add(assetId, data: dict, silent: bool = False) -> dict:
+    def add(assetId: int, data: dict, silent: bool = False) -> dict:
 
         try:
             infoblox = Asset(assetId)

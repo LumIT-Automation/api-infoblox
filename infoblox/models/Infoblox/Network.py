@@ -51,11 +51,18 @@ class Network:
 
 
 
-
     def modify(self, data: dict) -> dict:
         try:
             data["network"] = self.network
             return Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False)
+        except Exception as e:
+            raise e
+
+
+
+    def delete(self) -> None:
+        try:
+            Connector.delete(assetId=self.asset_id, _ref=self._ref, silent=False)
         except Exception as e:
             raise e
 
