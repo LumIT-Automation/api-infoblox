@@ -14,6 +14,7 @@ from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer
 from infoblox.controllers.CustomController import CustomController
 
 from infoblox.helpers.Lock import Lock
+from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
@@ -27,19 +28,19 @@ class InfobloxNetworkController(CustomController):
         ipv4Info = { "data": dict() }
         etagCondition = { "responseEtag": "" }
         permissionNetwork = list()
-
         user = CustomController.loggedUser(request)
-        parents = Network(assetId, networkAddress).parentList()
 
         try:
-            # Find the network and the father-network-container (if any)
-            # in the form aaaa/m to check permissions against.
-            n = Network(assetId, networkAddress)
-            permissionNetwork.extend(n.parentList())
-        except Exception:
-            pass
+            try:
+                # Find the network and the father/grandfather network-container (if any)
+                # in the form aaaa/m to check permissions against.
+                n = Network(assetId, networkAddress)
+                permissionNetwork.extend(n.parentList())
+            except CustomException as c:
+                raise c
+            except Exception:
+                pass
 
-        try:
             for net in permissionNetwork:
                 if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, networkName=net) or user["authDisabled"]:
                     auth = True
@@ -138,16 +139,17 @@ class InfobloxNetworkController(CustomController):
         permissionNetwork = list()
         user = CustomController.loggedUser(request)
 
-
         try:
-            # Find the network and the father-network-container (if any)
-            # in the form aaaa/m to check permissions against.
-            n = Network(assetId, networkAddress)
-            permissionNetwork.extend(n.parentList())
-        except Exception:
-            pass
+            try:
+                # Find the network and the father/grandfather network-container (if any)
+                # in the form aaaa/m to check permissions against.
+                n = Network(assetId, networkAddress)
+                permissionNetwork.extend(n.parentList())
+            except CustomException as c:
+                raise c
+            except Exception:
+                pass
 
-        try:
             for net in permissionNetwork:
                 if Permission.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, networkName=net) or user["authDisabled"]: # @todo: check also for permissions in containers of upper levels.
                     auth = True
@@ -187,14 +189,16 @@ class InfobloxNetworkController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            # Find the network and the father-network-container (if any)
-            # in the form aaaa/m to check permissions against.
-            n = Network(assetId, networkAddress)
-            permissionNetwork.extend(n.parentList())
-        except Exception:
-            pass
+            try:
+                # Find the network and the father/grandfather network-container (if any)
+                # in the form aaaa/m to check permissions against.
+                n = Network(assetId, networkAddress)
+                permissionNetwork.extend(n.parentList())
+            except CustomException as c:
+                raise c
+            except Exception:
+                pass
 
-        try:
             for net in permissionNetwork:
                 if Permission.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, networkName=net) or user["authDisabled"]: # @todo: check also for permissions in containers of upper levels.
                     auth = True
