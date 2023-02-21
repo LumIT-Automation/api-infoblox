@@ -53,7 +53,7 @@ class Network:
 
     def parentList(self) -> list:
         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-        parentList = [ self.network, self.network_container ]
+        parentList = [ self.network ]
 
         try:
             if self.network_container != "/":

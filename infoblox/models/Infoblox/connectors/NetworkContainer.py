@@ -41,7 +41,7 @@ class NetworkContainer:
 
     @staticmethod
     def parentList(assetId: int, container: str, maxNumRequests: int = 7) -> list:
-        parentList = []
+        parentList = [ container ]
         n = 0
 
         try:

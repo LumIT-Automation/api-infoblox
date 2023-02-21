@@ -26,18 +26,16 @@ class InfobloxNetworkController(CustomController):
         showIp = False
         ipv4Info = { "data": dict() }
         etagCondition = { "responseEtag": "" }
-        permissionNetwork = list("none")
+        permissionNetwork = list()
 
         user = CustomController.loggedUser(request)
         parents = Network(assetId, networkAddress).parentList()
-        Log.log(parents, 'PPPPPPPPPPPPPPPPPPPP')
-
 
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
             n = Network(assetId, networkAddress)
-            permissionNetwork.append(n.parentList())
+            permissionNetwork.extend(n.parentList())
         except Exception:
             pass
 
@@ -137,17 +135,15 @@ class InfobloxNetworkController(CustomController):
         response = None
         auth = False
         data = dict()
-        permissionNetwork = list("none")
+        permissionNetwork = list()
         user = CustomController.loggedUser(request)
+
 
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress)
-
-            permissionNetwork.append(netInfo.network)
-            if netInfo.network_container != "/":
-                permissionNetwork.append(netInfo.network_container)
+            n = Network(assetId, networkAddress)
+            permissionNetwork.extend(n.parentList())
         except Exception:
             pass
 
@@ -187,17 +183,14 @@ class InfobloxNetworkController(CustomController):
         response = None
         auth = False
         data = dict()
-        permissionNetwork = list("none")
+        permissionNetwork = list()
         user = CustomController.loggedUser(request)
 
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress)
-
-            permissionNetwork.append(netInfo.network)
-            if netInfo.network_container != "/":
-                permissionNetwork.append(netInfo.network_container)
+            n = Network(assetId, networkAddress)
+            permissionNetwork.extend(n.parentList())
         except Exception:
             pass
 
