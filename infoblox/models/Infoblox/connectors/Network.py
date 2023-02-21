@@ -20,7 +20,7 @@ class Network:
             apiParams = {
                 "network": network,
                 "_max_results": 65535,
-                "_return_fields+": "network,network_container,vlans,extattrs"
+                "_return_fields+": "network,network_container,vlans,options,extattrs"
             }
 
             if filter:
@@ -40,6 +40,34 @@ class Network:
                 return n[0]
             else:
                 return n
+        except Exception as e:
+            raise e
+
+
+
+    @staticmethod
+    def modify(assetId: int, _ref: str, data: dict, silent: bool = False) -> dict:
+        apiParams = {
+            "_max_results": 65535,
+            "_return_fields+": "network,network_container,vlans,options,extattrs"
+        }
+
+        try:
+            infoblox = Asset(assetId)
+            api = ApiSupplicant(
+                endpoint=infoblox.baseurl + "/" + _ref,
+                params=apiParams,
+                auth=(infoblox.username, infoblox.password),
+                tlsVerify = infoblox.tlsverify,
+                silent = silent
+            )
+
+            return api.put(
+                additionalHeaders={
+                    "Content-Type": "application/json",
+                },
+                data=json.dumps(data)
+            )
         except Exception as e:
             raise e
 

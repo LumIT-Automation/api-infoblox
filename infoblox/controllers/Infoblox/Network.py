@@ -1,9 +1,12 @@
+import json
+
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Permission.Permission import Permission
+from infoblox.models.History.History import History
 
 from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer
 from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer
@@ -126,3 +129,103 @@ class InfobloxNetworkController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
+
+
+
+    @staticmethod
+    def patch(request: Request, assetId: int, networkAddress: str) -> Response:
+        response = None
+        auth = False
+        data = dict()
+        permissionNetwork = list("none")
+
+        user = CustomController.loggedUser(request)
+
+        try:
+            # Find the network and the father-network-container (if any)
+            # in the form aaaa/m to check permissions against.
+            netInfo = Network(assetId, networkAddress)
+
+            permissionNetwork.append(netInfo.network)
+            if netInfo.network_container != "/":
+                permissionNetwork.append(netInfo.network_container)
+        except Exception:
+            pass
+
+        try:
+            for net in permissionNetwork:
+                if Permission.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, networkName=net) or user["authDisabled"]: # @todo: check also for permissions in containers of upper levels.
+                    auth = True
+            if auth:
+                Log.actionLog("Modify network", user)
+                Log.actionLog("User data: "+str(request.data), user)
+
+                serializer = InfobloxNetworkSerializer(data=request.data["data"], partial=True)
+                if serializer.is_valid():
+                    data = serializer.validated_data
+
+                    lock = Lock("network", locals(), networkAddress)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        n = Network(assetId, networkAddress)
+                        n.modify(data) # address pass: data will be modified, using this for the logs.
+
+                        httpStatus = status.HTTP_200_OK
+                        lock.release()
+                        # historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress)
+                    else:
+                        httpStatus = status.HTTP_423_LOCKED
+                else:
+                    httpStatus = status.HTTP_400_BAD_REQUEST
+                    response = {
+                        "infoblox": {
+                            "error": str(serializer.errors)
+                        }
+                    }
+
+                    Log.actionLog("User data incorrect: "+str(response), user)
+            else:
+                httpStatus = status.HTTP_403_FORBIDDEN
+        except Exception as e:
+            if "networkAddress" in locals():
+                Lock("network", locals(), locals()["networkAddress"]).release()
+
+            data, httpStatus, headers = CustomController.exceptionHandler(e)
+            return Response(data, status=httpStatus, headers=headers)
+
+        return Response(response, status=httpStatus, headers={
+            "Cache-Control": "no-cache"
+        })
+
+
+    ####################################################################################################################
+    # Helper methods
+    ####################################################################################################################
+    """
+    @staticmethod
+    def __historyLog(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
+        hId = 0
+
+        try:
+            oId = History.addByType({
+                "type": "ipv4",
+                "address": ipv4,
+                "network": network,
+                "mask": mask,
+                "gateway": gateway
+            }, "object")
+
+            hId = History.addByType({
+                "username": user,
+                "action": action,
+                "asset_id": assetId,
+                "object_id": oId,
+                "status": s
+            }, "log")
+
+        except Exception:
+            pass
+
+        return hId
+    """

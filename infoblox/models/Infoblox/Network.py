@@ -51,6 +51,16 @@ class Network:
 
 
 
+
+    def modify(self, data: dict) -> dict:
+        try:
+            data["network"] = self.network
+            return Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False)
+        except Exception as e:
+            raise e
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################

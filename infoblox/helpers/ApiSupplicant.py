@@ -58,9 +58,8 @@ class ApiSupplicant:
         additionalHeaders = {} if additionalHeaders is None else additionalHeaders
 
         try:
-            Log.actionLog(
-                "[API Supplicant] Putting to remote: "+str(self.endpoint)
-            )
+            Log.actionLog("[API Supplicant] Putting to remote: "+str(self.endpoint))
+            Log.actionLog("[API Supplicant] Putting data: " + str(data))
 
             return self.__request(requests.put, additionalHeaders=additionalHeaders, data=data)
         except Exception as e:
