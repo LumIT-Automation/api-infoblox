@@ -40,6 +40,24 @@ class NetworkContainer:
 
 
     @staticmethod
+    def parentList(assetId: int, container: str, maxNumRequests: int = 7) -> list:
+        parentList = []
+        n = 0
+
+        try:
+            while container != "/" and n < maxNumRequests:
+                container = NetworkContainer.get(assetId, container, filter = {"_return_fields+": "network,network_container"})[0]["network_container"]
+                parentList.append(container)
+                n += 1
+
+            return parentList
+        except Exception as e:
+            raise e
+
+
+
+
+    @staticmethod
     def networks(assetId: int, container: str, filter: dict = None) -> dict:
         filter = filter or {}
 

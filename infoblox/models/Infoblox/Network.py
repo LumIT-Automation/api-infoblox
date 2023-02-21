@@ -51,6 +51,20 @@ class Network:
 
 
 
+    def parentList(self) -> list:
+        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+        parentList = [ self.network, self.network_container ]
+
+        try:
+            if self.network_container != "/":
+                parentList.extend(NetworkContainer(assetId=self.asset_id, container=self.network_container ).parentList())
+
+            return parentList
+        except Exception as e:
+            raise e
+
+
+
     def modify(self, data: dict) -> dict:
         try:
             data["network"] = self.network

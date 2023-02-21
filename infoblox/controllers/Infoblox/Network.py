@@ -29,21 +29,21 @@ class InfobloxNetworkController(CustomController):
         permissionNetwork = list("none")
 
         user = CustomController.loggedUser(request)
+        parents = Network(assetId, networkAddress).parentList()
+        Log.log(parents, 'PPPPPPPPPPPPPPPPPPPP')
+
 
         try:
             # Find the network and the father-network-container (if any)
             # in the form aaaa/m to check permissions against.
-            netInfo = Network(assetId, networkAddress)
-
-            permissionNetwork.append(netInfo.network)
-            if netInfo.network_container != "/":
-                permissionNetwork.append(netInfo.network_container)
+            n = Network(assetId, networkAddress)
+            permissionNetwork.append(n.parentList())
         except Exception:
             pass
 
         try:
             for net in permissionNetwork:
-                if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, networkName=net) or user["authDisabled"]: # @todo: check also for permissions in containers of upper levels.
+                if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, networkName=net) or user["authDisabled"]:
                     auth = True
 
             if auth:
