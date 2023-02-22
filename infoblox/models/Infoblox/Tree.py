@@ -1,6 +1,8 @@
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 
+from infoblox.helpers.Log import Log
+
 
 class Tree:
 
@@ -19,6 +21,8 @@ class Tree:
                 "children": list()
             }
         }
+
+        Log.log(Tree.genealogy(assetId, "10.8.10.0/24"), "_")
 
         # Get a containers' key/values structure.
         l = NetworkContainer.listData(assetId)
@@ -179,19 +183,22 @@ class Tree:
 
     @staticmethod
     def genealogy(assetId: int, network: str) -> list:
-        f = list()
-        struct = dict()
+        try:
+            f = list()
+            struct = dict()
 
-        def __fathers(son: str):
-            f.append(son)
-            if son != "/":
-                __fathers(struct[son])
+            def __fathers(son: str):
+                f.append(son)
+                if son in struct:
+                    __fathers(struct[son])
 
-        l = NetworkContainer.listData(assetId)
-        for container in l:
-            struct[container["network"]] = container["network_container"]
+            l = NetworkContainer.listData(assetId)
+            for container in l:
+                struct[container["network"]] = container["network_container"]
 
-        __fathers(network)
+            __fathers(network)
+        except Exception as e:
+            raise e
 
         return f
 
