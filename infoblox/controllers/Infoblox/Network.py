@@ -217,7 +217,7 @@ class InfobloxNetworkController(CustomController):
                         n = Network(assetId, networkAddress).modify(data)
                         httpStatus = status.HTTP_200_OK
                         lock.release()
-                        historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress)
+                        historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress, n["network"])
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:
@@ -248,7 +248,7 @@ class InfobloxNetworkController(CustomController):
     ####################################################################################################################
 
     @staticmethod
-    def __historyLog(assetId, user, action, status, network: str = "") -> int:
+    def __historyLog(assetId, user, action, status, network: str = "", address: str = "") -> int:
         data = {
             "log": {
                 "username": user,
@@ -258,7 +258,7 @@ class InfobloxNetworkController(CustomController):
             },
             "log_object": {
                 "type": "network",
-                "address": network,
+                "address": address,
                 "network": network,
                 "mask": "",
                 "gateway": ""

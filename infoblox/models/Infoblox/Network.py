@@ -67,8 +67,9 @@ class Network:
 
     def modify(self, data: dict) -> dict:
         try:
-            data["network"] = self.network
-            return Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False)
+            if not "network" in data:
+                data["network"] = self.network
+            return { "_ref": Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False), "network": data["network"] }
         except Exception as e:
             raise e
 
