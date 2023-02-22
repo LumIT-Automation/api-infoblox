@@ -211,27 +211,24 @@ class InfobloxIpv4Controller(CustomController):
     ####################################################################################################################
 
     @staticmethod
-    def __historyLog(assetId, user, action, s, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
-        hId = 0
-
-        try:
-            oId = History.addByType({
+    def __historyLog(assetId, user, action, status, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
+        data = {
+            "log": {
+                "username": user,
+                "action": action,
+                "asset_id": assetId,
+                "status": status
+            },
+            "log_object": {
                 "type": "ipv4",
                 "address": ipv4,
                 "network": network,
                 "mask": mask,
                 "gateway": gateway
-            }, "object")
+            }
+        }
 
-            hId = History.addByType({
-                "username": user,
-                "action": action,
-                "asset_id": assetId,
-                "object_id": oId,
-                "status": s
-            }, "log")
-
+        try:
+            return History.add(data)
         except Exception:
             pass
-
-        return hId

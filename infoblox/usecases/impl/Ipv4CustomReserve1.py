@@ -481,21 +481,22 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             for o in response:
                 ipv4 = re.findall(r'[0-9]+(?:\.[0-9]+){3}', o["result"])[0]
 
-                oId = History.addByType({
-                    "type": "ipv4",
-                    "address": ipv4,
-                    "network": network,
-                    "mask": self.mask,
-                    "gateway": self.gateway
-                }, "object")
-
-                historyId = History.addByType({
-                    "username": self.username,
-                    "action": self.request,
-                    "asset_id": self.assetId,
-                    "object_id": oId,
-                    "status": "created"
-                }, "log")
+                data = {
+                    "log": {
+                        "username": self.username,
+                        "action": self.request,
+                        "asset_id": self.assetId,
+                        "status": "created"
+                    },
+                    "log_object": {
+                        "type": "ipv4",
+                        "address": ipv4,
+                        "network": network,
+                        "mask": self.mask,
+                        "gateway": self.gateway
+                    }
+                }
+                historyId = History.add(data)
 
             return historyId
         except Exception:

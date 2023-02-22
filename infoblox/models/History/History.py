@@ -31,22 +31,6 @@ class History:
 
 
     @staticmethod
-    def addByType(data: dict, logType: str) -> int:
-        if logType in ["object", "log"]:
-            table = "log"
-            if logType == "object":
-                table = "log_object"
-
-            try:
-                return Repository.add(data, table)
-            except Exception as e:
-                raise e
-        else:
-            return 0
-
-
-
-    @staticmethod
     def add(data: dict) -> int:
         try:
             if data["log_object"]:
