@@ -40,20 +40,15 @@ class NetworkContainer:
 
 
     @staticmethod
-    def parentList(assetId: int, container: str, maxNumRequests: int = 7) -> list:
+    def parentList(assetId: int, container: str) -> list:
+        from infoblox.models.Infoblox.Tree import Tree
         parentList = [ container ]
-        n = 0
-
         try:
-            while container != "/" and n < maxNumRequests:
-                container = NetworkContainer.get(assetId, container, filter = {"_return_fields+": "network,network_container"})[0]["network_container"]
-                parentList.append(container)
-                n += 1
-
-            return parentList
+            t = Tree.genealogy(assetId, container)
+            parentList.extend(t)
+            return t
         except Exception as e:
             raise e
-
 
 
 

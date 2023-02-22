@@ -114,6 +114,16 @@ class Ipv4:
 
 
 
+    def parentList(self) -> list:
+        from infoblox.models.Infoblox.Network import Network
+        net = self.network.split('/')[0] # Todo: fix the network to use the cidr for the calls and remove this.
+        try:
+            return Network(assetId=self.asset_id, network=net).parentList()
+        except Exception as e:
+            raise e
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################

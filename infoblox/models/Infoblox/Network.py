@@ -56,7 +56,9 @@ class Network:
         parentList = [ self.network ]
 
         try:
-            if self.network_container != "/":
+            if self.network_container == "/":
+                parentList.append("/")
+            else:
                 parentList.extend(NetworkContainer(assetId=self.asset_id, container=self.network_container ).parentList())
 
             return parentList
