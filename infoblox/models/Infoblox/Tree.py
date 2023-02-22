@@ -179,10 +179,10 @@ class Tree:
 
     @staticmethod
     def genealogy(assetId: int, network: str) -> list:
-        try:
-            f = list()
-            struct = dict()
+        f = list()
+        struct = dict()
 
+        try:
             def __fathers(son: str):
                 f.append(son)
                 if son in struct:
