@@ -49,7 +49,8 @@ class History:
     @staticmethod
     def add(data: dict) -> int:
         try:
-            data["log"]["object_id"] = Repository.add(data["log_object"], "log_object")
+            if data["log_object"]:
+                data["log"]["object_id"] = Repository.add(data["log_object"], "log_object")
             return Repository.add(data["log"], "log")
         except Exception as e:
             raise e
