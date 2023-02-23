@@ -23,7 +23,7 @@ class Ipv4:
         self.status: str = ""
         self.is_conflict: bool = False
         self.names: List[str] = []
-        self.objects: List[str] = []
+        self.objects: List[dict] = []
         self.types: List[str] = []
         self.usage: List[str] = []
         self.extattrs: Dict[str, Dict[str, str]] = {
@@ -78,7 +78,7 @@ class Ipv4:
 
 
 
-    def release(self, fixedaddressOnly: bool = False) -> None:
+    def release(self, fixedaddressOnly: bool = True) -> None:
         fixedaddress = ""
 
         try:
@@ -87,9 +87,10 @@ class Ipv4:
 
             # Reference to IP data.
             for el in self.objects:
-                if "fixedaddress" in el:
-                    fixedaddress = el
-                    break
+                if "_ref" in el:
+                    if "fixedaddress" in el["_ref"]:
+                        fixedaddress = el["_ref"]
+                        break
 
             if not fixedaddress:
                 raise CustomException(status=404, payload={})
