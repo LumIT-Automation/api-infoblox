@@ -177,29 +177,6 @@ class Tree:
 
 
 
-    @staticmethod
-    def genealogy(assetId: int, network: str) -> list:
-        f = list()
-        struct = dict()
-
-        try:
-            def __fathers(son: str):
-                f.append(son)
-                if son in struct:
-                    __fathers(struct[son])
-
-            l = NetworkContainer.listData(assetId)
-            for container in l:
-                struct[container["network"]] = container["network_container"]
-
-            __fathers(network)
-        except Exception as e:
-            raise e
-
-        return f
-
-
-
     ####################################################################################################################
     # Private static methods
     ####################################################################################################################

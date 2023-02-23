@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 
 from infoblox.helpers.Exception import CustomException
@@ -51,17 +52,28 @@ class Network:
 
 
 
-    def parentList(self) -> list:
+    def genealogy(self) -> list:
         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-        parentList = [ self.network ]
 
         try:
-            if self.network_container == "/":
-                parentList.append("/")
-            else:
-                parentList.extend(NetworkContainer(assetId=self.asset_id, container=self.network_container ).parentList())
+            f = list()
+            struct = dict()
 
-            return parentList
+            try:
+                def __fathers(son: str):
+                    f.append(son)
+                    if son in struct:
+                        __fathers(struct[son])
+
+                l = NetworkContainer.listData(self.asset_id)
+                for container in l:
+                    struct[container["network"]] = container["network_container"]
+
+                __fathers(self.network_container)
+            except Exception as e:
+                raise e
+
+            return f
         except Exception as e:
             raise e
 
@@ -69,9 +81,13 @@ class Network:
 
     def modify(self, data: dict) -> dict:
         try:
-            if not "network" in data:
+            if "network" not in data:
                 data["network"] = self.network
-            return { "_ref": Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False), "network": data["network"] }
+
+            return {
+                "_ref": Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False),
+                "network": data["network"]
+            }
         except Exception as e:
             raise e
 

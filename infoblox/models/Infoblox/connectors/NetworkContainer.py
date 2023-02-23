@@ -40,19 +40,6 @@ class NetworkContainer:
 
 
     @staticmethod
-    def parentList(assetId: int, container: str) -> list:
-        from infoblox.models.Infoblox.Tree import Tree
-        parentList = [ container ]
-        try:
-            t = Tree.genealogy(assetId, container)
-            parentList.extend(t)
-            return t
-        except Exception as e:
-            raise e
-
-
-
-    @staticmethod
     def networks(assetId: int, container: str, filter: dict = None) -> dict:
         filter = filter or {}
 

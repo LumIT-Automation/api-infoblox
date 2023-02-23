@@ -56,13 +56,6 @@ class NetworkContainer:
             raise e
 
 
-    def parentList(self) -> list:
-        try:
-            return Connector.parentList(self.asset_id, self.network)
-        except Exception as e:
-            raise e
-
-
 
     ####################################################################################################################
     # Public static methods
