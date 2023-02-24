@@ -14,6 +14,13 @@ class InfobloxIpv4Serializer(serializers.Serializer):
             self.fields["Mask"] = InfobloxIpv4ExtattrsValueSerializer(required=False)
             self.fields["Reference"] = InfobloxIpv4ExtattrsValueSerializer(required=False, allow_null=True)
 
+    class InfobloxIpv4OptionsSerializer(serializers.Serializer):
+        name = serializers.CharField(max_length=255, required=False)
+        num = serializers.IntegerField(required=True)
+        use_options = serializers.BooleanField(required=False)
+        value = serializers.CharField(max_length=255, required=False)
+        vendor_class = serializers.CharField(max_length=64, required=False)
+
     class InfobloxIpv4NamesInnerSerializer(serializers.ListField):
         name = serializers.CharField(max_length=255)
 
@@ -39,3 +46,4 @@ class InfobloxIpv4Serializer(serializers.Serializer):
     status = serializers.CharField(max_length=255, required=True)
     types = InfobloxIpv4TypesInnerSerializer(required=False)
     usage = InfobloxIpv4UsageInnerSerializer(required=False)
+    options = InfobloxIpv4OptionsSerializer(required=False, many=True)
