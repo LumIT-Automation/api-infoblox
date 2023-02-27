@@ -309,8 +309,7 @@ class PermissionPrivilege:
                 if gr.lower() == "automation.local":
                     return True
 
-            #try:
-            if True:
+            try:
                 # Build the first half of the where condition of the query.
                 # Obtain: WHERE (identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || ....)
                 groupWhere = ''
@@ -357,11 +356,10 @@ class PermissionPrivilege:
                 )
 
                 return DBHelper.asDict(c)[0]["count"]
-            """
+
             except Exception as e:
                 raise CustomException(status=400, payload={"database": e.__str__()})
             finally:
                 c.close()
-            """
 
         return False
