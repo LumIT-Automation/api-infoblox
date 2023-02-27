@@ -1,5 +1,6 @@
 import json
 from typing import Dict
+import redis
 
 from infoblox.helpers.Exception import CustomException
 
@@ -129,36 +130,35 @@ class Network:
 
 
 
-    # todo: call the container genealogy.
     @staticmethod
-    def genealogyS(assetId, network) -> list:
+    def genealogyS(assetId, network, includeChild: bool = False) -> list:
         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-        from infoblox.helpers.Log import Log
+        networkContainer = ""
 
         try:
             f = list()
-            struct = dict()
+            if includeChild:
+                f.append(network)
 
-            try:
-                def __fathers(son: str):
-                    f.append(son)
-                    if son in struct:
-                        __fathers(struct[son])
+            # Use redis to avoid to repeat the same call many times when list networks.
+            r = redis.Redis(host="127.0.0.1", port=6379, db=0)
+            if r.exists('networkList'):
+                networkList = json.loads(r.get("networkList").decode("utf-8"))
+            else:
+                networkList = Network.listData(assetId=assetId)
+                r.set("networkList", json.dumps(networkList))
+                r.expire('networkList', 30)
 
-                l = NetworkContainer.listData(assetId)
-                networkContainer = ""
-                for container in l:
-                    struct[container["network"]] = container["network_container"]
-                    if struct[container["network"]]  == network:
-                        networkContainer = container["network_container"]
+            for net in networkList:
+                if net["network"] == network:
+                    networkContainer = net["network_container"]
 
-                __fathers(networkContainer)
-            except Exception as e:
-                raise e
+            f.extend(NetworkContainer.genealogyS(assetId=assetId, network=networkContainer, includeChild=True))
 
             return f
         except Exception as e:
             raise e
+
 
 
     ####################################################################################################################

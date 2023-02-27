@@ -324,15 +324,12 @@ class PermissionPrivilege:
                 if networkName:
                     if isContainer:
                         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-                        net = NetworkContainer(assetId=assetId, container=networkName)
+                        netParents = NetworkContainer.genealogyS(assetId=assetId, network=networkName, includeChild=True)
                     else:
                         from infoblox.models.Infoblox.Network import Network
-                        net = Network(assetId=assetId, network=networkName)
+                        netParents = Network.genealogyS(assetId=assetId, network=networkName, includeChild=True)
 
-                    orNets = 'OR `network`.`network` = %s '
-                    args.append(net.network)
-
-                    netParents = net.genealogyS(assetId, net.network)
+                    orNets = ""
                     for _ in netParents:
                         orNets += 'OR `network`.`network` = %s '
                     args.extend(netParents)

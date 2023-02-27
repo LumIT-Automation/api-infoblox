@@ -1,4 +1,6 @@
+import json
 from typing import Dict
+import redis
 
 from infoblox.helpers.Exception import CustomException
 
@@ -73,11 +75,12 @@ class NetworkContainer:
 
 
     @staticmethod
-    def genealogyS(assetId, network) -> list:
-        from infoblox.helpers.Log import Log
+    def genealogyS(assetId, network, includeChild: bool = False) -> list:
 
         try:
             f = list()
+            if includeChild:
+                f.append(network)
             struct = dict()
 
             try:
@@ -86,11 +89,19 @@ class NetworkContainer:
                     if son in struct:
                         __fathers(struct[son])
 
-                l = NetworkContainer.listData(assetId)
+                # Use redis to avoid to repeat the same call many times when list networks.
+                r = redis.Redis(host="127.0.0.1", port=6379, db=0)
+                if r.exists('networkContainerList'):
+                    networkContainerList = json.loads(r.get("networkContainerList").decode("utf-8"))
+                else:
+                    networkContainerList = NetworkContainer.listData(assetId)
+                    r.set("networkContainerList", json.dumps(networkContainerList))
+                    r.expire('networkContainerList', 30)
+
                 networkContainer = ""
-                for container in l:
+                for container in networkContainerList:
                     struct[container["network"]] = container["network_container"]
-                    if struct[container["network"]]  == network:
+                    if container["network"]  == network:
                         networkContainer = container["network_container"]
 
                 __fathers(networkContainer)
