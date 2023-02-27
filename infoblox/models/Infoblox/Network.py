@@ -129,6 +129,38 @@ class Network:
 
 
 
+    # todo: call the container genealogy.
+    @staticmethod
+    def genealogyS(assetId, network) -> list:
+        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+        from infoblox.helpers.Log import Log
+
+        try:
+            f = list()
+            struct = dict()
+
+            try:
+                def __fathers(son: str):
+                    f.append(son)
+                    if son in struct:
+                        __fathers(struct[son])
+
+                l = NetworkContainer.listData(assetId)
+                networkContainer = ""
+                for container in l:
+                    struct[container["network"]] = container["network_container"]
+                    if struct[container["network"]]  == network:
+                        networkContainer = container["network_container"]
+
+                __fathers(networkContainer)
+            except Exception as e:
+                raise e
+
+            return f
+        except Exception as e:
+            raise e
+
+
     ####################################################################################################################
     # Private methods
     ####################################################################################################################

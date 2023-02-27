@@ -33,13 +33,10 @@ class InfobloxIpv4Controller(CustomController):
             try:
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
-
-                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr) \
-                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr):
                 Log.actionLog("Get ipv4s address information: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
@@ -102,13 +99,10 @@ class InfobloxIpv4Controller(CustomController):
             try:
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
-
-                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr) \
-                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr):
                 Log.actionLog("Delete ipv4s address: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
@@ -154,13 +148,10 @@ class InfobloxIpv4Controller(CustomController):
             try:
                 networkCidr = Ipv4(assetId, ipv4address).network
                 userNetwork, mask = networkCidr.split("/")
-
-                networkContainerCidr = Network(assetId, networkCidr).network_container
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr) \
-                    or Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkContainerCidr) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr):
                 Log.actionLog("Modify ipv4s address: "+ipv4address, user)
                 Log.actionLog("User data: "+str(request.data), user)
 

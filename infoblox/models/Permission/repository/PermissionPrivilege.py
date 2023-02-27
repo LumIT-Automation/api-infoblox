@@ -4,6 +4,7 @@ from django.db import connection
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
+from infoblox.helpers.Log import Log
 
 
 class PermissionPrivilege:
@@ -296,7 +297,7 @@ class PermissionPrivilege:
 
 
     @staticmethod
-    def countUserPermissions(groups: list, action: str, assetId: int = 0, networkName: str = "") -> int:
+    def countUserPermissions(groups: list, action: str, assetId: int = 0, networkName: str = "", isContainer: bool = False) -> int:
         if action and groups:
             args = groups.copy()
             assetWhere = ""
@@ -308,7 +309,8 @@ class PermissionPrivilege:
                 if gr.lower() == "automation.local":
                     return True
 
-            try:
+            #try:
+            if True:
                 # Build the first half of the where condition of the query.
                 # Obtain: WHERE (identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || ....)
                 groupWhere = ''
@@ -321,8 +323,22 @@ class PermissionPrivilege:
                     assetWhere = "AND `network`.id_asset = %s "
 
                 if networkName:
-                    args.append(networkName)
-                    networkWhere = "AND (`network`.`network` = %s OR `network`.`network` = 'any') " # if "any" appears in the query results so far -> pass.
+                    if isContainer:
+                        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+                        net = NetworkContainer(assetId=assetId, container=networkName)
+                    else:
+                        from infoblox.models.Infoblox.Network import Network
+                        net = Network(assetId=assetId, network=networkName)
+
+                    orNets = 'OR `network`.`network` = %s '
+                    args.append(net.network)
+
+                    netParents = net.genealogyS(assetId, net.network)
+                    for _ in netParents:
+                        orNets += 'OR `network`.`network` = %s '
+                    args.extend(netParents)
+
+                    networkWhere = "AND (`network`.`network` = 'any' " + orNets + " ) " # if "any" appears in the query results so far -> pass.
 
                 args.append(action)
 
@@ -341,9 +357,11 @@ class PermissionPrivilege:
                 )
 
                 return DBHelper.asDict(c)[0]["count"]
+            """
             except Exception as e:
                 raise CustomException(status=400, payload={"database": e.__str__()})
             finally:
                 c.close()
+            """
 
         return False

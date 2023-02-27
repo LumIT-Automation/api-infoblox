@@ -24,7 +24,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=networkAddress+"/"+mask) or user["authDisabled"]: # @todo: check also for permissions in father container or container of upper levels.
+            if Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=networkAddress+"/"+mask, isContainer=True) or user["authDisabled"]:
                 Log.actionLog("Network container information", user)
 
                 lock = Lock("networkContainer", locals(), networkAddress)
@@ -83,7 +83,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_container_post", assetId=assetId) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=networkAddress + "/" + mask, isContainer=True) or user["authDisabled"]:
                 Log.actionLog("Network addition in container", user)
                 Log.actionLog("User data: "+str(request.data), user)
 

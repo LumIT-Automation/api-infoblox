@@ -47,7 +47,7 @@ class InfobloxNetworkContainersController(CustomController):
 
                     # Filter network containers' list basing on permissions.
                     for p in itemData:
-                        if Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=str(p["network"])) or user["authDisabled"]:
+                        if Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=str(p["network"]), isContainer=True) or user["authDisabled"]:
                             allowedData["data"].append(p)
 
                     serializer = Serializer(data=allowedData)

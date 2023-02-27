@@ -42,7 +42,7 @@ class Permission:
     ####################################################################################################################
 
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "") -> bool:
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "", isContainer: bool = False) -> bool:
         # Superadmin's group.
         for gr in groups:
             if gr.lower() == "automation.local":
@@ -50,7 +50,7 @@ class Permission:
 
         try:
             return bool(
-                PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, networkName)
+                PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, networkName, isContainer)
             )
         except Exception as e:
             raise e
