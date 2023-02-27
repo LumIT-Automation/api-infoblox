@@ -3,7 +3,6 @@ from typing import List, Dict
 from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
 from infoblox.helpers.Exception import CustomException
-from infoblox.helpers.Log import Log
 
 
 Value: Dict[str, str] = {"value": ""}
@@ -110,19 +109,6 @@ class Ipv4:
     def repr(self) -> dict:
         try:
             return vars(self)
-        except Exception as e:
-            raise e
-
-
-
-    def parentList(self) -> list:
-        from infoblox.models.Infoblox.Network import Network
-
-        try:
-            return Network(
-                assetId=self.asset_id,
-                network=self.network.split('/')[0] # @todo: fix the network to use the cidr for the calls and remove this.
-            ).genealogy()
         except Exception as e:
             raise e
 

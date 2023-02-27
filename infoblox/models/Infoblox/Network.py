@@ -53,33 +53,6 @@ class Network:
 
 
 
-    def genealogy(self) -> list:
-        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-
-        try:
-            f = list()
-            struct = dict()
-
-            try:
-                def __fathers(son: str):
-                    f.append(son)
-                    if son in struct:
-                        __fathers(struct[son])
-
-                l = NetworkContainer.listData(self.asset_id)
-                for container in l:
-                    struct[container["network"]] = container["network_container"]
-
-                __fathers(self.network_container)
-            except Exception as e:
-                raise e
-
-            return f
-        except Exception as e:
-            raise e
-
-
-
     def modify(self, data: dict) -> dict:
         try:
             if "network" not in data:
@@ -131,7 +104,7 @@ class Network:
 
 
     @staticmethod
-    def genealogyS(assetId, network, includeChild: bool = False) -> list:
+    def genealogy(assetId, network, includeChild: bool = False) -> list:
         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
         networkContainer = ""
 
@@ -153,7 +126,7 @@ class Network:
                 if net["network"] == network:
                     networkContainer = net["network_container"]
 
-            f.extend(NetworkContainer.genealogyS(assetId=assetId, network=networkContainer, includeChild=True))
+            f.extend(NetworkContainer.genealogy(assetId=assetId, network=networkContainer, includeChild=True))
 
             return f
         except Exception as e:

@@ -75,7 +75,7 @@ class NetworkContainer:
 
 
     @staticmethod
-    def genealogyS(assetId, network, includeChild: bool = False) -> list:
+    def genealogy(assetId, network, includeChild: bool = False) -> list:
 
         try:
             f = list()

@@ -4,7 +4,6 @@ from django.db import connection
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
-from infoblox.helpers.Log import Log
 
 
 class PermissionPrivilege:
@@ -324,10 +323,10 @@ class PermissionPrivilege:
                 if networkName:
                     if isContainer:
                         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-                        netParents = NetworkContainer.genealogyS(assetId=assetId, network=networkName, includeChild=True)
+                        netParents = NetworkContainer.genealogy(assetId=assetId, network=networkName, includeChild=True)
                     else:
                         from infoblox.models.Infoblox.Network import Network
-                        netParents = Network.genealogyS(assetId=assetId, network=networkName, includeChild=True)
+                        netParents = Network.genealogy(assetId=assetId, network=networkName, includeChild=True)
 
                     orNets = ""
                     for _ in netParents:
