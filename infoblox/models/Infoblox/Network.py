@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-import redis
+from django.core.cache import cache
 
 from infoblox.helpers.Exception import CustomException
 
@@ -114,13 +114,11 @@ class Network:
                 f.append(network)
 
             # Use redis to avoid to repeat the same call many times when list networks.
-            r = redis.Redis(host="127.0.0.1", port=6379, db=0)
-            if r.exists('networkList'):
-                networkList = json.loads(r.get("networkList").decode("utf-8"))
+            if cache.get("networkList"):
+                networkList = cache.get("networkList")
             else:
-                networkList = Network.listData(assetId=assetId)
-                r.set("networkList", json.dumps(networkList))
-                r.expire('networkList', 30)
+                networkList = Network.listData(assetId)
+                cache.set("networkList", networkList, 20)
 
             for net in networkList:
                 if net["network"] == network:

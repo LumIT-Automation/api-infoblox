@@ -1,6 +1,6 @@
 import json
 from typing import Dict
-import redis
+from django.core.cache import cache
 
 from infoblox.helpers.Exception import CustomException
 
@@ -90,13 +90,11 @@ class NetworkContainer:
                         __fathers(struct[son])
 
                 # Use redis to avoid to repeat the same call many times when list networks.
-                r = redis.Redis(host="127.0.0.1", port=6379, db=0)
-                if r.exists('networkContainerList'):
-                    networkContainerList = json.loads(r.get("networkContainerList").decode("utf-8"))
+                if cache.get("networkContainerList"):
+                    networkContainerList = cache.get("networkContainerList")
                 else:
                     networkContainerList = NetworkContainer.listData(assetId)
-                    r.set("networkContainerList", json.dumps(networkContainerList))
-                    r.expire('networkContainerList', 30)
+                    cache.set("networkContainerList", networkContainerList, 20)
 
                 networkContainer = ""
                 for container in networkContainerList:
