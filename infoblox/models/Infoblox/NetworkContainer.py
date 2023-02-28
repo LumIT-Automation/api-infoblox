@@ -6,6 +6,7 @@ from infoblox.helpers.Exception import CustomException
 
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.connectors.NetworkContainer import NetworkContainer as Connector
+from infoblox.helpers.Log import Log
 
 
 Value: Dict[str, str] = {"value": ""}
@@ -75,8 +76,7 @@ class NetworkContainer:
 
 
     @staticmethod
-    def genealogy(assetId, network, includeChild: bool = False) -> list:
-
+    def genealogy(network, networkContainerList: list, includeChild: bool = False) -> list:
         try:
             f = list()
             if includeChild:
@@ -89,12 +89,14 @@ class NetworkContainer:
                     if son in struct:
                         __fathers(struct[son])
 
+                """
                 # Use redis to avoid to repeat the same call many times when list networks.
                 if cache.get("networkContainerList"):
                     networkContainerList = cache.get("networkContainerList")
                 else:
                     networkContainerList = NetworkContainer.listData(assetId)
                     cache.set("networkContainerList", networkContainerList, 20)
+                """
 
                 networkContainer = ""
                 for container in networkContainerList:

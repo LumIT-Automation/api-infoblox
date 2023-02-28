@@ -43,12 +43,11 @@ class InfobloxNetworkContainersController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = NetworkContainer.listData(assetId, filters)
-
+                    networkContainers = NetworkContainer.listData(assetId, filters)
                     # Filter network containers' list basing on permissions.
-                    for p in itemData:
-                        if Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=str(p["network"]), isContainer=True) or user["authDisabled"]:
-                            allowedData["data"].append(p)
+                    for nc in networkContainers:
+                        if Permission.checkPermissionInList(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=str(nc["network"]), netContainerList=networkContainers):
+                            allowedData["data"].append(nc)
 
                     serializer = Serializer(data=allowedData)
                     if serializer.is_valid():

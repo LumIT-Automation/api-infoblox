@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Network import Network
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Networks import InfobloxNetworksSerializer as Serializer
@@ -44,15 +46,16 @@ class InfobloxNetworksController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    itemData = Network.listData(assetId, filters)
-
+                    networks = Network.listData(assetId, filters)
+                    networkContainers = NetworkContainer.listData(assetId)
                     # Filter networks' list basing on permissions.
                     # This filter is strict: if you need to be able to read a network, that network must be enlisted in the permissions' table.
                     # For example: network: 10.8.0.0/24 // network_container: 10.8.0.0/17.
-                    # 10.8.0.0/24 won't be read if group has permission only on 10.8.0.0/17 (db).
-                    for p in itemData:
-                        if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, networkName=str(p["network"])) or user["authDisabled"]:
-                            allowedData["data"].append(p)
+                    # 10.8.0.0/24 won't be read if group has permission on 10.8.0.0/17 or in upper containers(db).
+
+                    for n in networks:
+                        if Permission.checkPermissionInList(groups=user["groups"], action="networks_get", assetId=assetId, networkName=str(n["network"]), netContainerList=networkContainers, netList=networks):
+                            allowedData["data"].append(n)
 
                     serializer = Serializer(data=allowedData)
                     if serializer.is_valid():

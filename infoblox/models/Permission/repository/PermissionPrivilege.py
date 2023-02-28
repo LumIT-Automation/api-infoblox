@@ -359,3 +359,64 @@ class PermissionPrivilege:
                 c.close()
 
         return False
+
+
+
+    @staticmethod
+    def countUserPermissionsInList(groups: list, action: str, assetId: int = 0, networks: list = None) -> int:
+        networks = networks or []
+        if action and groups:
+            args = groups.copy()
+            assetWhere = ""
+            networkWhere = ""
+            c = connection.cursor()
+
+            # Superadmin's group.
+            for gr in groups:
+                if gr.lower() == "automation.local":
+                    return True
+
+            try:
+                # Build the first half of the where condition of the query.
+                # Obtain: WHERE (identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || identity_group.identity_group_identifier = %s || ....)
+                groupWhere = ''
+                for _ in groups:
+                    groupWhere += 'identity_group.identity_group_identifier = %s || '
+
+                # Put all the args of the query in a list.
+                if assetId:
+                    args.append(assetId)
+                    assetWhere = "AND `network`.id_asset = %s "
+
+                if networks:
+                    orNets = ""
+                    for _ in networks:
+                        orNets += 'OR `network`.`network` = %s '
+                    args.extend(networks)
+
+                    networkWhere = "AND (`network`.`network` = 'any' " + orNets + " ) " # if "any" appears in the query results so far -> pass.
+
+                args.append(action)
+
+                c.execute("SELECT COUNT(*) AS count "
+                    "FROM identity_group "
+                    "LEFT JOIN group_role_network ON group_role_network.id_group = identity_group.id "
+                    "LEFT JOIN role ON role.id = group_role_network.id_role "
+                    "LEFT JOIN role_privilege ON role_privilege.id_role = role.id "
+                    "LEFT JOIN `network` ON `network`.id = group_role_network.id_network "                      
+                    "LEFT JOIN privilege ON privilege.id = role_privilege.id_privilege "
+                    "WHERE ("+groupWhere[:-4]+") " +
+                    assetWhere +
+                    networkWhere +
+                    "AND privilege.privilege = %s ",
+                        args
+                )
+
+                return DBHelper.asDict(c)[0]["count"]
+
+            except Exception as e:
+                raise CustomException(status=400, payload={"database": e.__str__()})
+            finally:
+                c.close()
+
+        return False

@@ -104,7 +104,7 @@ class Network:
 
 
     @staticmethod
-    def genealogy(assetId, network, includeChild: bool = False) -> list:
+    def genealogy(network: str, networkList: list, networkContainerList: list, includeChild: bool = False) -> list:
         from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
         networkContainer = ""
 
@@ -113,18 +113,20 @@ class Network:
             if includeChild:
                 f.append(network)
 
+            """
             # Use redis to avoid to repeat the same call many times when list networks.
             if cache.get("networkList"):
                 networkList = cache.get("networkList")
             else:
                 networkList = Network.listData(assetId)
                 cache.set("networkList", networkList, 20)
+            """
 
             for net in networkList:
                 if net["network"] == network:
                     networkContainer = net["network_container"]
 
-            f.extend(NetworkContainer.genealogy(assetId=assetId, network=networkContainer, includeChild=True))
+            f.extend(NetworkContainer.genealogy(network=networkContainer, networkContainerList=networkContainerList, includeChild=True))
 
             return f
         except Exception as e:

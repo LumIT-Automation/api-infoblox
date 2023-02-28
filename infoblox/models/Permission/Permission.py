@@ -6,6 +6,7 @@ from infoblox.models.Permission.repository.Permission import Permission as Repos
 from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
 from infoblox.helpers.Exception import CustomException
+from infoblox.helpers.Log import Log
 
 
 class Permission:
@@ -54,6 +55,32 @@ class Permission:
             )
         except Exception as e:
             raise e
+
+
+
+    @staticmethod
+    def checkPermissionInList(groups: list, action: str, assetId: int, networkName: str, netContainerList: list, netList: list = None):
+        netList = netList or []
+
+        # Superadmin's group.
+        for gr in groups:
+            if gr.lower() == "automation.local":
+                return True
+
+        if netList:
+            from infoblox.models.Infoblox.Network import Network as NetworkModel
+            parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+        else:
+            from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkModel
+            parentList = NetworkModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
+
+        try:
+            if PermissionPrivilegeRepository.countUserPermissionsInList(groups, action, assetId, parentList):
+                return True
+
+            return False
+        except Exception as e:
+                raise e
 
 
 
