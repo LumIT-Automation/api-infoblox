@@ -113,21 +113,11 @@ class Network:
             if includeChild:
                 f.append(network)
 
-            """
-            # Use redis to avoid to repeat the same call many times when list networks.
-            if cache.get("networkList"):
-                networkList = cache.get("networkList")
-            else:
-                networkList = Network.listData(assetId)
-                cache.set("networkList", networkList, 20)
-            """
-
             for net in networkList:
                 if net["network"] == network:
                     networkContainer = net["network_container"]
 
             f.extend(NetworkContainer.genealogy(network=networkContainer, networkContainerList=networkContainerList, includeChild=True))
-
             return f
         except Exception as e:
             raise e

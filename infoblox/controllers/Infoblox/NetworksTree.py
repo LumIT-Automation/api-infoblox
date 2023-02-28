@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Tree import Tree
+from infoblox.models.Infoblox.Network import Network
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.controllers.CustomController import CustomController
@@ -29,18 +31,18 @@ class InfobloxNetworksTreeController(CustomController):
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
-        def __allowedTree(el: dict, father: str, tree: dict) -> None: # -> tree.
+        def __allowedTree(el: dict, father: str, tree: dict, networkList: list, networkContainterList: list) -> None: # -> tree.
             if not el["children"]:
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
-                    action = "network_container_get"
-                    isContainer = True
+                    action = "network_containers_get"
+                    nList = []
                 else:
-                    action = "network_get"
-                    isContainer = False
+                    action = "networks_get"
+                    nList = networkList.copy()
 
                 # Add only allowed leaves to the tree data structure.
-                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"], isContainer=isContainer) or user["authDisabled"]:
+                if Permission.checkPermissionInList(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"], netContainerList=networkContainterList, netList=nList) or user["authDisabled"] :
                     el["key"] = hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest()
                     el["children"] = []
 
@@ -54,7 +56,7 @@ class InfobloxNetworksTreeController(CustomController):
                     tree[el["network"]] = list()
 
                 for son in el["children"]:
-                    __allowedTree(son, el["network"], tree) # recurse.
+                    __allowedTree(son, el["network"], tree, networkList, networkContainterList) # recurse.
 
                     try:
                         if father:
@@ -67,7 +69,7 @@ class InfobloxNetworksTreeController(CustomController):
                             }
 
                             # If not branch allowed, clear information but maintain structure.
-                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_container_get", assetId=assetId, networkName=el["network"], isContainer=True) or user["authDisabled"] or el["network"] == "/"):
+                            if not (Permission.checkPermissionInList(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=el["network"], netContainerList=networkContainterList)  or user["authDisabled"] or el["network"] == "/"):
                                 nc["title"] = ""
                                 nc["extattrs"] = dict()
 
@@ -115,8 +117,11 @@ class InfobloxNetworksTreeController(CustomController):
                     lock.lock()
 
                     # Get the tree and check here user's permissions.
+                    networkList = Network.listData(assetId)
+                    networkContainerList = NetworkContainer.listData(assetId)
+
                     itemData = Tree.tree(assetId)
-                    __allowedTree(itemData["/"], "", tree) # tree modified: by reference.
+                    __allowedTree(itemData["/"], "", tree, networkList, networkContainerList) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]
 
