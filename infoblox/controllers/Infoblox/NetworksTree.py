@@ -36,13 +36,15 @@ class InfobloxNetworksTreeController(CustomController):
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
                     action = "network_containers_get"
+                    isContainer = True
                     nList = []
                 else:
                     action = "networks_get"
+                    isContainer = False
                     nList = networkList.copy()
 
                 # Add only allowed leaves to the tree data structure.
-                if Permission.checkPermissionInList(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"], netContainerList=networkContainterList, netList=nList) or user["authDisabled"] :
+                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"], netContainerList=networkContainterList, netList=nList, isContainer=isContainer) or user["authDisabled"] :
                     el["key"] = hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest()
                     el["children"] = []
 
@@ -69,7 +71,7 @@ class InfobloxNetworksTreeController(CustomController):
                             }
 
                             # If not branch allowed, clear information but maintain structure.
-                            if not (Permission.checkPermissionInList(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=el["network"], netContainerList=networkContainterList)  or user["authDisabled"] or el["network"] == "/"):
+                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, networkName=el["network"], netContainerList=networkContainterList, isContainer=True) or user["authDisabled"] or el["network"] == "/"):
                                 nc["title"] = ""
                                 nc["extattrs"] = dict()
 

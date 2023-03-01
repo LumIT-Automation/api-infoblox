@@ -54,7 +54,7 @@ class InfobloxNetworksController(CustomController):
                     # 10.8.0.0/24 won't be read if group has permission on 10.8.0.0/17 or in upper containers(db).
 
                     for n in networks:
-                        if Permission.checkPermissionInList(groups=user["groups"], action="networks_get", assetId=assetId, networkName=str(n["network"]), netContainerList=networkContainers, netList=networks):
+                        if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, networkName=str(n["network"]), netContainerList=networkContainers, netList=networks):
                             allowedData["data"].append(n)
 
                     serializer = Serializer(data=allowedData)

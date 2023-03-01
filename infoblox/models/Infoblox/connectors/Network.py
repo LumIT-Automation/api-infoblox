@@ -121,7 +121,7 @@ class Network:
 
 
     @staticmethod
-    def list(assetId: int, filter: dict = None) -> list:
+    def list(assetId: int, filter: dict = None, silent: bool = False) -> list:
         filter = filter or {}
 
         apiParams = {
@@ -138,7 +138,8 @@ class Network:
                 endpoint=infoblox.baseurl+"/network",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
-                tlsVerify=infoblox.tlsverify
+                tlsVerify=infoblox.tlsverify,
+                silent = silent
             )
 
             return api.get()

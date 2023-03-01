@@ -43,39 +43,35 @@ class Permission:
     ####################################################################################################################
 
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "", isContainer: bool = False) -> bool:
-        # Superadmin's group.
-        for gr in groups:
-            if gr.lower() == "automation.local":
-                return True
-
-        try:
-            return bool(
-                PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, networkName, isContainer)
-            )
-        except Exception as e:
-            raise e
-
-
-
-    @staticmethod
-    def checkPermissionInList(groups: list, action: str, assetId: int, networkName: str, netContainerList: list, netList: list = None):
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "", netContainerList: list = None, netList: list = None, isContainer: bool = False) -> bool:
+        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
+        from infoblox.models.Infoblox.Network import Network as NetworkModel
         netList = netList or []
+        netContainerList = netContainerList or []
+        parentList = []
 
         # Superadmin's group.
         for gr in groups:
             if gr.lower() == "automation.local":
                 return True
 
-        if netList:
-            from infoblox.models.Infoblox.Network import Network as NetworkModel
-            parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
-        else:
-            from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkModel
-            parentList = NetworkModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
-
         try:
-            if PermissionPrivilegeRepository.countUserPermissionsInList(groups, action, assetId, parentList):
+            if networkName:
+                if "/" not in networkName:
+                    networkName = NetworkModel(assetId, networkName).network
+
+                if isContainer:
+                    if not netContainerList:
+                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                    parentList = NetworkContainerModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
+                else:
+                    if not netList:
+                        netList = NetworkModel.listData(assetId, silent=True)
+                    if not netContainerList:
+                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                    parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+
+            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, parentList):
                 return True
 
             return False
