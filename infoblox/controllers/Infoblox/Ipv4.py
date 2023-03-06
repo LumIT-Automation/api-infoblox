@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
-from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Permission.Permission import Permission
 from infoblox.models.History.History import History
 
@@ -116,7 +115,7 @@ class InfobloxIpv4Controller(CustomController):
 
                     lock.release()
 
-                    historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
+                    InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
                     Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
 
                     CustomController.plugins("ipv4_delete", locals())
@@ -171,7 +170,7 @@ class InfobloxIpv4Controller(CustomController):
                         httpStatus = status.HTTP_200_OK
                         lock.release()
 
-                        historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
+                        InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
                         CustomController.plugins("ipv4_patch", locals())
                     else:
                         httpStatus = status.HTTP_423_LOCKED
@@ -204,7 +203,7 @@ class InfobloxIpv4Controller(CustomController):
     ####################################################################################################################
 
     @staticmethod
-    def __historyLog(assetId, user, action, status, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
+    def __historyLog(assetId, user, action, status, ipv4, network: str = "", gateway: str = "", mask: str = "") -> None:
         data = {
             "log": {
                 "username": user,
@@ -222,6 +221,6 @@ class InfobloxIpv4Controller(CustomController):
         }
 
         try:
-            return History.add(data)
+            History.add(data)
         except Exception:
             pass

@@ -14,7 +14,6 @@ from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer
 from infoblox.controllers.CustomController import CustomController
 
 from infoblox.helpers.Lock import Lock
-from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
@@ -27,7 +26,7 @@ class InfobloxNetworkController(CustomController):
         showIp = False
         ipv4Info = { "data": dict() }
         etagCondition = { "responseEtag": "" }
-        permissionNetworksChain = [networkAddress]
+
         user = CustomController.loggedUser(request)
 
         try:
@@ -122,7 +121,7 @@ class InfobloxNetworkController(CustomController):
         response = None
         auth = False
         data = dict()
-        permissionNetwork = [networkAddress]
+
         user = CustomController.loggedUser(request)
 
         try:
@@ -158,7 +157,7 @@ class InfobloxNetworkController(CustomController):
         response = None
         auth = False
         data = dict()
-        permissionNetwork = [networkAddress]
+
         user = CustomController.loggedUser(request)
 
         try:
@@ -177,7 +176,7 @@ class InfobloxNetworkController(CustomController):
                         n = Network(assetId, networkAddress).modify(data)
                         httpStatus = status.HTTP_200_OK
                         lock.release()
-                        historyId = InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress, n["network"])
+                        InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress, n["network"])
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:
@@ -203,12 +202,13 @@ class InfobloxNetworkController(CustomController):
         })
 
 
+
     ####################################################################################################################
     # Helper methods
     ####################################################################################################################
 
     @staticmethod
-    def __historyLog(assetId, user, action, status, network: str = "", address: str = "") -> int:
+    def __historyLog(assetId, user, action, status, network: str = "", address: str = "") -> None:
         data = {
             "log": {
                 "username": user,
@@ -226,6 +226,6 @@ class InfobloxNetworkController(CustomController):
         }
 
         try:
-            return History.add(data)
+            History.add(data)
         except Exception:
             pass
