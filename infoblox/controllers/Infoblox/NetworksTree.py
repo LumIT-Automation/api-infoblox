@@ -119,11 +119,11 @@ class InfobloxNetworksTreeController(CustomController):
                     lock.lock()
 
                     # Get the tree and check here user's permissions.
-                    networkList = Network.listData(assetId)
-                    networkContainerList = NetworkContainer.listData(assetId)
+                    networksList = Network.listData(assetId)
+                    networkContainersList = NetworkContainer.listData(assetId)
 
-                    itemData = Tree.tree(assetId)
-                    __allowedTree(itemData["/"], "", tree, networkList, networkContainerList) # tree modified: by reference.
+                    itemData = Tree.tree(assetId, netWorkContainersList=networkContainersList, neworksList=networksList)
+                    __allowedTree(itemData["/"], "", tree, networksList, networkContainersList) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]
 

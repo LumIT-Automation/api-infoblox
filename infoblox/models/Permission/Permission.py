@@ -57,7 +57,7 @@ class Permission:
 
         try:
             if networkName:
-                if "/" not in networkName:
+                if "/" not in networkName and not isContainer:
                     networkName = NetworkModel(assetId, networkName).network
 
                 if isContainer:
@@ -65,11 +65,13 @@ class Permission:
                         netContainerList = NetworkContainerModel.listData(assetId, silent=True)
                     parentList = NetworkContainerModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
                 else:
-                    if not netList:
-                        netList = NetworkModel.listData(assetId, silent=True)
                     if not netContainerList:
                         netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+                    if not netList:
+                        parent = NetworkModel(assetId, networkName).network_container
+                        parentList = NetworkContainerModel.genealogy(parent, networkContainerList=netContainerList, includeChild=True)
+                    else:
+                        parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
 
             if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, parentList):
                 return True
