@@ -30,8 +30,9 @@ class InfobloxIpv4Controller(CustomController):
         networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
+            ipv4 = Ipv4(assetId, ipv4address)
             try:
-                networkCidr = Ipv4(assetId, ipv4address).network
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
@@ -43,7 +44,7 @@ class InfobloxIpv4Controller(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    serializer = Serializer(data=Ipv4(assetId, ipv4address).repr())
+                    serializer = Serializer(data=ipv4.repr())
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
@@ -96,8 +97,9 @@ class InfobloxIpv4Controller(CustomController):
         networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
+            ipv4 = Ipv4(assetId, ipv4address)
             try:
-                networkCidr = Ipv4(assetId, ipv4address).network
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
@@ -109,7 +111,7 @@ class InfobloxIpv4Controller(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    Ipv4(assetId, ipv4address).release(fixedaddressOnly=True)
+                    ipv4.release(fixedaddressOnly=True)
                     httpStatus = status.HTTP_200_OK
 
                     lock.release()
@@ -145,8 +147,9 @@ class InfobloxIpv4Controller(CustomController):
         networkContainerCidr = "/" # container of userNetwork, if any.
 
         try:
+            ipv4 = Ipv4(assetId, ipv4address)
             try:
-                networkCidr = Ipv4(assetId, ipv4address).network
+                networkCidr = ipv4.network
                 userNetwork, mask = networkCidr.split("/")
             except Exception:
                 pass
@@ -163,8 +166,7 @@ class InfobloxIpv4Controller(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        ip = Ipv4(assetId, ipv4address)
-                        ip.modify(data) # address pass: data will be modified, using this for the logs.
+                        ipv4.modify(data) # address pass: data will be modified, using this for the logs.
 
                         httpStatus = status.HTTP_200_OK
                         lock.release()

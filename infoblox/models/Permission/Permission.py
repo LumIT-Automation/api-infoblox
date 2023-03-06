@@ -48,7 +48,7 @@ class Permission:
         from infoblox.models.Infoblox.Network import Network as NetworkModel
         netList = netList or []
         netContainerList = netContainerList or []
-        parentList = []
+        genealogy = []
 
         # Superadmin's group.
         for gr in groups:
@@ -63,23 +63,52 @@ class Permission:
                 if isContainer:
                     if not netContainerList:
                         netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    parentList = NetworkContainerModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
+                    genealogy = NetworkContainerModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
                 else:
                     if not netContainerList:
                         netContainerList = NetworkContainerModel.listData(assetId, silent=True)
                     if not netList:
-                        parent = NetworkModel(assetId, networkName).network_container
-                        parentList = NetworkContainerModel.genealogy(parent, networkContainerList=netContainerList, includeChild=True)
+                        network = NetworkModel(assetId, networkName)
+                        genealogy.append(network.network)
+                        genealogy.extend(NetworkContainerModel.genealogy(network.network_container, networkContainerList=netContainerList, includeChild=True))
                     else:
-                        parentList = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+                        genealogy = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
 
-            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, parentList):
+            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
                 return True
 
             return False
         except Exception as e:
                 raise e
 
+
+
+    # Check permission using informations from .infoblox.model.Infoblox.Network.
+    @staticmethod
+    def hasUserPermissionOnNetwork(groups: list, action: str, assetId: int, networkObject: object, netContainerList: list = None) -> bool:
+        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
+        from infoblox.models.Infoblox.Network import Network as NetworkModel
+        netContainerList = netContainerList or []
+        genealogy = []
+
+        # Superadmin's group.
+        for gr in groups:
+            if gr.lower() == "automation.local":
+                return True
+
+        try:
+            if networkObject and isinstance(networkObject, NetworkModel):
+                genealogy.append(networkObject.network)
+                if not netContainerList:
+                    netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                genealogy.extend(NetworkContainerModel.genealogy(networkObject.network_container, networkContainerList=netContainerList, includeChild=True))
+
+            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
+                return True
+
+            return False
+        except Exception as e:
+                raise e
 
 
     @staticmethod

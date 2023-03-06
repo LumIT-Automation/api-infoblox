@@ -31,7 +31,8 @@ class InfobloxNetworkController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, networkName=networkAddress) or user["authDisabled"]:
+            n = Network(assetId, networkAddress)
+            if Permission.hasUserPermissionOnNetwork(groups=user["groups"], action="network_get", assetId=assetId, networkObject=n) or user["authDisabled"]:
                 Log.actionLog("Network information", user)
 
                 # If asked for, get related IPs.
@@ -44,7 +45,6 @@ class InfobloxNetworkController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    n = Network(assetId, networkAddress)
                     serializer = InfobloxNetworkSerializer(data=n.repr())
                     if serializer.is_valid():
                         data["data"] = serializer.validated_data
