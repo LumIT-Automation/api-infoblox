@@ -1,4 +1,5 @@
 import hashlib
+import copy
 
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -32,6 +33,7 @@ class InfobloxNetworksTreeController(CustomController):
         user = CustomController.loggedUser(request)
 
         def __allowedTree(el: dict, father: str, tree: dict, networkList: list, networkContainterList: list) -> None: # -> tree.
+
             if not el["children"]:
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
@@ -42,6 +44,7 @@ class InfobloxNetworksTreeController(CustomController):
                     action = "networks_get"
                     isContainer = False
                     nList = networkList.copy()
+
 
                 # Add only allowed leaves to the tree data structure.
                 if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, networkName=el["network"], netContainerList=networkContainterList, netList=nList, isContainer=isContainer) or user["authDisabled"] :
@@ -121,8 +124,9 @@ class InfobloxNetworksTreeController(CustomController):
                     # Get the tree and check here user's permissions.
                     networksList = Network.listData(assetId)
                     networkContainersList = NetworkContainer.listData(assetId)
+                    netList = copy.deepcopy(networksList)
+                    itemData = Tree.tree(assetId, netWorkContainersList=networkContainersList, networksList=netList)
 
-                    itemData = Tree.tree(assetId, netWorkContainersList=networkContainersList, neworksList=networksList)
                     __allowedTree(itemData["/"], "", tree, networksList, networkContainersList) # tree modified: by reference.
 
                     o["/"]["children"] = tree["/"]

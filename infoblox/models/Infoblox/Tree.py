@@ -9,9 +9,7 @@ class Tree:
     ####################################################################################################################
 
     @staticmethod
-    def tree(assetId: int, netWorkContainersList: list = None, neworksList: list = None) -> dict:
-        netWorkContainersList = netWorkContainersList or []
-        neworksList = neworksList or []
+    def tree(assetId: int, netWorkContainersList: list, networksList: list) -> dict:
         containers = dict()
         tree = dict()
         o = {
@@ -23,8 +21,6 @@ class Tree:
         }
 
         # Get a containers' key/values structure.
-        if not netWorkContainersList:
-            netWorkContainersList = NetworkContainer.listData(assetId)
         for container in netWorkContainersList:
             # {
             #      "_ref": "networkcontainer/ZG5zLm5ldHdvcmtfY29udGFpbmVyJDEwLjguMTAuMC8yNC8w:10.8.10.0/24/default",
@@ -96,9 +92,7 @@ class Tree:
             # }
 
         # Add networks information to the containers' data structure.
-        if not neworksList:
-            neworksList = Network.listData(assetId)
-        for network in neworksList:
+        for network in networksList:
             c = network["network_container"]
 
             del (network["network_view"])

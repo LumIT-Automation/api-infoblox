@@ -5,6 +5,9 @@ from infoblox.models.Permission.Network import Network
 from infoblox.models.Permission.repository.Permission import Permission as Repository
 from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
+from infoblox.models.Infoblox.Network import Network as NetworkModel
+
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
@@ -44,8 +47,6 @@ class Permission:
 
     @staticmethod
     def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "", netContainerList: list = None, netList: list = None, isContainer: bool = False) -> bool:
-        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
-        from infoblox.models.Infoblox.Network import Network as NetworkModel
         netList = netList or []
         netContainerList = netContainerList or []
         genealogy = []
@@ -85,9 +86,7 @@ class Permission:
 
     # Check permission using informations from .infoblox.model.Infoblox.Network.
     @staticmethod
-    def hasUserPermissionOnNetwork(groups: list, action: str, assetId: int, networkObject: object, netContainerList: list = None) -> bool:
-        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
-        from infoblox.models.Infoblox.Network import Network as NetworkModel
+    def hasUserPermissionOnNetwork(groups: list, action: str, assetId: int, networkObject: NetworkModel, netContainerList: list = None) -> bool:
         netContainerList = netContainerList or []
         genealogy = []
 
