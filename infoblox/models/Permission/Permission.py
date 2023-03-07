@@ -1,12 +1,14 @@
+from typing import Union
+
 from infoblox.models.Permission.IdentityGroup import IdentityGroup
 from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Network import Network
 
-from infoblox.models.Permission.repository.Permission import Permission as Repository
-from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
-
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
 from infoblox.models.Infoblox.Network import Network as NetworkModel
+
+from infoblox.models.Permission.repository.Permission import Permission as Repository
+from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
@@ -46,7 +48,7 @@ class Permission:
     ####################################################################################################################
 
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, networkName: str = "", netContainerList: list = None, netList: list = None, isContainer: bool = False) -> bool:
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, network: Union[str, NetworkModel] = None, netContainerList: list = None, netList: list = None, isContainer: bool = False) -> bool:
         netList = netList or []
         netContainerList = netContainerList or []
         genealogy = []
@@ -57,23 +59,30 @@ class Permission:
                 return True
 
         try:
-            if networkName:
-                if "/" not in networkName and not isContainer:
-                    networkName = NetworkModel(assetId, networkName).network
+            if network:
+                if isinstance(network, str):
+                    if "/" not in network and not isContainer:
+                        network = NetworkModel(assetId, network).network
 
-                if isContainer:
-                    if not netContainerList:
-                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    genealogy = NetworkContainerModel.genealogy(networkName, networkContainerList=netContainerList, includeChild=True)
-                else:
-                    if not netContainerList:
-                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    if not netList:
-                        network = NetworkModel(assetId, networkName)
-                        genealogy.append(network.network)
-                        genealogy.extend(NetworkContainerModel.genealogy(network.network_container, networkContainerList=netContainerList, includeChild=True))
+                    if isContainer:
+                        if not netContainerList:
+                            netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                        genealogy = NetworkContainerModel.genealogy(network, networkContainerList=netContainerList, includeChild=True)
                     else:
-                        genealogy = NetworkModel.genealogy(networkName, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+                        if not netContainerList:
+                            netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                        if not netList:
+                            n = NetworkModel(assetId, network)
+                            genealogy.append(n.network)
+                            genealogy.extend(NetworkContainerModel.genealogy(n.network_container, networkContainerList=netContainerList, includeChild=True))
+                        else:
+                            genealogy = NetworkModel.genealogy(network, networkList=netList, networkContainerList=netContainerList, includeChild=True)
+                        
+                if isinstance(network, NetworkModel):
+                    genealogy.append(network.network)
+                    if not netContainerList:
+                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                    genealogy.extend(NetworkContainerModel.genealogy(network.network_container, networkContainerList=netContainerList, includeChild=True))
 
             if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
                 return True
@@ -82,32 +91,6 @@ class Permission:
         except Exception as e:
                 raise e
 
-
-
-    # Check permission using informations from .infoblox.model.Infoblox.Network.
-    @staticmethod
-    def hasUserPermissionOnNetwork(groups: list, action: str, assetId: int, networkObject: NetworkModel, netContainerList: list = None) -> bool:
-        netContainerList = netContainerList or []
-        genealogy = []
-
-        # Superadmin's group.
-        for gr in groups:
-            if gr.lower() == "automation.local":
-                return True
-
-        try:
-            if networkObject and isinstance(networkObject, NetworkModel):
-                genealogy.append(networkObject.network)
-                if not netContainerList:
-                    netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                genealogy.extend(NetworkContainerModel.genealogy(networkObject.network_container, networkContainerList=netContainerList, includeChild=True))
-
-            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
-                return True
-
-            return False
-        except Exception as e:
-                raise e
 
 
     @staticmethod

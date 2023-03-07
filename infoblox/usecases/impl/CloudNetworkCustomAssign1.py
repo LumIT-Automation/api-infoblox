@@ -30,7 +30,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 try:
                     Log.log(f"Trying {container}...")
 
-                    if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, networkName=container) or self.user["authDisabled"]:
+                    if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, network=container) or self.user["authDisabled"]:
                         return NetworkContainer(self.assetId, container["network"]).addNextAvailableNetwork(
                             subnetMaskCidr=24,
                             data=data

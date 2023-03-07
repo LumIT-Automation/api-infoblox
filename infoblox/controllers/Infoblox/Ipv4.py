@@ -36,7 +36,7 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, networkName=networkCidr):
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, network=networkCidr):
                 Log.actionLog("Get ipv4s address information: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
@@ -103,7 +103,7 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, networkName=networkCidr):
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, network=networkCidr):
                 Log.actionLog("Delete ipv4s address: "+ipv4address, user)
 
                 lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
@@ -153,7 +153,7 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, networkName=networkCidr):
+            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, network=networkCidr):
                 Log.actionLog("Modify ipv4s address: "+ipv4address, user)
                 Log.actionLog("User data: "+str(request.data), user)
 

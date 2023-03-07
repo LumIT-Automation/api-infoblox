@@ -31,7 +31,7 @@ class InfobloxNetworkController(CustomController):
 
         try:
             n = Network(assetId, networkAddress)
-            if Permission.hasUserPermissionOnNetwork(groups=user["groups"], action="network_get", assetId=assetId, networkObject=n) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, network=n) or user["authDisabled"]:
                 Log.actionLog("Network information", user)
 
                 # If asked for, get related IPs.
@@ -125,7 +125,7 @@ class InfobloxNetworkController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, networkName=networkAddress) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, network=networkAddress) or user["authDisabled"]:
                 Log.actionLog("Network deletion", user)
 
                 lock = Lock("network", locals(), networkAddress)
@@ -161,7 +161,7 @@ class InfobloxNetworkController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, networkName=networkAddress) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, network=networkAddress) or user["authDisabled"]:
                 Log.actionLog("Modify network", user)
                 Log.actionLog("User data: "+str(request.data), user)
 

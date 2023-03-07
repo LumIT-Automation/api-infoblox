@@ -32,7 +32,7 @@ class InfobloxIpv4sController(CustomController):
                 ipv4CustomReserve = ReserveFactory(assetId, reqType, userValidatedData, user["username"])()
 
                 permissionCheckNetwork = ipv4CustomReserve.permissionCheckNetwork
-                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, networkName=permissionCheckNetwork) or user["authDisabled"]:
+                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, network=permissionCheckNetwork) or user["authDisabled"]:
                     Log.actionLog("Ipv4 addition", user)
                     Log.actionLog("User data: "+str(request.data), user)
 
