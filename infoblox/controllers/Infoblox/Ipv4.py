@@ -115,7 +115,7 @@ class InfobloxIpv4Controller(CustomController):
 
                     lock.release()
 
-                    InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
+                    historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
                     Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
 
                     CustomController.plugins("ipv4_delete", locals())
@@ -170,7 +170,7 @@ class InfobloxIpv4Controller(CustomController):
                         httpStatus = status.HTTP_200_OK
                         lock.release()
 
-                        InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
+                        historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
                         CustomController.plugins("ipv4_patch", locals())
                     else:
                         httpStatus = status.HTTP_423_LOCKED
@@ -203,7 +203,7 @@ class InfobloxIpv4Controller(CustomController):
     ####################################################################################################################
 
     @staticmethod
-    def __historyLog(assetId, user, action, status, ipv4, network: str = "", gateway: str = "", mask: str = "") -> None:
+    def __historyLog(assetId, user, action, status, ipv4, network: str = "", gateway: str = "", mask: str = "") -> int:
         data = {
             "log": {
                 "username": user,
@@ -221,6 +221,6 @@ class InfobloxIpv4Controller(CustomController):
         }
 
         try:
-            History.add(data)
+            return History.add(data)
         except Exception:
             pass

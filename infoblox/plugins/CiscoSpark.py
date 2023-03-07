@@ -64,9 +64,11 @@ def run(controller: str, o: dict):
     action = ""
     data = dict()
 
-    if controller in ["ipv4s_post", "ipv4_delete", "ipv4_patch"]:
+    if controller in ("ipv4s_post", "ipv4_get", "ipv4_delete", "ipv4_patch"):
         Log.log("Running CiscoSpark plugin")
 
+        if "GET" in str(o["request"]):
+            action = "read"
         if "POST" in str(o["request"]):
             action = "created"
         if "PATCH" in str(o["request"]):
@@ -77,7 +79,7 @@ def run(controller: str, o: dict):
         if "data" in o:
             data = o["data"]
 
-        if action == "modified" or action == "deleted":
+        if action in ("read", "modified", "deleted"):
             message = "IPv4 address "+o["ipv4address"]+" has been "+action+" by "+o["user"]["username"]+".\n"
 
             if "mac" in data:
