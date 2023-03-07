@@ -52,6 +52,7 @@ class Permission:
         netList = netList or []
         netContainerList = netContainerList or []
         genealogy = []
+        container = ""
 
         # Superadmin's group.
         for gr in groups:
@@ -60,29 +61,28 @@ class Permission:
 
         try:
             if network:
+                if isinstance(network, NetworkModel):
+                    genealogy.append(network.network)
+                    container = network.network_container
+
                 if isinstance(network, str):
                     if "/" not in network and not isContainer:
                         network = NetworkModel(assetId, network).network
 
                     if isContainer:
-                        if not netContainerList:
-                            netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                        genealogy = NetworkContainerModel.genealogy(network, networkContainerList=netContainerList, includeChild=True)
+                        container = network
                     else:
-                        if not netContainerList:
-                            netContainerList = NetworkContainerModel.listData(assetId, silent=True)
                         if not netList:
                             n = NetworkModel(assetId, network)
                             genealogy.append(n.network)
-                            genealogy.extend(NetworkContainerModel.genealogy(n.network_container, networkContainerList=netContainerList, includeChild=True))
+                            container = n.network_container
                         else:
-                            genealogy = NetworkModel.genealogy(network, networkList=netList, networkContainerList=netContainerList, includeChild=True)
-                        
-                if isinstance(network, NetworkModel):
-                    genealogy.append(network.network)
-                    if not netContainerList:
-                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    genealogy.extend(NetworkContainerModel.genealogy(network.network_container, networkContainerList=netContainerList, includeChild=True))
+                            genealogy.append(network)
+                            container = [net for net in netList if net["network"] == network][0]["network_container"]
+
+                if not netContainerList:
+                    netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                genealogy.extend(NetworkContainerModel.genealogy(container, networkContainerList=netContainerList, includeChild=True))
 
             if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
                 return True

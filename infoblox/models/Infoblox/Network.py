@@ -103,27 +103,6 @@ class Network:
 
 
 
-    @staticmethod
-    def genealogy(network: str, networkList: list, networkContainerList: list, includeChild: bool = False) -> list:
-        from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-        networkContainer = ""
-
-        try:
-            f = list()
-            if includeChild:
-                f.append(network)
-
-            for net in networkList:
-                if net["network"] == network:
-                    networkContainer = net["network_container"]
-
-            f.extend(NetworkContainer.genealogy(network=networkContainer, networkContainerList=networkContainerList, includeChild=True))
-            return f
-        except Exception as e:
-            raise e
-
-
-
     ####################################################################################################################
     # Private methods
     ####################################################################################################################
