@@ -75,11 +75,9 @@ class NetworkContainer:
 
 
     @staticmethod
-    def genealogy(network: str, networkContainerList: list, includeChild: bool = False) -> list:
+    def genealogy(network: str, networkContainerList: list) -> list:
         try:
             f = list()
-            if includeChild:
-                f.append(network)
             struct = dict()
 
             try:

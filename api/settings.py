@@ -226,6 +226,10 @@ API_SUPPLICANT_NETWORK_TIMEOUT = 60 # seconds.
 
 LOCK_MAX_VALIDITY = 30 # seconds.
 
+# If set to false only the permissions of the father are checked (exclude grandparent).
+# If set to true some overhead is added.
+INHERIT_GRANDPARENTS_PERMISSIONS = False
+
 # Plugins and configuration.
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")
 CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomAssign1", "CloudNetworkCustomAssign1")

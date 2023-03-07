@@ -1,5 +1,7 @@
 from typing import Union
 
+from django.conf import settings
+
 from infoblox.models.Permission.IdentityGroup import IdentityGroup
 from infoblox.models.Permission.Role import Role
 from infoblox.models.Permission.Network import Network
@@ -80,9 +82,14 @@ class Permission:
                             genealogy.append(network)
                             container = [net for net in netList if net["network"] == network][0]["network_container"]
 
-                if not netContainerList:
-                    netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                genealogy.extend(NetworkContainerModel.genealogy(container, networkContainerList=netContainerList, includeChild=True))
+                genealogy.append(container)
+
+                if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
+                    if not netContainerList:
+                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
+                    genealogy.extend(NetworkContainerModel.genealogy(container, networkContainerList=netContainerList))
+                elif isContainer and netContainerList:
+                    genealogy.append([c for c in netContainerList if c["network"] == network][0]["network_container"])
 
             if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
                 return True
