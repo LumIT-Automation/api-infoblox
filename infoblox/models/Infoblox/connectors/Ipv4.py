@@ -56,7 +56,7 @@ class Ipv4:
 
 
     @staticmethod
-    def delete(assetId, ref) -> None:
+    def deleteReferencedObject(assetId, ref) -> None:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
@@ -75,7 +75,7 @@ class Ipv4:
 
 
     @staticmethod
-    def reserve(assetId, data: dict) -> dict:
+    def reserveFixedAddress(assetId, data: dict) -> dict:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(

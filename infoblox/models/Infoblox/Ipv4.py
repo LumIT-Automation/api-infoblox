@@ -22,7 +22,7 @@ class Ipv4:
         self.status: str = ""
         self.is_conflict: bool = False
         self.names: List[str] = []
-        self.objects: List[dict] = []
+        self.objects: List[dict] = [] # fixedaddress, record:host, ptr ...
         self.types: List[str] = []
         self.usage: List[str] = []
         self.extattrs: Dict[str, Dict[str, str]] = {
@@ -98,7 +98,7 @@ class Ipv4:
                 if fixedaddressOnly:
                     ref = fixedaddress # release only the fixedaddress data.
 
-                Connector.delete(self.asset_id, ref)
+                Connector.deleteReferencedObject(self.asset_id, ref)
 
             self.__load()
         except Exception as e:
@@ -121,7 +121,7 @@ class Ipv4:
     @staticmethod
     def reserve(assetId, data: dict) -> dict:
         try:
-            return Connector.reserve(assetId, data)
+            return Connector.reserveFixedAddress(assetId, data)
         except Exception as e:
             raise e
 
@@ -133,7 +133,6 @@ class Ipv4:
             # @todo: atomicity?
 
             try:
-                # If address is already reserved (but usable -> "DNS"), a fixedaddress information is present.
                 # Delete the address' information regarding the fixedaddress value, if available.
                 ipv4 = Ipv4(assetId, address)
                 ipv4.release(fixedaddressOnly=True)
