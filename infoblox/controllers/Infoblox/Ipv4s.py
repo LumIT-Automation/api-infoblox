@@ -19,6 +19,8 @@ class InfobloxIpv4sController(CustomController):
     def post(request: Request, assetId: int) -> Response:
         response = dict()
         user = CustomController.loggedUser(request)
+        permissionContainer = ""
+        permissionNetwork = ""
 
         if "next-available" in request.GET:
             reqType = "post.next-available"
@@ -32,7 +34,12 @@ class InfobloxIpv4sController(CustomController):
                 ipv4CustomReserve = ReserveFactory(assetId, reqType, userValidatedData, user["username"])()
 
                 permissionCheckNetwork = ipv4CustomReserve.permissionCheckNetwork
-                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, network=permissionCheckNetwork) or user["authDisabled"]:
+                if ipv4CustomReserve.networkLogic == "container":
+                    permissionContainer = permissionCheckNetwork
+                if ipv4CustomReserve.networkLogic == "network":
+                    permissionNetwork = permissionCheckNetwork
+
+                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork) or user["authDisabled"]:
                     Log.actionLog("Ipv4 addition", user)
                     Log.actionLog("User data: "+str(request.data), user)
 

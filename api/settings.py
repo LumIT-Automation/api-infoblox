@@ -228,7 +228,7 @@ LOCK_MAX_VALIDITY = 30 # seconds.
 
 # If set to False only the permissions on the father are checked (exclude upper tree).
 # If set to True some overhead is added.
-INHERIT_GRANDPARENTS_PERMISSIONS = False
+INHERIT_GRANDPARENTS_PERMISSIONS = True
 
 # Plugins and configuration.
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")

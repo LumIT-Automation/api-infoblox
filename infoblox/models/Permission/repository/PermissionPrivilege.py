@@ -322,7 +322,7 @@ class PermissionPrivilege:
                     args.append(assetId)
                     assetWhere = "AND `network`.id_asset = %s "
 
-                if networks:
+                if networks and any(net != "" for net in networks):
                     orNets = ""
                     for _ in networks:
                         orNets += 'OR `network`.`network` = %s '
