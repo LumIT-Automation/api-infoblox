@@ -62,30 +62,31 @@ class Permission:
                 return True
 
         try:
-            if network:
-                if isinstance(network, NetworkModel):
-                    permissionNetworks.append(network.network)
-                    container = network.network_container
+            if network or container:
+                if network:
+                    if isinstance(network, NetworkModel):
+                        permissionNetworks.append(network.network)
+                        container = network.network_container
 
-                if isinstance(network, str):
-                    if "/" not in network: # if not already in CIDR notation.
-                        network = NetworkModel(assetId, network).network
+                    if isinstance(network, str):
+                        if "/" not in network: # if not already in CIDR notation.
+                            network = NetworkModel(assetId, network).network
 
-                    if not networks:
-                        n = NetworkModel(assetId, network)
-                        permissionNetworks.append(n.network)
-                        container = n.network_container
-                    else:
-                        permissionNetworks.append(network)
-                        container = [net for net in networks if net["network"] == network][0]["network_container"]
+                        if not networks:
+                            n = NetworkModel(assetId, network)
+                            permissionNetworks.append(n.network)
+                            container = n.network_container
+                        else:
+                            permissionNetworks.append(network)
+                            container = [net for net in networks if net["network"] == network][0]["network_container"]
 
-            permissionNetworks.append(container) # [network, container] if network // [container] if container.
+                permissionNetworks.append(container) # [network, container] if network // [container] if container.
 
-            if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
-                if not containers:
-                    containers = NetworkContainerModel.listData(assetId, silent=True)
+                if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
+                    if not containers:
+                        containers = NetworkContainerModel.listData(assetId, silent=True)
 
-                permissionNetworks.extend(NetworkContainerModel.genealogy(network=container, networkContainerList=containers))
+                    permissionNetworks.extend(NetworkContainerModel.genealogy(network=container, networkContainerList=containers))
 
             # User permissions for all permissionNetworks.
             if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, permissionNetworks):
