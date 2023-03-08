@@ -226,8 +226,8 @@ API_SUPPLICANT_NETWORK_TIMEOUT = 60 # seconds.
 
 LOCK_MAX_VALIDITY = 30 # seconds.
 
-# If set to false only the permissions of the father are checked (exclude grandparent).
-# If set to true some overhead is added.
+# If set to False only the permissions on the father are checked (exclude upper tree).
+# If set to True some overhead is added.
 INHERIT_GRANDPARENTS_PERMISSIONS = False
 
 # Plugins and configuration.

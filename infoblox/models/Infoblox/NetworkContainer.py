@@ -77,6 +77,7 @@ class NetworkContainer:
     @staticmethod
     def genealogy(network: str, networkContainerList: list) -> list:
         try:
+            networkContainer = ""
             f = list()
             struct = dict()
 
@@ -86,10 +87,12 @@ class NetworkContainer:
                     if son in struct:
                         __fathers(struct[son])
 
-                networkContainer = ""
+                # Pre-process structure.
                 for container in networkContainerList:
                     struct[container["network"]] = container["network_container"]
-                    if container["network"]  == network:
+
+                    # Get container of given network.
+                    if container["network"] == network:
                         networkContainer = container["network_container"]
 
                 __fathers(networkContainer)

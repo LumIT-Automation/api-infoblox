@@ -50,11 +50,11 @@ class Permission:
     ####################################################################################################################
 
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, network: Union[str, NetworkModel] = None, netContainerList: list = None, netList: list = None, isContainer: bool = False) -> bool:
-        netList = netList or []
-        netContainerList = netContainerList or []
-        genealogy = []
-        container = ""
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, container: str = "", network: Union[str, NetworkModel] = None, containers: list = None, networks: list = None) -> bool:
+        networks = networks or []
+        containers = containers or []
+
+        permissionNetworks = []
 
         # Superadmin's group.
         for gr in groups:
@@ -64,34 +64,31 @@ class Permission:
         try:
             if network:
                 if isinstance(network, NetworkModel):
-                    genealogy.append(network.network)
+                    permissionNetworks.append(network.network)
                     container = network.network_container
 
                 if isinstance(network, str):
-                    if "/" not in network and not isContainer:
+                    if "/" not in network: # if not already in CIDR notation.
                         network = NetworkModel(assetId, network).network
 
-                    if isContainer:
-                        container = network
+                    if not networks:
+                        n = NetworkModel(assetId, network)
+                        permissionNetworks.append(n.network)
+                        container = n.network_container
                     else:
-                        if not netList:
-                            n = NetworkModel(assetId, network)
-                            genealogy.append(n.network)
-                            container = n.network_container
-                        else:
-                            genealogy.append(network)
-                            container = [net for net in netList if net["network"] == network][0]["network_container"]
+                        permissionNetworks.append(network)
+                        container = [net for net in networks if net["network"] == network][0]["network_container"]
 
-                genealogy.append(container)
+            permissionNetworks.append(container) # [network, container] if network // [container] if container.
 
-                if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
-                    if not netContainerList:
-                        netContainerList = NetworkContainerModel.listData(assetId, silent=True)
-                    genealogy.extend(NetworkContainerModel.genealogy(container, networkContainerList=netContainerList))
-                elif isContainer and netContainerList:
-                    genealogy.append([c for c in netContainerList if c["network"] == network][0]["network_container"])
+            if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
+                if not containers:
+                    containers = NetworkContainerModel.listData(assetId, silent=True)
 
-            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, genealogy):
+                permissionNetworks.extend(NetworkContainerModel.genealogy(network=container, networkContainerList=containers))
+
+            # User permissions for all permissionNetworks.
+            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, permissionNetworks):
                 return True
 
             return False

@@ -50,7 +50,7 @@ class InfobloxNetworksController(CustomController):
                     networkContainers = NetworkContainer.listData(assetId)
                     # Filter networks' list basing on permissions.
                     for n in networks:
-                        if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, network=str(n["network"]), netContainerList=networkContainers, netList=networks):
+                        if Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, network=str(n["network"]), containers=networkContainers, networks=networks):
                             allowedData["data"].append(n)
 
                     serializer = Serializer(data=allowedData)

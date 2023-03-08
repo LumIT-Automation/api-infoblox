@@ -33,21 +33,22 @@ class InfobloxNetworksTreeController(CustomController):
         user = CustomController.loggedUser(request)
 
         def __allowedTree(el: dict, father: str, tree: dict, networkList: list, networkContainterList: list) -> None: # -> tree.
-
             if not el["children"]:
                 # Leaf, container or network.
                 if "networkcontainer" in el["_ref"]:
                     action = "network_containers_get"
-                    isContainer = True
+                    permissionNetwork = ""
+                    permissionContainer = el["network"]
                     nList = []
                 else:
                     action = "networks_get"
-                    isContainer = False
+                    permissionNetwork = el["network"]
+                    permissionContainer = ""
                     nList = networkList.copy()
 
 
                 # Add only allowed leaves to the tree data structure.
-                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, network=el["network"], netContainerList=networkContainterList, netList=nList, isContainer=isContainer) or user["authDisabled"] :
+                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, container=permissionContainer, network=permissionNetwork, containers=networkContainterList, networks=nList) or user["authDisabled"]:
                     el["key"] = hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest()
                     el["children"] = []
 
@@ -74,7 +75,7 @@ class InfobloxNetworksTreeController(CustomController):
                             }
 
                             # If not branch allowed, clear information but maintain structure.
-                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, network=el["network"], netContainerList=networkContainterList, isContainer=True) or user["authDisabled"] or el["network"] == "/"):
+                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, container=el["network"], containers=networkContainterList) or user["authDisabled"] or el["network"] == "/"):
                                 nc["title"] = ""
                                 nc["extattrs"] = dict()
 
