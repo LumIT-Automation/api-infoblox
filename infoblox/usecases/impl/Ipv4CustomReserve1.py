@@ -322,7 +322,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     @staticmethod
-    def findFirstIpByAttrs(assetId: int, network: str, number: int) -> list:
+    def findFirstIpByAttrs(assetId: int, network: str, number: int, startIp: str ="", endIp: str = "") -> list:
         j = 0
         cleanAddresses = list()
 
@@ -330,12 +330,15 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             networkCidr = network
             n, mask = networkCidr.split('/')
 
-            # There can be many IP addresses here.
-            # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
-            ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
-            ipList = list(ipaddressNetworkObj.hosts())
+            if startIp and endIp and (ipaddress.IPAddress(startIp) <= ipaddress.IPAddress(endIp)):
+                ipList = list(ipaddress.iter_iprange(startIp, endIp))
+            else:
+                # There can be many IP addresses here.
+                # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
+                ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
+                ipList = list(ipaddressNetworkObj.hosts())
 
-            if int(mask) > 22:
+            if int(mask) > 22 or ((startIp and endIp) and (ipaddress.IPAddress(startIp) <= ipaddress.IPAddress(endIp))):
                 ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:
                 ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
