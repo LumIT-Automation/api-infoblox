@@ -324,9 +324,10 @@ class PermissionPrivilege:
 
                 if networks and any(net != "" for net in networks):
                     orNets = ""
-                    for _ in networks:
-                        orNets += 'OR `network`.`network` = %s '
-                    args.extend(networks)
+                    for n in networks:
+                        if n:
+                            orNets += 'OR `network`.`network` = %s '
+                            args.append(n)
 
                     networkWhere = "AND (`network`.`network` = 'any' " + orNets + " ) " # if "any" appears in the query results so far -> pass.
 
