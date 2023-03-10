@@ -9,3 +9,4 @@ PyJWT~=2.5.0
 urllib3~=1.26.12
 redis~=4.3.3
 requests~=2.27.1
+netaddr~=0.8.0

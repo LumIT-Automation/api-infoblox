@@ -1,6 +1,7 @@
 import socket
 import re
 import ipaddress
+import netaddr
 from datetime import datetime
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
@@ -27,6 +28,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         self.data = userData
         # "ipv4addr": "10.8.1.100", --> only for user-specified.
         # "network": "10.8.128.0", --> only next-available.
+        # "start_ip": "10.8.4.115", --> only next-available in range.
+        # "end_ip": "10.8.4.111", --> only next-available in range.
         # "object_type": "Server", --> only for next-available container and next-available heartbeat.
         # "number": 1,
         # "mac": [
@@ -48,6 +51,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         self.networkLogic: str = ""
         self.targetNetwork: str = ""
         self.networkContainer: str = ""
+        self.startIp: str = ""
+        self.endIp: str = ""
         self.gateway: str = ""
         self.mask: str = ""
 
@@ -121,6 +126,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     self.gateway = info.extattrs["Gateway"]["value"]
                 except Exception:
                     self.mask = ipaddress.IPv4Network(targetNetwork).netmask
+
         except Exception as e:
             raise e
 
@@ -322,7 +328,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     @staticmethod
-    def findFirstIpByAttrs(assetId: int, network: str, number: int, startIp: str ="", endIp: str = "") -> list:
+    def findFirstIpByAttrs(assetId: int, network: str, number: int, rangeFirstIp: str ="", rangeLastIp: str = "") -> list:
         j = 0
         cleanAddresses = list()
 
@@ -330,15 +336,17 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             networkCidr = network
             n, mask = networkCidr.split('/')
 
-            if startIp and endIp and (ipaddress.IPAddress(startIp) <= ipaddress.IPAddress(endIp)):
-                ipList = list(ipaddress.iter_iprange(startIp, endIp))
+            if rangeFirstIp and rangeLastIp and (netaddr.IPAddress(rangeFirstIp) <= netaddr.IPAddress(rangeLastIp)):
+                netObj = netaddr.IPNetwork(networkCidr)
+                ipObjList = list(netaddr.iter_iprange(rangeFirstIp, rangeLastIp)) # [ netaddr.IPAddress ]
+                ipList = [ str(ip) for ip in ipObjList if ip in netObj ]
             else:
                 # There can be many IP addresses here.
                 # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
                 ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
                 ipList = list(ipaddressNetworkObj.hosts())
 
-            if int(mask) > 22 or ((startIp and endIp) and (ipaddress.IPAddress(startIp) <= ipaddress.IPAddress(endIp))):
+            if int(mask) > 22 or ((rangeFirstIp and rangeLastIp) and (netaddr.IPAddress(rangeFirstIp) <= netaddr.IPAddress(rangeLastIp))):
                 ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:
                 ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
@@ -375,7 +383,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, number, objectType) -> tuple:
+    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, startIp: str, endIp: str ,number, objectType) -> tuple:
         # Get the next available IP address within allSubnetworks.
         # Select the first IPv4 among them which is:
         # * unused or used but with usage == "DNS" (only "DNS")
@@ -388,7 +396,9 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
                     assetId,
                     Network(assetId, n).network,
-                    number
+                    number,
+                    startIp,
+                    endIp
                 )
 
                 if len(addresses) == number:
@@ -413,12 +423,18 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             number = int(self.data["number"])
             if number > 10:
                 number = 10 # limited to 10.
+        if "start_ip" in self.data:
+            self.startIp = self.data["start_ip"]
+        if "end_ip" in self.data:
+            self.endIp = self.data["end_ip"]
 
         actualNetwork, addresses = Ipv4CustomReserve1.getNextAvailableIpv4Addresses(
             self.assetId,
             self.networkLogic,
             self.targetNetwork,
             self.networkContainer,
+            self.startIp,
+            self.endIp,
             number,
             objectType
         )

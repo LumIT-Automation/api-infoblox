@@ -46,6 +46,8 @@ class InfobloxIpv4sSerializer(serializers.Serializer):
 
                 elif reqType == "post.next-available":
                     self.fields["network"] = serializers.RegexField(regex='^([01]?\d\d?|2[0-4]\d|25[0-5])(?:\.(?:[01]?\d\d?|2[0-4]\d|25[0-5])){3}(?:/[0-2]\d|/3[0-2])?$', required=True)
+                    self.fields["start_ip"] = serializers.IPAddressField(protocol='IPv4', required=False)
+                    self.fields["end_ip"] = serializers.IPAddressField(protocol='IPv4', required=False)
                     self.fields["object_type"] = serializers.CharField(max_length=255, required=False)
                     self.fields["mac"] = serializers.ListField(
                         child=serializers.RegexField(regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', required=True)
