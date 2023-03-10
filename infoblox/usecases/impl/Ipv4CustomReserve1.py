@@ -1,7 +1,7 @@
 import socket
 import re
 import ipaddress
-import netaddr
+
 from datetime import datetime
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
@@ -347,9 +347,9 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             n, mask = networkCidr.split('/')
 
             if rangeFirstIp and rangeLastIp:
-                netObj = netaddr.IPNetwork(networkCidr)
-                ipObjList = list(netaddr.iter_iprange(rangeFirstIp, rangeLastIp)) # [ netaddr.IPAddress ]
-                ipList = [ str(ip) for ip in ipObjList if ip in netObj ]
+                ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
+                rangeIpList = [ ipaddress.ip_address(ip_int) for ip_int in range(int(ipaddress.ip_address(rangeFirstIp)), int( ipaddress.ip_address(rangeLastIp))) ] # explode the ip range in a list of ipaddress.ip_address.
+                ipList = [ str(ip) for ip in rangeIpList if ip in ipaddressNetworkObj ]
             else:
                 # There can be many IP addresses here.
                 # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
