@@ -51,8 +51,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         self.networkLogic: str = ""
         self.targetNetwork: str = ""
         self.networkContainer: str = ""
-        self.startIp: str = ""
-        self.endIp: str = ""
+        self.rangeFirstIp: str = ""
+        self.rangeLastIp: str = ""
         self.gateway: str = ""
         self.mask: str = ""
 
@@ -126,6 +126,16 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     self.gateway = info.extattrs["Gateway"]["value"]
                 except Exception:
                     self.mask = ipaddress.IPv4Network(targetNetwork).netmask
+
+            if "range_first_ip" in self.data and "range_last_ip" in self.data:
+                if not ipaddress.ip_address(self.data["range_first_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork) or \
+                        not ipaddress.ip_address(self.data["range_last_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork):
+                    raise CustomException(status=400, payload={"message": "range_first_ip and range_last_ip cannot be outside of network."})
+                if not (ipaddress.ip_address(self.data["range_first_ip"]) <= ipaddress.ip_address(self.data["range_last_ip"])):
+                    raise CustomException(status=400, payload={"message": "must be: range_first_ip <= range_last_ip."})
+
+                self.rangeFirstIp = self.data["range_first_ip"]
+                self.rangeLastIp = self.data["range_last_ip"]
 
         except Exception as e:
             raise e
@@ -336,7 +346,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             networkCidr = network
             n, mask = networkCidr.split('/')
 
-            if rangeFirstIp and rangeLastIp and (netaddr.IPAddress(rangeFirstIp) <= netaddr.IPAddress(rangeLastIp)):
+            if rangeFirstIp and rangeLastIp:
                 netObj = netaddr.IPNetwork(networkCidr)
                 ipObjList = list(netaddr.iter_iprange(rangeFirstIp, rangeLastIp)) # [ netaddr.IPAddress ]
                 ipList = [ str(ip) for ip in ipObjList if ip in netObj ]
@@ -346,7 +356,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
                 ipList = list(ipaddressNetworkObj.hosts())
 
-            if int(mask) > 22 or ((rangeFirstIp and rangeLastIp) and (netaddr.IPAddress(rangeFirstIp) <= netaddr.IPAddress(rangeLastIp))):
+            if int(mask) > 22 or (rangeFirstIp and rangeLastIp):
                 ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:
                 ipListChunks = [ipList[x:x + 500] for x in range(0, len(ipList), 500)]
@@ -383,7 +393,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, startIp: str, endIp: str ,number, objectType) -> tuple:
+    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, rangeFirstIp: str, rangeLastIp: str ,number, objectType) -> tuple:
         # Get the next available IP address within allSubnetworks.
         # Select the first IPv4 among them which is:
         # * unused or used but with usage == "DNS" (only "DNS")
@@ -397,8 +407,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     assetId,
                     Network(assetId, n).network,
                     number,
-                    startIp,
-                    endIp
+                    rangeFirstIp,
+                    rangeLastIp
                 )
 
                 if len(addresses) == number:
@@ -423,18 +433,14 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             number = int(self.data["number"])
             if number > 10:
                 number = 10 # limited to 10.
-        if "start_ip" in self.data:
-            self.startIp = self.data["start_ip"]
-        if "end_ip" in self.data:
-            self.endIp = self.data["end_ip"]
 
         actualNetwork, addresses = Ipv4CustomReserve1.getNextAvailableIpv4Addresses(
             self.assetId,
             self.networkLogic,
             self.targetNetwork,
             self.networkContainer,
-            self.startIp,
-            self.endIp,
+            self.rangeFirstIp,
+            self.rangeLastIp,
             number,
             objectType
         )

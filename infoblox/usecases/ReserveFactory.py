@@ -2,6 +2,9 @@ from importlib import import_module
 
 from django.conf import settings
 
+from infoblox.helpers.Exception import CustomException
+
+
 
 class ReserveFactory:
     def __init__(self, assetId, reqType, data, username):
@@ -20,5 +23,7 @@ class ReserveFactory:
             )
 
             return Implementation(self.assetId, self.reqType, self.data, self.username)
+        except CustomException as c:
+            raise c
         except Exception:
             raise NotImplementedError
