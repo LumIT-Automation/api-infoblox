@@ -346,16 +346,14 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             networkCidr = network
             n, mask = networkCidr.split('/')
 
+            ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
             if rangeFirstIp and rangeLastIp:
-                ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
                 rangeIpList = [ ipaddress.ip_address(ip_int) for ip_int in range(int(ipaddress.ip_address(rangeFirstIp)), int( ipaddress.ip_address(rangeLastIp))) ] # explode the ip range in a list of ipaddress.ip_address.
                 ipList = [ str(ip) for ip in rangeIpList if ip in ipaddressNetworkObj ]
             else:
-                # There can be many IP addresses here.
-                # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
-                ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
                 ipList = list(ipaddressNetworkObj.hosts())
 
+            # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
             if int(mask) > 22 or (rangeFirstIp and rangeLastIp):
                 ipListChunks = [ipList[x:x + 100] for x in range(0, len(ipList), 100)]
             else:

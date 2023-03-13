@@ -5,7 +5,6 @@ from django.conf import settings
 from infoblox.helpers.Exception import CustomException
 
 
-
 class ReserveFactory:
     def __init__(self, assetId, reqType, data, username):
         self.assetId = assetId
