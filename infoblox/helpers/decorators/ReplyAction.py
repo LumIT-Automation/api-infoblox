@@ -65,13 +65,14 @@ class ReplyAction:
 
     def replyActionRequestParams(self) -> dict:
         try:
-            ipAddress = self.prResponseParser(self.responsePr)[0]
             # replyAssetId = asset.get("id", 0)
             replyAssetId = 1
+            ipAddress = self.prResponseParser(self.responsePr)[0]
+            replyPath = '/api/v1/infoblox/' + str(replyAssetId) + "/ipv4/" + str(ipAddress)
 
             return {
                 "request": self.replyActionRequest(
-                    requestPr=self.requestPr, responsePr=self.responsePr, replyAssetId=replyAssetId, replyMethod=self.replyMethod, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                    requestPr=self.requestPr, replyPath=replyPath, replyMethod=self.replyMethod, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                 ),
                 "assetId": replyAssetId,
                 "ipv4address": ipAddress
@@ -128,15 +129,14 @@ class ReplyAction:
 
 
 
-    def replyActionRequest(self, requestPr: Request, responsePr: Response, replyAssetId: int, replyMethod: str, additionalQueryParams: dict = None) -> Request:
+    def replyActionRequest(self, requestPr: Request, replyPath: str, replyMethod: str, additionalQueryParams: dict = None) -> Request:
         additionalQueryParams = additionalQueryParams or {}
 
         djangoHttpRequest = HttpRequest()
         setattr(djangoHttpRequest, "auth", getattr(requestPr, "auth"))
         djangoHttpRequest.META["HTTP_AUTHORIZATION"] = requestPr.META["HTTP_AUTHORIZATION"]
 
-        ip = self.prResponseParser(responsePr)[0]
-        djangoHttpRequest.path = '/api/v1/infoblox/' + str(replyAssetId) + "/ipv4/" + str(ip)
+        djangoHttpRequest.path = replyPath
         djangoHttpRequest.method = replyMethod
 
         req = Request(djangoHttpRequest)
