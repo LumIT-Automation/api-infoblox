@@ -3,6 +3,7 @@ import functools
 
 from django.http import HttpRequest
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from infoblox.models.Infoblox.Asset.Asset import Asset
 
@@ -49,11 +50,12 @@ class ReplyAction:
                                 #replyAssetId = asset.get("id", 0)
                                 replyAssetId = 1
 
-                                self.replyAction(
+                                o = self.replyAction(
                                     self.replyActionequest(
-                                        requestPr=request, responsePr=responsePr, replyAssetId=replyAssetId, additionalQueryParams={"__concertoDrReplicaFlow": relationUuid}
+                                        requestPr=request, responsePr=responsePr, replyAssetId=replyAssetId, replyMethod='GET', additionalQueryParams={"__concertoDrReplicaFlow": relationUuid}
                                     ),
-                                    assetId=replyAssetId
+                                    assetId=replyAssetId,
+                                    ipv4address=self.prResponseParser(responsePr)[0]
                                 )
                             except Exception as e:
                                 raise e
@@ -66,25 +68,73 @@ class ReplyAction:
 
 
 
-    def getReplyAction(self):
-        from infoblox.controllers.Infoblox.Networks import InfobloxNetworksController
-        return InfobloxNetworksController.get
+    def getReplyAction(self) -> callable:
+        try:
+            from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
+        except ImportError:
+            class action:
+                def get(self):
+                    pass
+
+        return action.get
 
 
 
-    def replyActionequest(self, requestPr, responsePr, replyAssetId: int, additionalQueryParams: dict = None):
+    def prResponseParser(self, response: Response) -> list:
+        import re
+        ipList = []
+
+        try:
+            """
+            # responsePr example:
+            {
+                "data": [
+                    {
+                        "result": "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default",
+                        "mask": "255.255.128.0",
+                        "gateway": "10.8.1.1"
+                    }
+                ]
+            }
+            """
+
+            if hasattr(response, "data"):
+                if "data" in response.data and response.data["data"]:
+                    for el in response.data["data"]:
+                        if "result" in el:
+                            ipList.extend(
+                                re.findall(
+                                    r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$',
+                                    el["result"]
+                                )
+                            )
+
+            return ipList
+        except Exception as e:
+            raise e
+
+
+
+    def replyActionequest(self, requestPr: Request, responsePr: Response, replyAssetId: int, replyMethod: str, additionalQueryParams: dict = None) -> Request:
         additionalQueryParams = additionalQueryParams or {}
 
         djangoHttpRequest = HttpRequest()
-        djangoHttpRequest.path = str(replyAssetId) + "/networks/"
-        djangoHttpRequest.method = 'GET'
+
         for attr in ("auth", "META"):
             setattr(djangoHttpRequest, attr, getattr(requestPr, attr))
+        djangoHttpRequest.META["QUERY_STRING"] = ""
+        djangoHttpRequest.META["REQUEST_URI"] = ""
+
+        ip = self.prResponseParser(responsePr)[0]
+        djangoHttpRequest.path = '/api/v1/infoblox/' + str(replyAssetId) + "/ipv4/" + str(ip)
+        djangoHttpRequest.method = replyMethod
 
         req = Request(djangoHttpRequest)
 
         setattr(req, "authenticators", getattr(requestPr, "authenticators"))
 
+        for p in req.query_params.items():
+            req.query_params.pop(p)
         if additionalQueryParams:
             req.query_params.update(additionalQueryParams)
 
