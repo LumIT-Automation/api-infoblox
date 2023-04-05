@@ -15,7 +15,11 @@ class ReplyAction:
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         self.wrappedMethod = wrappedMethod
         self.replyAction = self.getReplyAction()
+        self.replyMethod = 'GET'
+        self.requestPr = None
+        self.responsePr = None
         self.primaryAssetId: int = 0
+        self.relationUuid = uuid.uuid4().hex
         self.assets = list() # dr asset ids list.
 
 
@@ -28,43 +32,52 @@ class ReplyAction:
         @functools.wraps(request)
         def wrapped():
             try:
-                relationUuid = uuid.uuid4().hex
                 self.primaryAssetId = int(kwargs["assetId"])
+                self.requestPr = request
 
                 # Modify the request injecting the __concertoDrReplicaFlow query parameter,
                 # then perform the request to the primary asset.
-                responsePr = self.wrappedMethod(
+                self.responsePr = self.wrappedMethod(
                     ReplyAction.__forgeRequest(
-                        request=request,
-                        additionalQueryParams={"__concertoDrReplicaFlow": relationUuid}
+                        request=self.requestPr,
+                        additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                     ),
                     **kwargs
                 )
 
-                if responsePr.status_code in (200, 201, 202, 204): # reply the action in dr only if it was successful.
-                    if "rep" in request.query_params and request.query_params["rep"]: # reply action in dr only if dr=1 param was passed.
+                if self.responsePr.status_code in (200, 201, 202, 204): # reply the action in dr only if it was successful.
+                    if "rep" in self.requestPr.query_params and self.requestPr.query_params["rep"]: # reply action in dr only if dr=1 param was passed.
                         for asset in self.__listAssetsDr():
                             try:
-                                # Modify the request injecting the dr asset and the __concertoDrReplicaFlow query parameter,
-                                # then re-run the decorated method.
-                                #replyAssetId = asset.get("id", 0)
-                                replyAssetId = 1
-
                                 o = self.replyAction(
-                                    self.replyActionequest(
-                                        requestPr=request, responsePr=responsePr, replyAssetId=replyAssetId, replyMethod='GET', additionalQueryParams={"__concertoDrReplicaFlow": relationUuid}
-                                    ),
-                                    assetId=replyAssetId,
-                                    ipv4address=self.prResponseParser(responsePr)[0]
+                                    **self.replyActionRequestParams()
                                 )
                             except Exception as e:
                                 raise e
 
-                return responsePr
+                return self.responsePr
             except Exception as e:
                 raise e
 
         return wrapped()
+
+
+
+    def replyActionRequestParams(self) -> dict:
+        try:
+            ipAddress = self.prResponseParser(self.responsePr)[0]
+            # replyAssetId = asset.get("id", 0)
+            replyAssetId = 1
+
+            return {
+                "request": self.replyActionRequest(
+                    requestPr=self.requestPr, responsePr=self.responsePr, replyAssetId=replyAssetId, replyMethod=self.replyMethod, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                ),
+                "assetId": replyAssetId,
+                "ipv4address": ipAddress
+            }
+        except Exception as e:
+            raise e
 
 
 
@@ -115,26 +128,20 @@ class ReplyAction:
 
 
 
-    def replyActionequest(self, requestPr: Request, responsePr: Response, replyAssetId: int, replyMethod: str, additionalQueryParams: dict = None) -> Request:
+    def replyActionRequest(self, requestPr: Request, responsePr: Response, replyAssetId: int, replyMethod: str, additionalQueryParams: dict = None) -> Request:
         additionalQueryParams = additionalQueryParams or {}
 
         djangoHttpRequest = HttpRequest()
-
-        for attr in ("auth", "META"):
-            setattr(djangoHttpRequest, attr, getattr(requestPr, attr))
-        djangoHttpRequest.META["QUERY_STRING"] = ""
-        djangoHttpRequest.META["REQUEST_URI"] = ""
+        setattr(djangoHttpRequest, "auth", getattr(requestPr, "auth"))
+        djangoHttpRequest.META["HTTP_AUTHORIZATION"] = requestPr.META["HTTP_AUTHORIZATION"]
 
         ip = self.prResponseParser(responsePr)[0]
         djangoHttpRequest.path = '/api/v1/infoblox/' + str(replyAssetId) + "/ipv4/" + str(ip)
         djangoHttpRequest.method = replyMethod
 
         req = Request(djangoHttpRequest)
-
         setattr(req, "authenticators", getattr(requestPr, "authenticators"))
 
-        for p in req.query_params.items():
-            req.query_params.pop(p)
         if additionalQueryParams:
             req.query_params.update(additionalQueryParams)
 
