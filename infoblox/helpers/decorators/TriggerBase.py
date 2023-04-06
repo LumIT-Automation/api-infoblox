@@ -1,7 +1,7 @@
 import uuid
 import functools
 
-from django.http import HttpRequest
+from django.http import HttpRequest, QueryDict
 from rest_framework.request import Request
 
 from infoblox.models.Infoblox.Asset.Asset import Asset
@@ -15,7 +15,6 @@ class TriggerBase:
         self.wrappedMethod = wrappedMethod
         self.triggerMethod = "UNDEFINED" # GET, POST, PUT, PATCH, DELETE
         self.triggerAction = self.getTriggerAction()
-        self.triggerData = dict()
         self.requestPr = None
         self.responsePr = None
         self.primaryAssetId: int = 0
@@ -70,7 +69,7 @@ class TriggerBase:
         Example:
               return {
                 "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerData=self.triggerData, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=triggerPayload, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                 ),
                 "assetId": triggerAssetId,
                 "ipv4address": ipAddress
@@ -97,8 +96,8 @@ class TriggerBase:
 
 
 
-    def triggerActionRequest(self, requestPr: Request, triggerPath: str, triggerMethod: str, triggerData: dict = None, additionalQueryParams: dict = None) -> Request:
-        triggerData = triggerData or {}
+    def triggerActionRequest(self, requestPr: Request, triggerPath: str, triggerMethod: str, triggerPayload: dict = None, additionalQueryParams: dict = None) -> Request:
+        triggerPayload = triggerPayload or {}
         additionalQueryParams = additionalQueryParams or {}
 
         djangoHttpRequest = HttpRequest()
@@ -110,8 +109,10 @@ class TriggerBase:
 
         req = Request(djangoHttpRequest)
         setattr(req, "authenticators", getattr(requestPr, "authenticators"))
-        if triggerData:
-            setattr(req, "data", triggerData)
+        if triggerPayload:
+            if isinstance(req.data, QueryDict):  # optional
+                req.data._mutable = True
+            req.data.update(triggerPayload)
 
         if additionalQueryParams:
             req.query_params.update(additionalQueryParams)

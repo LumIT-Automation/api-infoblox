@@ -4,12 +4,11 @@ from infoblox.helpers.decorators.TriggerBase import TriggerBase
 
 from infoblox.helpers.Log import Log
 
-
-class TriggerIpv4s(TriggerBase):
+# Trigget a GET ipv4 request for example and test.
+class TriggerIpv4(TriggerBase):
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         super().__init__(wrappedMethod)
-        self.wrappedMethod = wrappedMethod
-        self.triggerMethod = "POST"
+        self.triggerMethod = "GET"
         self.triggerAction = self.getTriggerAction()
 
 
@@ -24,21 +23,13 @@ class TriggerIpv4s(TriggerBase):
             triggerAssetId = 1
             ipAddress = self.__prResponseParser(self.responsePr)[0]
             triggerPath = '/api/v1/infoblox/' + str(triggerAssetId) + "/ipv4/" + str(ipAddress)
-            triggerPayload =  {
-                "data": {
-                    "ipv4addr": ipAddress,
-                    "number": 1,
-                    "mac": [
-                        "00:00:00:00:00:00"
-                    ]
-                }
-            }
 
             return {
                 "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=triggerPayload, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerData=self.triggerData, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                 ),
-                "assetId": triggerAssetId
+                "assetId": triggerAssetId,
+                "ipv4address": ipAddress
             }
         except Exception as e:
             raise e
@@ -46,7 +37,14 @@ class TriggerIpv4s(TriggerBase):
 
 
     def getTriggerAction(self) -> callable:
-        return self.wrappedMethod # same controller of the first call, same method, different params.
+        try:
+            from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
+
+            m = self.triggerMethod.lower()
+            if hasattr(action, m) and callable(getattr(action, m)):
+                return getattr(action, m)
+        except ImportError as e:
+            raise e
 
 
 
