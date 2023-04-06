@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
 
-
 from infoblox.helpers.Log import Log
 
 

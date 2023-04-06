@@ -5,9 +5,7 @@ from django.http import HttpRequest, QueryDict
 from rest_framework.request import Request
 
 from infoblox.models.Infoblox.Asset.Asset import Asset
-
 from infoblox.helpers.Log import Log
-
 
 
 class TriggerBase:

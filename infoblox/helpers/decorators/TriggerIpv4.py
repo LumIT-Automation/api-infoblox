@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
 
-
 from infoblox.helpers.Log import Log
+
 
 # Trigget a GET ipv4 request for example and test.
 class TriggerIpv4(TriggerBase):
