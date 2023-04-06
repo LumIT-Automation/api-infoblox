@@ -128,7 +128,8 @@ class Ipv4:
 
 
     @staticmethod
-    def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str) -> dict:
+    def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str, options: list = None) -> dict:
+        options = options or []
         try:
             # @todo: atomicity?
 
@@ -143,7 +144,8 @@ class Ipv4:
             return Ipv4.reserve(assetId, {
                 "ipv4addr": address,
                 "mac": mac,
-                "extattrs": extattrs
+                "extattrs": extattrs,
+                "options": options
             })
 
         except Exception as e:

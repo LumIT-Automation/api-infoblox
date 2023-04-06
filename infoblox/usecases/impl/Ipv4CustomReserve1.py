@@ -55,6 +55,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         self.rangeLastIp: str = ""
         self.gateway: str = ""
         self.mask: str = ""
+        self.options: list = []
 
         self.__init()
 
@@ -424,6 +425,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         number = 1
         response = list()
         reservedIps = list()
+        options = []
 
         if "object_type" in self.data:
             objectType = self.data["object_type"]
@@ -431,6 +433,9 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             number = int(self.data["number"])
             if number > 10:
                 number = 10 # limited to 10.
+
+        if "options" in self.data and self.data["options"]:
+            options = self.data["options"]
 
         actualNetwork, addresses = Ipv4CustomReserve1.getNextAvailableIpv4Addresses(
             self.assetId,
@@ -460,7 +465,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             }
 
             try:
-                r = Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac) # {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}
+                r = Ipv4.reserveNextAvailable(self.assetId, address, extattrs, mac, options) # {'result': 'fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjE1OC4wLi4:10.8.0.158/default'}
                 if isinstance(r, dict):
                     r["mask"] = self.mask
                     r["gateway"] = self.gateway

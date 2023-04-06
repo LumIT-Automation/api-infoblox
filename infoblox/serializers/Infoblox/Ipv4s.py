@@ -55,6 +55,7 @@ class InfobloxIpv4sSerializer(serializers.Serializer):
                     self.fields["name"] = serializers.CharField(max_length=255, required=False)
                     self.fields["extattrs"] = InfobloxIpv4sExtattrsInnerSerializer(required=False, many=True)
                     self.fields["number"] = serializers.IntegerField(required=False)
+                    self.fields["options"] = InfobloxIpv4OptionsSerializer(required=False, many=True)
 
                 elif reqType == "get":
                     self.fields["items"] = InfobloxIpv4Serializer(many=True, required=False)
