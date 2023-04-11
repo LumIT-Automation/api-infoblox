@@ -37,4 +37,5 @@ urlpatterns = [
 
     # Log history.
     path('history/', History.HistoryLogsController.as_view(), name='f5-log-history'),
+    path('action-history/', ActionHistory.ActionHistoryLogsController.as_view(), name='f5-log-action-history'),
 ]

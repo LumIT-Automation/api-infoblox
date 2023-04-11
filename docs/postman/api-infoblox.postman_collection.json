@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "19358a78-18f4-4b25-b975-2b888dd0e60c",
+		"_postman_id": "e6e588e3-1698-49b0-bec3-9f7aaf5c6136",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -2069,6 +2069,44 @@
 								"v1",
 								"infoblox",
 								"history",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "action history",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/action-history/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"action-history",
 								""
 							]
 						}
