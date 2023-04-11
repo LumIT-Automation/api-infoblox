@@ -5,7 +5,7 @@ from .controllers.Infoblox.Asset import Asset, Assets
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, \
     Ipv4s, Vlans, Vlan, AssignCloudNetwork
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
-from .controllers import History
+from .controllers.History import History, ActionHistory
 
 
 urlpatterns = [

@@ -99,6 +99,21 @@ CREATE TABLE `log_object` (
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `log_request`
+--
+
+CREATE TABLE `log_request` (
+  `id` int(11) NOT NULL,
+  `asset_id` int(11) DEFAULT NULL,
+  `action` varchar(255) NOT NULL,
+  `response_status` int(11) NOT NULL,
+  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `username` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `migrations`
 --
 
@@ -200,6 +215,13 @@ ALTER TABLE `log_object`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indici per le tabelle `log_request`
+--
+ALTER TABLE `log_request`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `log_request_asset_id` (`asset_id`);
+
+--
 -- Indici per le tabelle `migrations`
 --
 ALTER TABLE `migrations`
@@ -269,6 +291,12 @@ ALTER TABLE `log_object`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `log_request`
+--
+ALTER TABLE `log_request`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `migrations`
 --
 ALTER TABLE `migrations`
@@ -322,6 +350,13 @@ ALTER TABLE `network`
 ALTER TABLE `role_privilege`
   ADD CONSTRAINT `rp_privilege` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `rp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+--
+-- Limiti per la tabella `log_request`
+--
+ALTER TABLE `log_request`
+  ADD CONSTRAINT `log_request_asset_id` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

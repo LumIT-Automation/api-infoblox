@@ -51,8 +51,8 @@ class TriggerBase:
                     try:
                         for req in self.triggerBuildRequests():
                             r = self.triggerAction(**req)
-                            Log.log(r, 'RRRRRRRRRRRRRRRRRRRRRRR')
                             # Todo: history.
+
                     except Exception:
                         # Todo: Log and continue
                         pass

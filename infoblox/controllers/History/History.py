@@ -5,7 +5,7 @@ from rest_framework import status
 from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.serializers.History import HistorySerializer as Serializer
+from infoblox.serializers.History.History import HistorySerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Conditional import Conditional
