@@ -16,6 +16,7 @@ class TriggerBase:
         self.wrappedMethod = wrappedMethod
         self.triggerMethod = "UNDEFINED" # GET, POST, PUT, PATCH, DELETE
         self.triggerAction = self.getTriggerAction()
+        self.triggerName = "trigger_base"
         self.requestPr = None
         self.responsePr = None
         self.primaryAssetId: int = 0
@@ -47,7 +48,7 @@ class TriggerBase:
                 )
 
                 if self.triggerCondition(request=self.requestPr, response=self.responsePr):
-                    self.drAssetIds = self.__listAssetsDr()
+                    self.drAssetIds = self.__triggerAssetList()
                     try:
                         for req in self.triggerBuildRequests():
                             r = self.triggerAction(**req)
@@ -122,11 +123,14 @@ class TriggerBase:
     # Private methods
     ####################################################################################################################
 
-    def __listAssetsDr(self) -> list:
+    def __triggerAssetList(self) -> list:
         l = list()
 
         try:
             if self.primaryAssetId:
+                #from infoblox.models.Infoblox.Asset.Trigger import Trigger
+                #dataList = Trigger.condition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId)
+
                 pass
                 #l = Asset(self.primaryAssetId).drDataList(onlyEnabled=True)
 

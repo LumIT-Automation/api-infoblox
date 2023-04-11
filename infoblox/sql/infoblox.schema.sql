@@ -43,6 +43,21 @@ CREATE TABLE `asset` (
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `trigger_data`
+--
+
+CREATE TABLE `trigger_data` (
+  `id` int(11) NOT NULL,
+  `trigger_name` varchar(64) NOT NULL,
+  `src_asset_id` int(11) NOT NULL,
+  `dst_asset_id` int(11) NOT NULL,
+  `trigger_condition` varchar(255) NOT NULL,
+  `enabled` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `group_role_network`
 --
 
@@ -183,6 +198,12 @@ ALTER TABLE `asset`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `address` (`address`);
 
+
+-- Indici per le tabelle `trigger_data`
+--
+ALTER TABLE `trigger_data`
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Indici per le tabelle `group_role_network`
 --
@@ -267,6 +288,12 @@ ALTER TABLE `asset`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `trigger_data`
+--
+ALTER TABLE `trigger_data`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `group_role_network`
 --
 ALTER TABLE `group_role_network`
@@ -323,6 +350,13 @@ ALTER TABLE `role`
 --
 -- Limiti per le tabelle scaricate
 --
+
+--
+-- Limiti per la tabella `trigger_data`
+--
+ALTER TABLE `trigger_data`
+  ADD CONSTRAINT `k_src_asset_id` FOREIGN KEY (`src_asset_id`) REFERENCES `asset` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `k_dst_asset_id` FOREIGN KEY (`dst_asset_id`) REFERENCES `asset` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `group_role_network`
