@@ -27,7 +27,7 @@ class TriggerIpv4s(TriggerBase):
 
             for assetId in self.drAssetIds:
                 for ip in ipAddressList:
-                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip)
+                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4s/"
                     triggerPayload = {
                         "data": {
                             "ipv4addr": ip,
