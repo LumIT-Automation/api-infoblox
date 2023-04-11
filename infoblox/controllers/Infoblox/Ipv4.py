@@ -16,10 +16,12 @@ from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Mail import Mail
 from infoblox.helpers.Log import Log
+from infoblox.helpers.decorators.ActionHistory import HistoryLog
 
 
 class InfobloxIpv4Controller(CustomController):
     @staticmethod
+    @HistoryLog
     def get(request: Request, assetId: int, ipv4address: str) -> Response:
         user = CustomController.loggedUser(request)
         data = dict()

@@ -26,7 +26,7 @@ class TriggerIpv4(TriggerBase):
 
             for assetId in self.drAssetIds:
                 for ip in ipAddressList:
-                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip)
+                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip) + "/"
                     requestsList.append({
                         "request":  self.triggerActionRequest(
                             requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}

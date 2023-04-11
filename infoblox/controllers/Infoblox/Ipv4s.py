@@ -13,11 +13,13 @@ from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Log import Log
 from infoblox.helpers.decorators.TriggerIpv4 import TriggerIpv4
+from infoblox.helpers.decorators.ActionHistory import HistoryLog
 
 
 class InfobloxIpv4sController(CustomController):
     @staticmethod
     @TriggerIpv4
+    @HistoryLog
     def post(request: Request, assetId: int) -> Response:
         response = dict()
         user = CustomController.loggedUser(request)
