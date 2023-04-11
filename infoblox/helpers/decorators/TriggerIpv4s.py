@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
 
 from infoblox.helpers.Log import Log
@@ -17,28 +18,34 @@ class TriggerIpv4s(TriggerBase):
     # Public methods
     ####################################################################################################################
 
-    def triggerActionRequestParams(self) -> dict:
-        try:
-            # triggerAssetId = asset.get("id", 0)
-            triggerAssetId = 1
-            ipAddress = self.__prResponseParser(self.responsePr)[0]
-            triggerPath = '/api/v1/infoblox/' + str(triggerAssetId) + "/ipv4/" + str(ipAddress)
-            triggerPayload =  {
-                "data": {
-                    "ipv4addr": ipAddress,
-                    "number": 1,
-                    "mac": [
-                        "00:00:00:00:00:00"
-                    ]
-                }
-            }
 
-            return {
-                "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=triggerPayload, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                ),
-                "assetId": triggerAssetId
-            }
+    def triggerBuildRequests(self):
+        requestsList = list()
+
+        try:
+            ipAddressList = self.__prResponseParser(self.responsePr)
+
+            for assetId in self.drAssetIds:
+                for ip in ipAddressList:
+                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip)
+                    triggerPayload = {
+                        "data": {
+                            "ipv4addr": ip,
+                            "number": 1,
+                            "mac": [
+                                "00:00:00:00:00:00"
+                            ]
+                        }
+                    }
+
+                    requestsList.append({
+                        "request":  self.triggerActionRequest(
+                            requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=triggerPayload, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                        ),
+                        "assetId": assetId
+                    })
+
+            return requestsList
         except Exception as e:
             raise e
 
