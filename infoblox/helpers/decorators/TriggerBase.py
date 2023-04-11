@@ -1,5 +1,6 @@
 import uuid
 import functools
+from typing import List
 
 from django.http import HttpRequest, QueryDict
 from rest_framework.request import Request
@@ -18,6 +19,7 @@ class TriggerBase:
         self.requestPr = None
         self.responsePr = None
         self.primaryAssetId: int = 0
+        self.drAssetIds: List[int] = [] # secondary/dr assetIds.
         self.relationUuid = uuid.uuid4().hex
         self.assets = list() # dr asset ids list.
 
@@ -45,14 +47,14 @@ class TriggerBase:
                 )
 
                 if self.triggerCondition(request=self.requestPr, response=self.responsePr):
-                    for asset in self.__listAssetsDr():
-                        try:
-                            o = self.triggerAction(
-                                **self.triggerActionRequestParams()
-                            )
-                            
-                        except Exception as e:
-                            raise e
+                    self.drAssetIds = self.__listAssetsDr()
+                    try:
+                        for req in self.triggerBuildRequests():
+                            r = self.triggerAction(**req)
+                            # Todo: history.
+                    except Exception:
+                        # Todo: Log and continue
+                        pass
 
                 return self.responsePr
             except Exception as e:
@@ -62,25 +64,13 @@ class TriggerBase:
 
 
 
+    def triggerBuildRequests(self) -> list:
+        raise NotImplementedError
+
+
+
     def triggerCondition(self, request: Request, response: Response) -> bool:
         raise NotImplementedError
-
-
-
-    # Forge the dict with the params for the triggerAction.
-    def triggerActionRequestParams(self) -> dict:
-        raise NotImplementedError
-
-        """
-        Example:
-              return {
-                "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=triggerPayload, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                ),
-                "assetId": triggerAssetId,
-                "ipv4address": ipAddress
-            }
-        """
 
 
 

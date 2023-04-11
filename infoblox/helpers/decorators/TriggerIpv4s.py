@@ -49,6 +49,15 @@ class TriggerIpv4s(TriggerBase):
 
 
 
+    def triggerCondition(self, request: Request = None, response: Response = None):
+        if response.status_code in (200, 201, 202, 204):  # trigger the action in dr only if it was successful.
+            if "rep" in request.query_params and request.query_params["rep"]:  # trigger action in dr only if dr=1 param was passed.
+                return True
+
+        return False
+
+
+
     ####################################################################################################################
     # Private methods
     ####################################################################################################################

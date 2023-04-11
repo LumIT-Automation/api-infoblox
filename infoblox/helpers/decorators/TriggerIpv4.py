@@ -18,20 +18,24 @@ class TriggerIpv4(TriggerBase):
     # Public methods
     ####################################################################################################################
 
-    def triggerActionRequestParams(self) -> dict:
-        try:
-            # triggerAssetId = asset.get("id", 0)
-            triggerAssetId = 1
-            ipAddress = self.__prResponseParser(self.responsePr)[0]
-            triggerPath = '/api/v1/infoblox/' + str(triggerAssetId) + "/ipv4/" + str(ipAddress)
+    def triggerBuildRequests(self):
+        requestsList = list()
 
-            return {
-                "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                ),
-                "assetId": triggerAssetId,
-                "ipv4address": ipAddress
-            }
+        try:
+            ipAddressList = self.__prResponseParser(self.responsePr)
+
+            for assetId in self.drAssetIds:
+                for ip in ipAddressList:
+                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip)
+                    requestsList.append({
+                        "request":  self.triggerActionRequest(
+                            requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                        ),
+                        "assetId": assetId,
+                        "ipv4address": ip
+                    })
+
+            return requestsList
         except Exception as e:
             raise e
 
