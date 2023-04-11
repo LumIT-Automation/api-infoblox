@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from rest_framework.response import Response
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
 
@@ -26,7 +27,7 @@ class TriggerIpv4(TriggerBase):
 
             return {
                 "request": self.triggerActionRequest(
-                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerData=self.triggerData, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                    requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                 ),
                 "assetId": triggerAssetId,
                 "ipv4address": ipAddress
@@ -45,6 +46,15 @@ class TriggerIpv4(TriggerBase):
                 return getattr(action, m)
         except ImportError as e:
             raise e
+
+
+
+    def triggerCondition(self, request: Request = None, response: Response = None):
+        if response.status_code in (200, 201, 202, 204):  # trigger the action in dr only if it was successful.
+            if "rep" in request.query_params and request.query_params["rep"]:  # trigger action in dr only if dr=1 param was passed.
+                return True
+
+        return False
 
 
 

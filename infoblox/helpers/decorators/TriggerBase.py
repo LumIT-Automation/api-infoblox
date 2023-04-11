@@ -3,6 +3,8 @@ import functools
 
 from django.http import HttpRequest, QueryDict
 from rest_framework.request import Request
+from rest_framework.response import Response
+
 
 from infoblox.models.Infoblox.Asset.Asset import Asset
 from infoblox.helpers.Log import Log
@@ -42,21 +44,27 @@ class TriggerBase:
                     **kwargs
                 )
 
-                if self.responsePr.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
-                    if "rep" in self.requestPr.query_params and self.requestPr.query_params["rep"]: # trigger action in dr only if dr=1 param was passed.
-                        for asset in self.__listAssetsDr():
-                            try:
-                                o = self.triggerAction(
-                                    **self.triggerActionRequestParams()
-                                )
-                            except Exception as e:
-                                raise e
+                if self.triggerCondition(request=self.requestPr, response=self.responsePr):
+                    for asset in self.__listAssetsDr():
+                        try:
+                            o = self.triggerAction(
+                                **self.triggerActionRequestParams()
+                            )
+                            
+                        except Exception as e:
+                            raise e
 
                 return self.responsePr
             except Exception as e:
                 raise e
 
         return wrapped()
+
+
+
+    def triggerCondition(self, request: Request, response: Response) -> bool:
+        raise NotImplementedError
+
 
 
     # Forge the dict with the params for the triggerAction.
