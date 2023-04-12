@@ -18,7 +18,7 @@ class TriggerBase:
         self.requestPr = None
         self.responsePr = None
         self.primaryAssetId: int = 0
-        self.drAssetIds: set() # secondary/dr assetIds.
+        self.drAssetIds = set() # secondary/dr assetIds.
         self.relationUuid = uuid.uuid4().hex
         self.assets = list() # dr asset ids list.
 

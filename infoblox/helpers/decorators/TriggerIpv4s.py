@@ -29,9 +29,9 @@ class TriggerIpv4s(TriggerBase):
             ipAddressList = self.__prResponseParser(self.responsePr)
 
             for assetId in self.drAssetIds:
-                networkCondition =  [ el["trigger_condition"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId) ][0]
+                networkCondition =  [ el["trigger_condition"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId) ]
                 for ip in ipAddressList:
-                    if ipaddress.ip_address(ip) in ipaddress.ip_network(networkCondition):
+                    if any(ipaddress.ip_address(ip) in ipaddress.ip_network(net) for net in networkCondition):
                         triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4s/"
                         triggerPayload = {
                             "data": {
