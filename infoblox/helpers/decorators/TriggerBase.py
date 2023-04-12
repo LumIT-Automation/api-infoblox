@@ -6,8 +6,6 @@ from django.http import HttpRequest, QueryDict
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-
-from infoblox.models.Infoblox.Asset.Asset import Asset
 from infoblox.helpers.Log import Log
 
 
