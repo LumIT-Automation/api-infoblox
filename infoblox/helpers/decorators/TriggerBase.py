@@ -50,6 +50,7 @@ class TriggerBase:
                     try:
                         for req in self.triggerBuildRequests():
                             r = self.triggerAction(**req)
+                            Log.log(r.data, 'DDDDDDDDDDDDDDD')
                             # Todo: history.
 
                     except Exception:
