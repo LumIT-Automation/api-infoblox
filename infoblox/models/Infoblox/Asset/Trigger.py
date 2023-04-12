@@ -25,9 +25,7 @@ class Trigger:
     def modify(self, enabled: bool) -> None:
         try:
             Repository.modify(self.id, enabled)
-
-            for k, v in Misc.toDict(enabled).items():
-                setattr(self, k, v)
+            setattr(self, "enabled", enabled)
         except Exception as e:
             raise e
 

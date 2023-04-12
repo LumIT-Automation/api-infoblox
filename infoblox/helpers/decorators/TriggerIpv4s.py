@@ -12,6 +12,7 @@ from infoblox.helpers.Log import Log
 class TriggerIpv4s(TriggerBase):
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         super().__init__(wrappedMethod)
+
         self.wrappedMethod = wrappedMethod
         self.triggerMethod = "POST"
         self.triggerName = "trigger_ipv4s"
@@ -30,7 +31,7 @@ class TriggerIpv4s(TriggerBase):
             ipAddressList = self.__prResponseParser(self.responsePr)
 
             for assetId in self.drAssetIds:
-                networkCondition =  [ el["trigger_condition"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId) ]
+                networkCondition = [ el["trigger_condition"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId) ]
                 for ip in ipAddressList:
                     if any(ipaddress.ip_address(ip) in ipaddress.ip_network(net) for net in networkCondition):
                         triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4s/"
@@ -63,8 +64,8 @@ class TriggerIpv4s(TriggerBase):
 
 
     def triggerCondition(self, request: Request = None, response: Response = None):
-        if response.status_code in (200, 201, 202, 204):  # trigger the action in dr only if it was successful.
-            if "rep" in request.query_params and request.query_params["rep"]:  # trigger action in dr only if dr=1 param was passed.
+        if response.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+            if "rep" in request.query_params and request.query_params["rep"]: # trigger action in dr only if dr=1 param was passed.
                 return True
 
         return False
