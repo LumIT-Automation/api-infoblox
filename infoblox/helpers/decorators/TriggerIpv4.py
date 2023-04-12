@@ -1,6 +1,9 @@
+import ipaddress
+
 from rest_framework.request import Request
 from rest_framework.response import Response
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
+from infoblox.models.Infoblox.Asset.Trigger import Trigger
 
 from infoblox.helpers.Log import Log
 
@@ -10,6 +13,7 @@ class TriggerIpv4(TriggerBase):
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         super().__init__(wrappedMethod)
         self.triggerMethod = "GET"
+        self.triggerName = "trigger_ipv4"
         self.triggerAction = self.getTriggerAction()
 
 
@@ -25,15 +29,20 @@ class TriggerIpv4(TriggerBase):
             ipAddressList = self.__prResponseParser(self.responsePr)
 
             for assetId in self.drAssetIds:
+                networkCondition =  [ el["trigger_condition"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId) ][0]
+                Log.log(networkCondition, 'NNNNNNNNNNNNNNNNNNNN')
                 for ip in ipAddressList:
-                    triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip) + "/"
-                    requestsList.append({
-                        "request":  self.triggerActionRequest(
-                            requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                        ),
-                        "assetId": assetId,
-                        "ipv4address": ip
-                    })
+                    Log.log(ip, 'IIIIIIIIIIIIIIIIIIIIII')
+                    if ipaddress.ip_address(ip) in ipaddress.ip_network(networkCondition):
+                        Log.log(ip, 'JJJJJJJJJJJJJJJJJJIIIII')
+                        triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip) + "/"
+                        requestsList.append({
+                            "request":  self.triggerActionRequest(
+                                requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                            ),
+                            "assetId": assetId,
+                            "ipv4address": ip
+                        })
 
             return requestsList
         except Exception as e:

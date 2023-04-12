@@ -65,9 +65,9 @@ class Trigger:
 
 
     @staticmethod
-    def condition(triggerName, srcAssetId) -> list:
+    def runCondition(triggerName: str, srcAssetId: int, dstAssetId: int = None) -> list:
         try:
-            return Repository.condition(triggerName=triggerName, srcAssetId=srcAssetId)
+            return Repository.runCondition(triggerName=triggerName, srcAssetId=srcAssetId, dstAssetId=dstAssetId)
         except Exception as e:
             raise e
 

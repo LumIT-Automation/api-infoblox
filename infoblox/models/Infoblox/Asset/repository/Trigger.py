@@ -131,17 +131,22 @@ class Trigger:
 
 
     @staticmethod
-    def condition(triggerName: str,  srcAssetId: int) -> list:
+    def runCondition(triggerName: str,  srcAssetId: int, dstAssetId: int = None) -> list:
         c = connection.cursor()
+        args = [ triggerName, srcAssetId ]
+        queryFilter = ""
 
         try:
+            if dstAssetId:
+                queryFilter = "AND dst_asset_id = %s "
+                args.append(dstAssetId)
+
             c.execute(
-                "SELECT dst_asset_id, trigger_condition FROM trigger_data "
-                "WHERE trigger_name = %s AND src_asset_id = %s "
-                "AND enabled > 0", [
-                    triggerName,
-                    srcAssetId
-                ])
+                "SELECT * FROM trigger_data "
+                "WHERE trigger_name = %s "
+                "AND src_asset_id = %s " + queryFilter + "AND enabled > 0",
+                    args
+                )
 
             return DBHelper.asDict(c)
         except Exception as e:

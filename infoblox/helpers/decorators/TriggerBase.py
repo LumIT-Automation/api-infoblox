@@ -128,13 +128,10 @@ class TriggerBase:
 
         try:
             if self.primaryAssetId:
-                #from infoblox.models.Infoblox.Asset.Trigger import Trigger
-                #dataList = Trigger.condition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId)
+                from infoblox.models.Infoblox.Asset.Trigger import Trigger
+                l = [ el["dst_asset_id"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId) ]
 
-                pass
-                #l = Asset(self.primaryAssetId).drDataList(onlyEnabled=True)
-
-            return [1]
+            return l
         except Exception as e:
             raise e
 
