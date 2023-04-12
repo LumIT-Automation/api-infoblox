@@ -18,7 +18,7 @@ class TriggerBase:
         self.requestPr = None
         self.responsePr = None
         self.primaryAssetId: int = 0
-        self.drAssetIds: List[int] = [] # secondary/dr assetIds.
+        self.drAssetIds: set() # secondary/dr assetIds.
         self.relationUuid = uuid.uuid4().hex
         self.assets = list() # dr asset ids list.
 
@@ -50,7 +50,6 @@ class TriggerBase:
                     try:
                         for req in self.triggerBuildRequests():
                             r = self.triggerAction(**req)
-                            Log.log(r.data, 'DDDDDDDDDDDDDDD')
                             # Todo: history.
 
                     except Exception:
@@ -122,15 +121,16 @@ class TriggerBase:
     # Private methods
     ####################################################################################################################
 
-    def __triggerAssetList(self) -> list:
-        l = list()
+    def __triggerAssetList(self) -> set:
+        s = set()
 
         try:
             if self.primaryAssetId:
                 from infoblox.models.Infoblox.Asset.Trigger import Trigger
-                l = [ el["dst_asset_id"] for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId) ]
+                for el in Trigger.runCondition(triggerName=self.triggerName, srcAssetId=self.primaryAssetId):
+                    s.add( el["dst_asset_id"] )
 
-            return l
+            return s
         except Exception as e:
             raise e
 
