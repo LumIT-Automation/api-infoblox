@@ -131,7 +131,7 @@ class Trigger:
 
 
     @staticmethod
-    def runCondition(triggerName: str,  srcAssetId: int, dstAssetId: int = None) -> list:
+    def runConditionList(triggerName: str, srcAssetId: int, dstAssetId: int = None) -> list:
         c = connection.cursor()
         args = [ triggerName, srcAssetId ]
         queryFilter = ""
