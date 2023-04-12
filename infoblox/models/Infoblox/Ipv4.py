@@ -130,6 +130,7 @@ class Ipv4:
     @staticmethod
     def reserveNextAvailable(assetId: int, address: str, extattrs: dict, mac: str, options: list = None) -> dict:
         options = options or []
+
         try:
             # @todo: atomicity?
 

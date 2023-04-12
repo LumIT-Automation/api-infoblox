@@ -429,6 +429,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
         if "object_type" in self.data:
             objectType = self.data["object_type"]
+
         if "number" in self.data:
             number = int(self.data["number"])
             if number > 10:

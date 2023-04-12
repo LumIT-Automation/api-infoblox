@@ -8,7 +8,7 @@ from infoblox.models.Infoblox.Asset.Trigger import Trigger
 from infoblox.helpers.Log import Log
 
 
-# Trigget a GET ipv4 request for example and test.
+# Trigger a GET ipv4 request for example and test.
 class TriggerIpv4(TriggerBase):
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         super().__init__(wrappedMethod)
@@ -60,8 +60,8 @@ class TriggerIpv4(TriggerBase):
 
 
     def triggerCondition(self, request: Request = None, response: Response = None):
-        if response.status_code in (200, 201, 202, 204):  # trigger the action in dr only if it was successful.
-            if "rep" in request.query_params and request.query_params["rep"]:  # trigger action in dr only if dr=1 param was passed.
+        if response.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+            if "rep" in request.query_params and request.query_params["rep"]: # trigger action in dr only if dr=1 param was passed.
                 return True
 
         return False

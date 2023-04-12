@@ -1,7 +1,9 @@
 import ipaddress
 from rest_framework.response import Response
 from rest_framework.request import Request
+
 from infoblox.helpers.decorators.TriggerBase import TriggerBase
+
 from infoblox.models.Infoblox.Asset.Trigger import Trigger
 
 from infoblox.helpers.Log import Log
@@ -20,7 +22,6 @@ class TriggerIpv4s(TriggerBase):
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
-
 
     def triggerBuildRequests(self):
         requestsList = list()
