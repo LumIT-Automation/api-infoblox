@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "e6e588e3-1698-49b0-bec3-9f7aaf5c6136",
+		"_postman_id": "00d5fe19-a58e-49cf-8db2-f0e6f74d46fe",
 		"name": "api-infoblox",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2436069"
 	},
 	"item": [
 		{
@@ -708,7 +709,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"VLAN\": {\n                    \"value\": \"Vi Lan Su Chi\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
