@@ -2,9 +2,10 @@ import ipaddress
 
 from rest_framework.request import Request
 from rest_framework.response import Response
-from infoblox.helpers.decorators.TriggerBase import TriggerBase
+
 from infoblox.models.Infoblox.Asset.Trigger import Trigger
 
+from infoblox.helpers.decorators.TriggerBase import TriggerBase
 from infoblox.helpers.Log import Log
 
 
@@ -27,7 +28,7 @@ class TriggerIpv4(TriggerBase):
         requestsList = list()
 
         try:
-            ipAddressList = self.__prResponseParser(self.responsePr)
+            ipAddressList = self.__prResponseParser(self.responsePrimary)
 
             for assetId in self.drAssetIds:
                 networkCondition = [el["trigger_condition"] for el in Trigger.runConditionList(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId)]
@@ -36,7 +37,7 @@ class TriggerIpv4(TriggerBase):
                         triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip) + "/"
                         requestsList.append({
                             "request":  self.triggerActionRequest(
-                                requestPr=self.requestPr, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
+                                requestPr=self.requestPrimary, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                             ),
                             "assetId": assetId,
                             "ipv4address": ip
@@ -60,9 +61,9 @@ class TriggerIpv4(TriggerBase):
 
 
 
-    def triggerCondition(self, request: Request = None, response: Response = None):
-        if response.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
-            if "rep" in request.query_params and request.query_params["rep"]: # trigger action in dr only if dr=1 param was passed.
+    def triggerCondition(self):
+        if self.responsePrimary.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+            if "rep" in self.requestPrimary.query_params and self.requestPrimary.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
                 return True
 
         return False
@@ -79,7 +80,7 @@ class TriggerIpv4(TriggerBase):
 
         try:
             """
-            # responsePr example:
+            # responsePrimary example:
             {
                 "data": [
                     {

@@ -14,8 +14,8 @@ class TriggerBase:
         self.triggerMethod = "UNDEFINED" # GET, POST, PUT, PATCH, DELETE
         self.triggerAction = self.getTriggerAction()
         self.triggerName = "trigger_base"
-        self.requestPr = None
-        self.responsePr = None
+        self.requestPrimary = None
+        self.responsePrimary = None
         self.primaryAssetId: int = 0
         self.drAssetIds = set() # secondary/dr assetIds.
         self.relationUuid = uuid.uuid4().hex
@@ -32,30 +32,30 @@ class TriggerBase:
         def wrapped():
             try:
                 self.primaryAssetId = int(kwargs["assetId"])
-                self.requestPr = request
+                self.requestPrimary = request
 
                 # Modify the request injecting the __concertoDrReplicaFlow query parameter,
                 # then perform the request to the primary asset.
-                self.responsePr = self.wrappedMethod(
+                self.responsePrimary = self.wrappedMethod(
                     TriggerBase.__forgeRequest(
-                        request=self.requestPr,
+                        request=self.requestPrimary,
                         additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
                     ),
                     **kwargs
                 )
 
-                if self.triggerCondition(request=self.requestPr, response=self.responsePr):
+                # Whatever a particular condition is met, perform found triggers.
+                if self.triggerCondition():
                     self.drAssetIds = self.__triggerAssetList()
                     try:
                         for req in self.triggerBuildRequests():
                             r = self.triggerAction(**req)
                             # Todo: history.
-
                     except Exception:
                         # Todo: Log and continue
                         pass
 
-                return self.responsePr
+                return self.responsePrimary
             except Exception as e:
                 raise e
 
@@ -68,26 +68,15 @@ class TriggerBase:
 
 
 
-    def triggerCondition(self, request: Request, response: Response) -> bool:
+    def triggerCondition(self) -> bool:
+        # Checks whatever a condition is met.
         raise NotImplementedError
 
 
 
-    # Returns the method of the controller called by the trigger (triggerAction).
     def getTriggerAction(self) -> callable:
+        # Return the controller's method called by the trigger.
         raise NotImplementedError
-
-        """
-        Example:
-        try:
-            from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
-
-            m = self.triggerMethod.lower()
-            if hasattr(action, m) and callable(getattr(action, m)):
-                return getattr(action, m)
-        except ImportError as e:
-            raise e
-        """
 
 
 
