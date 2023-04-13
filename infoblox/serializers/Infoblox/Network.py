@@ -51,5 +51,5 @@ class InfobloxNetworkSerializer(serializers.Serializer):
     network_view = serializers.CharField(max_length=255, required=False)
     vlans = InfobloxNetworkVlansSerializer(many=True, required=False)
     extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
-    comment = serializers.CharField(max_length=255, required=False)
+    comment = serializers.CharField(max_length=255, allow_blank=True, required=False)
     options = InfobloxNetworkOptionsSerializer(many=True, required=False)
