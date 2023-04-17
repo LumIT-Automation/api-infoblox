@@ -1,8 +1,8 @@
+import re
 import ipaddress
-
 import functools
+from typing import List
 
-from django.http import HttpRequest, QueryDict
 from django.urls import resolve
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -12,9 +12,7 @@ from infoblox.models.Infoblox.Asset.Trigger import Trigger
 from infoblox.helpers.Log import Log
 
 
-
-# Trigger a GET ipv4 request for example and test.
-class Trigger:
+class RunTriggers:
     def __init__(self, wrappedMethod: callable, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -23,11 +21,9 @@ class Trigger:
         self.triggerAction = self.getTriggerAction()
         self.requestPrimary = None
         self.responsePrimary = None
+
         self.primaryAssetId: int = 0
         self.drAssetIds = set() # secondary/dr assetIds.
-        self.assets = list() # dr asset ids list.
-        self.controllerName = ""
-
 
 
 
@@ -41,19 +37,22 @@ class Trigger:
             try:
                 self.primaryAssetId = int(kwargs["assetId"])
                 self.requestPrimary = request
-                self.controllerName = resolve(self.requestPrimary.path).url_name + '_' + self.requestPrimary.method.lower()
                 self.responsePrimary = self.wrappedMethod(request, **kwargs)
 
                 # Whatever a particular condition is met, perform found triggers.
                 if self.triggerCondition():
-                    self.drAssetIds = self.__triggerAssetList()
-                    try:
-                        for req in self.triggerBuildRequests():
-                            r = self.triggerAction(**req)
-                            # Todo: history.
-                    except Exception:
-                        # Todo: Log and continue
-                        pass
+                    Log.log(self.__triggers(), "_")
+
+
+
+                    # self.drAssetIds = self.__triggerAssetList()
+                    # try:
+                    #     for req in self.triggerBuildRequests():
+                    #         r = self.triggerAction(**req)
+                    #         # Todo: history.
+                    # except Exception:
+                    #     # Todo: Log and continue
+                    #     pass
 
                 return self.responsePrimary
             except Exception as e:
@@ -76,17 +75,12 @@ class Trigger:
                     "dst_asset_id": assetId
                 }
 
-                Log.log(triggerFilter, 'GGGGGGGGGGGGGGGGGGGGGG')
-                t = Trigger.list(filter=triggerFilter)
-                Log.log(t, 'TTTTTTTTTTTTTTTTT')
-                networkCondition = [el["trigger_condition"] for el in Trigger.list(filter=triggerFilter)]
-                Log.log(networkCondition, 'NNNNNNNNNNNNNNN')
+                t = RunTriggers.list(filter=triggerFilter)
+                networkCondition = [el["trigger_condition"] for el in RunTriggers.list(filter=triggerFilter)]
                 for ip in ipAddressList:
                     if any(ipaddress.ip_address(ip) in ipaddress.ip_network(net) for net in networkCondition):
                         from infoblox.models.Infoblox.Ipv4 import Ipv4
                         outputList.append(Ipv4(assetId=assetId, address=ip).repr())
-
-            Log.log(outputList, 'OOOOOOOOOOOOOOOOOOOOOOOOOOO')
             return outputList
         except Exception as e:
             raise e
@@ -118,50 +112,47 @@ class Trigger:
     # Private methods
     ####################################################################################################################
 
+    def __triggers(self) -> List[dict]:
+        triggers = list()
+
+        try:
+            # Find related triggers:
+            # triggers named after the controller's decorated name (via urls.py) + method.
+            l = Trigger.list(filter={
+                "trigger_name": resolve(self.requestPrimary.path).url_name + '_' + self.requestPrimary.method.lower(),
+                "src_asset_id": self.primaryAssetId,
+                "enabled": True
+            })
+
+            # Return relevant information.
+            for el in l:
+                triggers.append({
+                    "destinationAssetId": el["dst_asset_id"],
+                    "action": el["trigger_action"],
+                    "condition": el["trigger_condition"],
+                })
+
+            return triggers
+        except Exception as e:
+            raise e
+
+
+
     def __prResponseParser(self, response: Response) -> list:
-        import re
         ipList = []
 
         try:
-            """
-            # responsePrimary example:
-            {
-                "data": [
-                    {
-                        "result": "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default",
-                        "mask": "255.255.128.0",
-                        "gateway": "10.8.1.1"
-                    }
-                ]
-            }
-            """
-
-            if hasattr(response, "data"):
-                if "data" in response.data and response.data["data"]:
-                    for el in response.data["data"]:
-                        if "result" in el:
-                            ipList.extend(
-                                re.findall(
-                                    r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$',
-                                    el["result"]
-                                )
-                            )
-
-            return ipList
+            for el in response.data["data"]:
+                if "result" in el:
+                    ipList.extend(
+                        re.findall(
+                            r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
+                            el["result"]
+                        )
+                    )
+        except KeyError:
+            pass
         except Exception as e:
             raise e
 
-
-
-    def __triggerAssetList(self) -> set:
-        s = set()
-
-        try:
-            if self.primaryAssetId:
-                from infoblox.models.Infoblox.Asset.Trigger import Trigger
-                for el in Trigger.list({"trigger_name": self.controllerName, "src_asset_id": self.primaryAssetId}):
-                    s.add( el["dst_asset_id"] )
-
-            return s
-        except Exception as e:
-            raise e
+        return ipList

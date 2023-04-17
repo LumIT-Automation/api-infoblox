@@ -7,12 +7,12 @@ class Trigger:
     def __init__(self, id: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.id = int(id)
-        self.trigger_name = ""
-        self.src_asset_id = ""
-        self.dst_asset_id = ""
-        self.trigger_condition = ""
-        self.enabled = ""
+        self.id: int = int(id)
+        self.trigger_name: str = ""
+        self.src_asset_id: str = ""
+        self.dst_asset_id: str = ""
+        self.trigger_condition: str = ""
+        self.enabled: bool = False
 
         self.__load()
 
@@ -45,11 +45,10 @@ class Trigger:
     ####################################################################################################################
 
     @staticmethod
-    def list(filter: dict) -> list:
-        #filter = filter or {}
-        Log.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFF')
-        l = Repository.list(filter)
-        return l
+    def list(filter: dict = None) -> list:
+        filter = filter or {}
+
+        return Repository.list(filter)
 
 
 

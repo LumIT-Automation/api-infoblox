@@ -36,7 +36,7 @@ class Trigger:
                     "FROM trigger_data "
                     "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
                     "WHERE id = %s", [
-                    id
+                        id
                 ])
 
             return DBHelper.asDict(c)[0]
@@ -101,14 +101,19 @@ class Trigger:
     @staticmethod
     def list(filter: dict = None) -> list:
         filter = filter or {}
+
         filterWhere = ""
         filterArgs = list()
+
         c = connection.cursor()
 
         try:
             for k, v in filter.items():
-                if k in ("trigger_name", "src_asset_id", "dst_asset_id"):
+                if k in ("trigger_name", "src_asset_id", "dst_asset_id", "enabled"):
                     filterWhere += k + ' = %s AND '
+
+                    if k == "enabled":
+                        v = int(v)
                     filterArgs.append(v)
 
             if filterWhere:
@@ -116,18 +121,13 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            q = ("SELECT * FROM trigger_data "
-                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
-                    "WHERE " + filterWhere)
-
-            Log.log(q, 'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
-            c.execute(q,
-                filterArgs
+            c.execute("SELECT * FROM trigger_data "
+                "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
+                "WHERE " + filterWhere,
+                    filterArgs
             )
 
-            o = DBHelper.asDict(c)
-            Log.log(o, 'OOOOOOOOOOOOOOOOOOOOOOOO')
-            return o
+            return DBHelper.asDict(c)
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
