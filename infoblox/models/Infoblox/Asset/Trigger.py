@@ -1,6 +1,6 @@
 from infoblox.models.Infoblox.Asset.repository.Trigger import Trigger as Repository
 
-from infoblox.helpers.Misc import Misc
+from infoblox.helpers.Log import Log
 
 
 class Trigger:
@@ -64,8 +64,19 @@ class Trigger:
 
     @staticmethod
     def runConditionList(triggerName: str, srcAssetId: int, dstAssetId: int = None) -> list:
+
+        filter = {
+            "trigger_name": triggerName,
+            "src_asset_id": srcAssetId
+        }
+        if dstAssetId:
+            filter["dst_asset_id"] = dstAssetId
+
         try:
-            return Repository.runConditionList(triggerName=triggerName, srcAssetId=srcAssetId, dstAssetId=dstAssetId)
+            l = Repository.list(filter=filter)
+            Log.log(l, 'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
+            return l
+            #return Repository.runConditionList(triggerName=triggerName, srcAssetId=srcAssetId, dstAssetId=dstAssetId)
         except Exception as e:
             raise e
 

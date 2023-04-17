@@ -34,15 +34,7 @@ class TriggerBase:
                 self.primaryAssetId = int(kwargs["assetId"])
                 self.requestPrimary = request
 
-                # Modify the request injecting the __concertoDrReplicaFlow query parameter,
-                # then perform the request to the primary asset.
-                self.responsePrimary = self.wrappedMethod(
-                    TriggerBase.__forgeRequest(
-                        request=self.requestPrimary,
-                        additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                    ),
-                    **kwargs
-                )
+                self.responsePrimary = self.wrappedMethod(request, **kwargs)
 
                 # Whatever a particular condition is met, perform found triggers.
                 if self.triggerCondition():
@@ -127,32 +119,3 @@ class TriggerBase:
     ####################################################################################################################
     # Private static methods
     ####################################################################################################################
-
-    @staticmethod
-    def __forgeRequest(request: Request, additionalQueryParams: dict = None) -> Request:
-        additionalQueryParams = additionalQueryParams or {}
-
-        try:
-            djangoHttpRequest = HttpRequest()
-            djangoHttpRequest.path = request.path[:]
-            djangoHttpRequest.method = request.method
-            query_params = request.query_params.copy()
-            if "dr" in query_params:
-                del query_params["dr"]
-
-            if additionalQueryParams:
-                query_params.update(additionalQueryParams)
-
-            for attr in ("POST", "data", "FILES", "auth", "META"):
-                setattr(djangoHttpRequest, attr, getattr(request, attr))
-
-            req = Request(djangoHttpRequest)
-            for attr in ("authenticators", "accepted_media_type", "accepted_renderer", "version", "versioning_scheme"):
-                setattr(req, attr, getattr(request, attr))
-
-            if additionalQueryParams:
-                req.query_params.update(query_params)
-
-            return req
-        except Exception as e:
-            raise e

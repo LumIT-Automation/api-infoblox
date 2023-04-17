@@ -30,13 +30,18 @@ class Trigger:
 
         try:
             if id:
-                c.execute("SELECT * FROM trigger_data WHERE id = %s", [
+                c.execute("SELECT trigger_data.id, trigger_data.trigger_name, "
+                    "trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
+                    "trigger_condition.id as id_trigger_condition, trigger_condition.src_asset_id, trigger_condition.trigger_condition "
+                    "FROM trigger_data "
+                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
+                    "WHERE id = %s", [
                     id
                 ])
 
             return DBHelper.asDict(c)[0]
         except IndexError:
-            raise CustomException(status=404, payload={"database": "non existent identity group"})
+            raise CustomException(status=404, payload={"database": "non existent trigger"})
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -50,6 +55,21 @@ class Trigger:
 
         try:
             c.execute("DELETE FROM trigger_data WHERE id = %s", [
+                id
+            ])
+        except Exception as e:
+            raise CustomException(status=400, payload={"database": e.__str__()})
+        finally:
+            c.close()
+
+
+
+    @staticmethod
+    def deleteCondition(id: int) -> None:
+        c = connection.cursor()
+
+        try:
+            c.execute("DELETE FROM trigger_condition WHERE id = %s", [
                 id
             ])
         except Exception as e:
@@ -79,15 +99,27 @@ class Trigger:
 
 
     @staticmethod
-    def list() -> list:
+    def list(filter: dict = None) -> list:
+        filter = filter or {}
+        filterWhere = ""
+        filterArgs = list()
         c = connection.cursor()
 
         try:
-            c.execute(
-                "SELECT trigger_data.id, trigger_data.trigger_name, src_asset.fqdn AS src_fqdn, dst_asset.fqdn AS dst_fqdn, "
-                "trigger_data.trigger_condition, trigger_data.enabled FROM trigget_data "
-                "INNER JOIN asset AS src_asset ON src_asset.id = trigger_data.src_asset_id "
-                "INNER JOIN asset AS dst_asset ON dst_asset.id = trigger_data.dst_asset_id "
+            for k, v in filter.items():
+                if k in ("trigger_name", "src_asset_id", "dst_asset_id"):
+                    filterWhere += k + ' = %s AND '
+                    filterArgs.append(v)
+
+            if filterWhere:
+                filterWhere = filterWhere[:-4]
+            else:
+                filterWhere = "1"
+
+            c.execute("SELECT * FROM trigger_data "
+                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
+                    "WHERE " + filterWhere,
+                filterArgs
             )
 
             return DBHelper.asDict(c)[0]
@@ -122,7 +154,27 @@ class Trigger:
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
                     and e.args and e.args[0] and e.args[0] == 1062:
-                        raise CustomException(status=400, payload={"database": "duplicated identity group"})
+                        raise CustomException(status=400, payload={"database": "duplicated trigger data"})
+            else:
+                raise CustomException(status=400, payload={"database": e.__str__()})
+        finally:
+            c.close()
+
+
+
+    @staticmethod
+    def addCondition(triggerId: int, srcAssetId: int, condition: str) -> None:
+        c = connection.cursor()
+
+        try:
+            c.execute("INSERT INTO trigger_condition (`trigger_id`, `src_asset_id`, `trigger_condition`) VALUES (%s, %s, %s)", [
+                triggerId, srcAssetId, condition
+            ])
+
+        except Exception as e:
+            if e.__class__.__name__ == "IntegrityError" \
+                    and e.args and e.args[0] and e.args[0] == 1062:
+                raise CustomException(status=400, payload={"database": "duplicated trigger data"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:

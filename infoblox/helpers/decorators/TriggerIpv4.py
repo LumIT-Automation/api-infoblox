@@ -25,7 +25,7 @@ class TriggerIpv4(TriggerBase):
     ####################################################################################################################
 
     def triggerBuildRequests(self):
-        requestsList = list()
+        outputList = list()
 
         try:
             ipAddressList = self.__prResponseParser(self.responsePrimary)
@@ -34,16 +34,11 @@ class TriggerIpv4(TriggerBase):
                 networkCondition = [el["trigger_condition"] for el in Trigger.runConditionList(triggerName=self.triggerName, srcAssetId=self.primaryAssetId, dstAssetId=assetId)]
                 for ip in ipAddressList:
                     if any(ipaddress.ip_address(ip) in ipaddress.ip_network(net) for net in networkCondition):
-                        triggerPath = '/api/v1/infoblox/' + str(assetId) + "/ipv4/" + str(ip) + "/"
-                        requestsList.append({
-                            "request":  self.triggerActionRequest(
-                                requestPr=self.requestPrimary, triggerPath=triggerPath, triggerMethod=self.triggerMethod, triggerPayload=None, additionalQueryParams={"__concertoDrReplicaFlow": self.relationUuid}
-                            ),
-                            "assetId": assetId,
-                            "ipv4address": ip
-                        })
+                        from infoblox.models.Infoblox.Ipv4 import Ipv4
+                        outputList.append(Ipv4(assetId=assetId, address=ip).repr())
 
-            return requestsList
+            Log.log(outputList, 'OOOOOOOOOOOOOOOOOOOOOOOOOOO')
+            return outputList
         except Exception as e:
             raise e
 

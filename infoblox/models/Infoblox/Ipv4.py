@@ -40,6 +40,14 @@ class Ipv4:
     # Public methods
     ####################################################################################################################
 
+    def repr(self) -> dict:
+        try:
+            return vars(self)
+        except Exception as e:
+            raise e
+
+
+
     def modify(self, data: dict) -> None:
         extraAttributes = dict()
 
@@ -101,14 +109,6 @@ class Ipv4:
                 Connector.deleteReferencedObject(self.asset_id, ref)
 
             self.__load()
-        except Exception as e:
-            raise e
-
-
-
-    def repr(self) -> dict:
-        try:
-            return vars(self)
         except Exception as e:
             raise e
 

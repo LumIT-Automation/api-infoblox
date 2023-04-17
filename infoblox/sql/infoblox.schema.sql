@@ -59,10 +59,22 @@ CREATE TABLE `asset` (
 CREATE TABLE `trigger_data` (
   `id` int(11) NOT NULL,
   `trigger_name` varchar(64) NOT NULL,
-  `src_asset_id` int(11) DEFAULT NULL,
   `dst_asset_id` int(11) DEFAULT NULL,
-  `trigger_condition` varchar(255) NOT NULL,
+  `trigger_action` varchar(255) NOT NULL,
   `enabled` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `trigger_action`
+--
+
+CREATE TABLE `trigger_condition` (
+  `id` int(11) NOT NULL,
+  `trigger_id` int(11) NOT NULL,
+  `src_asset_id` int(11) DEFAULT NULL,
+  `trigger_condition` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -220,9 +232,15 @@ ALTER TABLE `asset`
 ALTER TABLE `configuration`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
+
 -- Indici per le tabelle `trigger_data`
 --
 ALTER TABLE `trigger_data`
+  ADD PRIMARY KEY (`id`);
+
+-- Indici per le tabelle `trigger_condition`
+--
+ALTER TABLE `trigger_condition`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -322,6 +340,12 @@ ALTER TABLE `trigger_data`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `trigger_condition`
+--
+ALTER TABLE `trigger_condition`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT per la tabella `group_role_network`
 --
 ALTER TABLE `group_role_network`
@@ -383,8 +407,14 @@ ALTER TABLE `role`
 -- Limiti per la tabella `trigger_data`
 --
 ALTER TABLE `trigger_data`
-  ADD CONSTRAINT `k_src_asset_id` FOREIGN KEY (`src_asset_id`) REFERENCES `asset` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `k_dst_asset_id` FOREIGN KEY (`dst_asset_id`) REFERENCES `asset` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `trigger_condition`
+--
+ALTER TABLE `trigger_condition`
+  ADD CONSTRAINT `k_trigger_id` FOREIGN KEY (`trigger_id`) REFERENCES `trigger_data` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `k_src_asset_id` FOREIGN KEY (`src_asset_id`) REFERENCES `asset` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Limiti per la tabella `group_role_network`
