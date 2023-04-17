@@ -21,6 +21,16 @@ SET time_zone = "+00:00";
 -- Database: `api`
 --
 
+--
+-- Struttura della tabella `configuration`
+--
+
+CREATE TABLE `configuration` (
+  `id` int(11) NOT NULL,
+  `config_type` varchar(255) DEFAULT NULL,
+  `configuration` text NOT NULL DEFAULT '[]'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- --------------------------------------------------------
 
 --
@@ -192,13 +202,24 @@ CREATE TABLE `role_privilege` (
 --
 
 --
+-- Indici per le tabelle `configuration`
+--
+ALTER TABLE `configuration`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indici per le tabelle `asset`
 --
 ALTER TABLE `asset`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `address` (`address`);
 
-
+--
+-- AUTO_INCREMENT per la tabella `configuration`
+--
+ALTER TABLE `configuration`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+COMMIT;
 -- Indici per le tabelle `trigger_data`
 --
 ALTER TABLE `trigger_data`
@@ -280,6 +301,13 @@ ALTER TABLE `role_privilege`
 --
 -- AUTO_INCREMENT per le tabelle scaricate
 --
+
+--
+-- AUTO_INCREMENT per la tabella `configuration`
+--
+ALTER TABLE `configuration`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+COMMIT;
 
 --
 -- AUTO_INCREMENT per la tabella `asset`

@@ -2,9 +2,9 @@ from django.urls import path
 
 from .controllers import Root
 from .controllers.Infoblox.Asset import Asset, Assets
-from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, \
-    Ipv4s, Vlans, Vlan, AssignCloudNetwork
+from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
+from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
 
 
@@ -18,6 +18,8 @@ urlpatterns = [
     path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
 
     path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+
+    path('configuration/<str:configType>/', Configuration.ConfigurationController.as_view(), name='configuration'),
 
     path('assets/', Assets.InfobloxAssetsController.as_view(), name='infoblox-assets'),
     path('asset/<int:assetId>/', Asset.InfobloxAssetController.as_view(), name='infoblox-asset'),

@@ -22,6 +22,13 @@ SET time_zone = "+00:00";
 --
 
 --
+-- Dump dei dati per la tabella `configuration`
+--
+
+INSERT INTO `configuration` (`id`, `config_type`) VALUES
+(1, 'global');
+
+--
 -- Dump dei dati per la tabella `privilege`
 --
 
@@ -49,7 +56,8 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (21, 'full_visibility', 'global', NULL),
 (22, 'vlans_get', 'asset', NULL),
 (23, 'vlan_get', 'asset', NULL),
-(24, 'assign_network', 'asset', NULL);
+(24, 'assign_network', 'asset', NULL),
+(25, 'configuration_put', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -87,6 +95,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 22),
 (1, 23),
 (1, 24),
+(1, 25),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -99,6 +108,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (2, 22),
 (2, 23),
 (2, 24),
+(2, 25),
 (3, 3),
 (3, 5),
 (3, 6),
@@ -120,7 +130,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 14),
 (4, 22),
 (4, 23),
-(4, 24);
+(4, 24),
+(4, 25);
 
 
 -- Dump dei dati per la tabella `identity_group`
