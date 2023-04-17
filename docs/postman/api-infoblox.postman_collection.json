@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "00d5fe19-a58e-49cf-8db2-f0e6f74d46fe",
+		"_postman_id": "5d98dd8d-48be-4b71-90b5-fd4e4c441dd0",
 		"name": "api-infoblox",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "2436069"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -726,6 +725,84 @@
 										"infoblox",
 										"1",
 										"assign-cloud-network",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Configuration",
+					"item": [
+						{
+							"name": "configuration",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwttoken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"configuration",
+										"global",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "configuration",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwttoken}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"configuration\": [\n            {\n                \"key\": \"key1\",\n                \"value\": \"value1\"\n            },\n            {\n                \"key\": \"key2\",\n                \"value\": \"value2\"\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"configuration",
+										"global",
 										""
 									]
 								}
