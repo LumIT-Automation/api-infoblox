@@ -116,13 +116,18 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            c.execute("SELECT * FROM trigger_data "
+            q = ("SELECT * FROM trigger_data "
                     "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
-                    "WHERE " + filterWhere,
+                    "WHERE " + filterWhere)
+
+            Log.log(q, 'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
+            c.execute(q,
                 filterArgs
             )
 
-            return DBHelper.asDict(c)
+            o = DBHelper.asDict(c)
+            Log.log(o, 'OOOOOOOOOOOOOOOOOOOOOOOO')
+            return o
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:

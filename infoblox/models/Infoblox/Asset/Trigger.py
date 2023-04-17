@@ -45,13 +45,11 @@ class Trigger:
     ####################################################################################################################
 
     @staticmethod
-    def list(filter: dict = None) -> list:
-        filter = filter or {}
-
-        try:
-            return Repository.list(filter)
-        except Exception as e:
-            raise e
+    def list(filter: dict) -> list:
+        #filter = filter or {}
+        Log.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFF')
+        l = Repository.list(filter)
+        return l
 
 
 
