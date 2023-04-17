@@ -45,9 +45,11 @@ class Trigger:
     ####################################################################################################################
 
     @staticmethod
-    def list() -> list:
+    def list(filter: dict = None) -> list:
+        filter = filter or {}
+
         try:
-            return Repository.list()
+            return Repository.list(filter)
         except Exception as e:
             raise e
 
@@ -57,26 +59,6 @@ class Trigger:
     def add(data: dict) -> int:
         try:
             return Repository.add(data)
-        except Exception as e:
-            raise e
-
-
-
-    @staticmethod
-    def runConditionList(triggerName: str, srcAssetId: int, dstAssetId: int = None) -> list:
-
-        filter = {
-            "trigger_name": triggerName,
-            "src_asset_id": srcAssetId
-        }
-        if dstAssetId:
-            filter["dst_asset_id"] = dstAssetId
-
-        try:
-            l = Repository.list(filter=filter)
-            Log.log(l, 'LLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-            return l
-            #return Repository.runConditionList(triggerName=triggerName, srcAssetId=srcAssetId, dstAssetId=dstAssetId)
         except Exception as e:
             raise e
 

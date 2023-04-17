@@ -107,7 +107,7 @@ class TriggerBase:
         try:
             if self.primaryAssetId:
                 from infoblox.models.Infoblox.Asset.Trigger import Trigger
-                for el in Trigger.runConditionList(triggerName=self.triggerName, srcAssetId=self.primaryAssetId):
+                for el in Trigger.list({"trigger_name": self.triggerName, "src_asset_id": self.primaryAssetId}):
                     s.add( el["dst_asset_id"] )
 
             return s

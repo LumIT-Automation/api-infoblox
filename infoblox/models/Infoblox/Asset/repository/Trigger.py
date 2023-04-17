@@ -122,7 +122,7 @@ class Trigger:
                 filterArgs
             )
 
-            return DBHelper.asDict(c)[0]
+            return DBHelper.asDict(c)
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
