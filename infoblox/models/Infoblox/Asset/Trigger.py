@@ -15,7 +15,7 @@ class Trigger:
         super().__init__(*args, **kwargs)
 
         self.id: int = int(id)
-        self.trigger_name: str = ""
+        self.name: str = ""
         self.dst_asset_id: str = ""
         self.trigger_action: str = ""
         self.enabled: bool = False

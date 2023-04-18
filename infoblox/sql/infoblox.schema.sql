@@ -58,7 +58,7 @@ CREATE TABLE `asset` (
 
 CREATE TABLE `trigger_data` (
   `id` int(11) NOT NULL,
-  `trigger_name` varchar(64) NOT NULL,
+  `name` varchar(64) NOT NULL,
   `dst_asset_id` int(11) DEFAULT NULL,
   `trigger_action` varchar(255) NOT NULL,
   `enabled` tinyint(1) NOT NULL

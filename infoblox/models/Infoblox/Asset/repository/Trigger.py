@@ -12,7 +12,7 @@ class Trigger:
     # table: trigger_data
 
     # `id` int(11) NOT NULL AUTO_INCREMENT,
-    # `trigger_name` varchar(64) NOT NULL,
+    # `name` varchar(64) NOT NULL,
     # `src_asset_id` int(11) NOT NULL,
     # `dst_asset_id` int(11) NOT NULL,
     # `trigger_condition` varchar(255) NOT NULL DEFAULT '',
@@ -30,7 +30,7 @@ class Trigger:
 
         try:
             if id:
-                c.execute("SELECT trigger_data.id, trigger_data.trigger_name, "
+                c.execute("SELECT trigger_data.id, trigger_data.name, "
                     "trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
                     "trigger_condition.id as id_trigger_condition, trigger_condition.src_asset_id, trigger_condition.trigger_condition "
                     "FROM trigger_data "
@@ -109,7 +109,7 @@ class Trigger:
 
         try:
             for k, v in filter.items():
-                if k in ("trigger_name", "src_asset_id", "dst_asset_id", "enabled"):
+                if k in ("name", "src_asset_id", "dst_asset_id", "enabled"):
                     filterWhere += k + ' = %s AND '
 
                     if k == "enabled":
@@ -121,7 +121,7 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            c.execute("SELECT trigger_data.id, trigger_data.trigger_name, trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
+            c.execute("SELECT trigger_data.id, trigger_data.name, trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
                 "group_concat(src_asset_id, '::', trigger_condition SEPARATOR ' | ') as conditions "
                 "FROM trigger_data "
                 "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
@@ -217,7 +217,7 @@ class Trigger:
 
             c.execute(
                 "SELECT * FROM trigger_data "
-                "WHERE trigger_name = %s "
+                "WHERE name = %s "
                 "AND src_asset_id = %s " + queryFilter + "AND enabled > 0",
                     args
                 )

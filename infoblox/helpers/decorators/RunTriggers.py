@@ -21,10 +21,6 @@ class RunTriggers:
         self.primaryAssetId: int = 0
 
 
-        # self.triggerMethod = "GET"
-        # self.triggerAction = self.getTriggerAction()
-
-
 
     ####################################################################################################################
     # Public methods
@@ -41,7 +37,7 @@ class RunTriggers:
                 primaryResponse = self.wrappedMethod(request, **kwargs)
 
                 # Whatever a particular pre-condition is met, perform found triggers.
-                if self.triggerPreCondition(primaryResponse):
+                if self.__triggerPreCondition(primaryResponse):
                     # Run found triggers if trigger-condition is met.
                     for t in self.__triggers():
                         # [
@@ -59,19 +55,11 @@ class RunTriggers:
 
 
 
-    # def getTriggerAction(self) -> callable:
-    #     try:
-    #         from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
-    #
-    #         m = self.triggerMethod.lower()
-    #         if hasattr(action, m) and callable(getattr(action, m)):
-    #             return getattr(action, m)
-    #     except ImportError as e:
-    #         raise e
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
 
-
-
-    def triggerPreCondition(self, primaryResponse: Response):
+    def __triggerPreCondition(self, primaryResponse: Response):
         if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
             if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
                 return True
@@ -80,10 +68,6 @@ class RunTriggers:
 
 
 
-    ####################################################################################################################
-    # Private methods
-    ####################################################################################################################
-
     def __triggers(self) -> List[dict]:
         triggers = list()
 
@@ -91,7 +75,7 @@ class RunTriggers:
             # Find related triggers:
             # triggers named after the decorated controller's name (via urls.py) + method (get/post/...).
             l = Trigger.list(filter={
-                "trigger_name": resolve(self.request.path).url_name + '_' + self.request.method.lower(),
+                "name": resolve(self.request.path).url_name + '_' + self.request.method.lower(),
                 "src_asset_id": self.primaryAssetId,
                 "enabled": True
             })
@@ -107,6 +91,18 @@ class RunTriggers:
             return triggers
         except Exception as e:
             raise e
+
+
+
+    # def __getTriggerAction(self) -> callable:
+    #     try:
+    #         from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
+    #
+    #         m = self.triggerMethod.lower()
+    #         if hasattr(action, m) and callable(getattr(action, m)):
+    #             return getattr(action, m)
+    #     except ImportError as e:
+    #         raise e
 
 
 
