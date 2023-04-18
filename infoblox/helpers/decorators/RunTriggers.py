@@ -52,7 +52,7 @@ class RunTriggers:
                         Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
 
             except Exception as e:
-                Log.log("Trigger Exception: " + str(e), '_')
+                RunTriggers.__raiseFlag("Trigger Exception: " + str(e))
                 pass
 
             return primaryResponse
@@ -160,3 +160,10 @@ class RunTriggers:
             raise e
 
         return ipList
+
+
+    @staticmethod
+    def __raiseFlag(message):
+        # Todo: send webex message.
+        Log.log(message, '_')
+
