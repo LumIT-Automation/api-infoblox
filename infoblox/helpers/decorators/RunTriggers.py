@@ -36,6 +36,10 @@ class RunTriggers:
                 # Run wrappedMethod with given parameters.
                 primaryResponse = self.wrappedMethod(request, **kwargs)
 
+            except Exception as e:
+                raise e
+
+            try:
                 # Whatever a particular pre-condition is met, perform found triggers.
                 if self.__triggerPreCondition(primaryResponse):
                     # Run found triggers if trigger-condition is met.
@@ -45,11 +49,13 @@ class RunTriggers:
                         #     {"destinationAssetId": 1, "action": "ipv4_post", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}
                         # ]
 
-                        Log.log(self.__runTrigger(t, primaryResponse), "O _") # add list to list.
+                        Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
 
-                return primaryResponse
             except Exception as e:
-                raise e
+                Log.log("Trigger Exception: " + str(e), '_')
+                pass
+
+            return primaryResponse
 
         return wrapped()
 
