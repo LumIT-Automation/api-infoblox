@@ -1,5 +1,5 @@
 import re
-import ipaddress
+from ipaddress import ip_address, ip_network
 import functools
 from typing import List
 
@@ -17,13 +17,12 @@ class RunTriggers:
         super().__init__(*args, **kwargs)
 
         self.wrappedMethod = wrappedMethod
-        self.triggerMethod = "GET"
-        self.triggerAction = self.getTriggerAction()
-        self.requestPrimary = None
-        self.responsePrimary = None
-
+        self.request = None
         self.primaryAssetId: int = 0
-        self.drAssetIds = set() # secondary/dr assetIds.
+
+
+        # self.triggerMethod = "GET"
+        # self.triggerAction = self.getTriggerAction()
 
 
 
@@ -35,26 +34,25 @@ class RunTriggers:
         @functools.wraps(request)
         def wrapped():
             try:
+                self.request = request
                 self.primaryAssetId = int(kwargs["assetId"])
-                self.requestPrimary = request
-                self.responsePrimary = self.wrappedMethod(request, **kwargs)
 
-                # Whatever a particular condition is met, perform found triggers.
-                if self.triggerCondition():
-                    Log.log(self.__triggers(), "_")
+                # Run wrappedMethod with given parameters.
+                primaryResponse = self.wrappedMethod(request, **kwargs)
+
+                # Whatever a particular pre-condition is met, perform found triggers.
+                if self.triggerPreCondition(primaryResponse):
+                    # Run found triggers if trigger-condition is met.
+                    for t in self.__triggers():
+                        # [{"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17 "}, {"src_asset_id": " 1", "condition": "10.8.0.0/17"}]}, {"destinationAssetId": 1, "action": "ipv4_suca", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}]
+
+                        Log.log(self.__runTrigger(t, primaryResponse)) # add list to list.
 
 
 
-                    # self.drAssetIds = self.__triggerAssetList()
-                    # try:
-                    #     for req in self.triggerBuildRequests():
-                    #         r = self.triggerAction(**req)
-                    #         # Todo: history.
-                    # except Exception:
-                    #     # Todo: Log and continue
-                    #     pass
 
-                return self.responsePrimary
+
+                return primaryResponse
             except Exception as e:
                 raise e
 
@@ -62,46 +60,21 @@ class RunTriggers:
 
 
 
-    def triggerBuildRequests(self):
-        outputList = list()
-
-        try:
-            ipAddressList = self.__prResponseParser(self.responsePrimary)
-
-            for assetId in self.drAssetIds:
-                triggerFilter = {
-                    "trigger_name": self.controllerName,
-                    "src_asset_id": self.primaryAssetId,
-                    "dst_asset_id": assetId
-                }
-
-                t = RunTriggers.list(filter=triggerFilter)
-                networkCondition = [el["trigger_condition"] for el in RunTriggers.list(filter=triggerFilter)]
-                for ip in ipAddressList:
-                    if any(ipaddress.ip_address(ip) in ipaddress.ip_network(net) for net in networkCondition):
-                        from infoblox.models.Infoblox.Ipv4 import Ipv4
-                        outputList.append(Ipv4(assetId=assetId, address=ip).repr())
-            return outputList
-        except Exception as e:
-            raise e
+    # def getTriggerAction(self) -> callable:
+    #     try:
+    #         from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
+    #
+    #         m = self.triggerMethod.lower()
+    #         if hasattr(action, m) and callable(getattr(action, m)):
+    #             return getattr(action, m)
+    #     except ImportError as e:
+    #         raise e
 
 
 
-    def getTriggerAction(self) -> callable:
-        try:
-            from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
-
-            m = self.triggerMethod.lower()
-            if hasattr(action, m) and callable(getattr(action, m)):
-                return getattr(action, m)
-        except ImportError as e:
-            raise e
-
-
-
-    def triggerCondition(self):
-        if self.responsePrimary.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
-            if "rep" in self.requestPrimary.query_params and self.requestPrimary.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
+    def triggerPreCondition(self, primaryResponse: Response):
+        if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+            if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
                 return True
 
         return False
@@ -117,9 +90,9 @@ class RunTriggers:
 
         try:
             # Find related triggers:
-            # triggers named after the controller's decorated name (via urls.py) + method.
+            # triggers named after the decorated controller's name (via urls.py) + method (get/post/...).
             l = Trigger.list(filter={
-                "trigger_name": resolve(self.requestPrimary.path).url_name + '_' + self.requestPrimary.method.lower(),
+                "trigger_name": resolve(self.request.path).url_name + '_' + self.request.method.lower(),
                 "src_asset_id": self.primaryAssetId,
                 "enabled": True
             })
@@ -129,7 +102,7 @@ class RunTriggers:
                 triggers.append({
                     "destinationAssetId": el["dst_asset_id"],
                     "action": el["trigger_action"],
-                    "condition": el["trigger_condition"],
+                    "conditions": el["conditions"],
                 })
 
             return triggers
@@ -138,7 +111,38 @@ class RunTriggers:
 
 
 
-    def __prResponseParser(self, response: Response) -> list:
+    def __runTrigger(self, t: dict, primaryResponse: Response):
+        outputList = list()
+
+        # @todo: run a specific action only once for any ipv4.
+
+        Log.log(t, "TRIGGER _")
+
+        try:
+            # Run trigger t for all response IPv4 addresses.
+            for ip in RunTriggers.__responseIpv4Addresses(primaryResponse):
+                Log.log(ip, "IP _")
+
+
+                if ip_address(ip) in ip_network(t["condition"]):
+                    Log.log("", "CONDITION MET _")
+
+                    from infoblox.models.Infoblox.Ipv4 import Ipv4
+                    outputList.append(Ipv4(assetId=t["destinationAssetId"], address=ip).repr())
+
+                    Log.log(Ipv4(assetId=t["destinationAssetId"], address=ip).repr(), "LIST _")
+            return outputList
+        except Exception as e:
+            raise e
+
+
+
+    ####################################################################################################################
+    # Private static methods
+    ####################################################################################################################
+
+    @staticmethod
+    def __responseIpv4Addresses(response: Response) -> list:
         ipList = []
 
         try:

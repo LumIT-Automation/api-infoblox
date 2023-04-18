@@ -1,9 +1,6 @@
+import json
 import logging
 import traceback
-
-from django.utils.html import strip_tags
-from django.db import connection
-
 
 
 class Log:
@@ -12,14 +9,20 @@ class Log:
         # Sends input logs to the configured logger (settings).
         log = logging.getLogger("django")
         if title:
-            if title == "_":
+            if "_" in title:
                 for j in range(80):
                     title = title + "_"
             log.debug(title)
 
-        log.debug(o)
+        try:
+            log.debug(json.dumps(o))
+        except Exception:
+            log.debug(o)
 
         if title:
+            title = ""
+            for j in range(80):
+                title = title + "_"
             log.debug(title)
 
 

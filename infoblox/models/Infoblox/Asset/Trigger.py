@@ -1,7 +1,14 @@
+from typing import List
+
 from infoblox.models.Infoblox.Asset.repository.Trigger import Trigger as Repository
 
 from infoblox.helpers.Log import Log
 
+
+Condition = {
+    "src_asset_id": int,
+    "condition": str
+}
 
 class Trigger:
     def __init__(self, id: int, *args, **kwargs):
@@ -9,10 +16,10 @@ class Trigger:
 
         self.id: int = int(id)
         self.trigger_name: str = ""
-        self.src_asset_id: str = ""
         self.dst_asset_id: str = ""
-        self.trigger_condition: str = ""
+        self.trigger_action: str = ""
         self.enabled: bool = False
+        self.conditions = List[Condition]
 
         self.__load()
 

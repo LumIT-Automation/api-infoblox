@@ -121,13 +121,27 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            c.execute("SELECT * FROM trigger_data "
-                "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
-                "WHERE " + filterWhere,
+            c.execute("SELECT trigger_data.id, trigger_data.trigger_name, trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
+                "group_concat(src_asset_id, '::', trigger_condition SEPARATOR ' | ') as conditions "
+                "FROM trigger_data "
+                "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
+                "WHERE " + filterWhere + " " 
+                "GROUP BY trigger_data.trigger_action ",
                     filterArgs
             )
 
-            return DBHelper.asDict(c)
+            o = DBHelper.asDict(c)
+            for t in o:
+                conditions = t["conditions"].split("|")
+
+                t["conditions"] = list()
+                for condition in conditions:
+                    t["conditions"].append({
+                        "src_asset_id": condition.split("::")[0],
+                        "condition": condition.split("::")[1]
+                    })
+
+            return o
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
