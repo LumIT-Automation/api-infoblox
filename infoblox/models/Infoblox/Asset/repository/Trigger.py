@@ -136,10 +136,13 @@ class Trigger:
 
                 t["conditions"] = list()
                 for condition in conditions:
-                    t["conditions"].append({
-                        "src_asset_id": condition.split("::")[0],
-                        "condition": condition.split("::")[1]
-                    })
+                    try:
+                        t["conditions"].append({
+                            "src_asset_id": int(condition.split("::")[0]),
+                            "condition": condition.split("::")[1].strip()
+                        })
+                    except IndexError:
+                        pass
 
             return o
         except Exception as e:

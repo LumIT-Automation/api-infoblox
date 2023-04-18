@@ -1,6 +1,6 @@
 import re
-from ipaddress import ip_address, ip_network
 import functools
+from ipaddress import ip_address, ip_network
 from typing import List
 
 from django.urls import resolve
@@ -44,13 +44,12 @@ class RunTriggers:
                 if self.triggerPreCondition(primaryResponse):
                     # Run found triggers if trigger-condition is met.
                     for t in self.__triggers():
-                        # [{"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17 "}, {"src_asset_id": " 1", "condition": "10.8.0.0/17"}]}, {"destinationAssetId": 1, "action": "ipv4_suca", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}]
+                        # [
+                        #     {"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17 "}, {"src_asset_id": " 1", "condition": "10.8.0.0/17"}]},
+                        #     {"destinationAssetId": 1, "action": "ipv4_post", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}
+                        # ]
 
-                        Log.log(self.__runTrigger(t, primaryResponse)) # add list to list.
-
-
-
-
+                        Log.log(self.__runTrigger(t, primaryResponse), "O _") # add list to list.
 
                 return primaryResponse
             except Exception as e:
@@ -114,23 +113,17 @@ class RunTriggers:
     def __runTrigger(self, t: dict, primaryResponse: Response):
         outputList = list()
 
-        # @todo: run a specific action only once for any ipv4.
-
-        Log.log(t, "TRIGGER _")
+        # t example:
+        # {"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
 
         try:
             # Run trigger t for all response IPv4 addresses.
             for ip in RunTriggers.__responseIpv4Addresses(primaryResponse):
-                Log.log(ip, "IP _")
-
-
-                if ip_address(ip) in ip_network(t["condition"]):
-                    Log.log("", "CONDITION MET _")
+                if any(ip_address(ip) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
 
                     from infoblox.models.Infoblox.Ipv4 import Ipv4
                     outputList.append(Ipv4(assetId=t["destinationAssetId"], address=ip).repr())
 
-                    Log.log(Ipv4(assetId=t["destinationAssetId"], address=ip).repr(), "LIST _")
             return outputList
         except Exception as e:
             raise e
