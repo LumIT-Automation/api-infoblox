@@ -118,7 +118,12 @@ class RunTriggers:
                 if any(ip_address(ip) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
 
                     from infoblox.models.Infoblox.Ipv4 import Ipv4
-                    outputList.append(Ipv4(assetId=t["destinationAssetId"], address=ip).repr())
+                    data = {
+                        "ipv4addr": ip,
+                        "mac": "00:00:00:00:00:00",
+                        "extattrs":  self.request.data.get("extattrs", [])
+                    }
+                    outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
 
             return outputList
         except Exception as e:
