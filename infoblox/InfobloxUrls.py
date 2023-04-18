@@ -2,7 +2,7 @@ from django.urls import path
 
 from .controllers import Root
 from .controllers.Infoblox.Asset import Asset, Assets
-from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork
+from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
@@ -31,6 +31,8 @@ urlpatterns = [
     path('<int:assetId>/networks/', Networks.InfobloxNetworksController.as_view(), name='infoblox-networks'),
     path('<int:assetId>/network-container/<str:networkAddress>/<str:mask>/networks/', NetworkContainerNetworks.InfobloxNetworkContainerNetworksController.as_view(), name='infoblox-network-container-networks'),
     path('<int:assetId>/network-containers/', NetworkContainers.InfobloxNetworkContainersController.as_view(), name='infoblox-network-containers'),
+    path('<int:assetId>/ranges/', Ranges.InfobloxRangesController.as_view(), name='infoblox-ranges'),
+    path('<int:assetId>/range/<str:startAddr>/<str:endAddr>/', Range.InfobloxRangeController.as_view(), name='infoblox-range'),
     path('<int:assetId>/ipv4/<str:ipv4address>/', Ipv4.InfobloxIpv4Controller.as_view(), name='infoblox-ipv4'),
     path('<int:assetId>/ipv4s/', Ipv4s.InfobloxIpv4sController.as_view(), name='infoblox-ipv4s'),
 
