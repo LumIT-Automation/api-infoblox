@@ -17,7 +17,7 @@ class Trigger:
         self.id: int = int(id)
         self.name: str = ""
         self.dst_asset_id: str = ""
-        self.trigger_action: str = ""
+        self.action: str = ""
         self.enabled: bool = False
         self.conditions = List[Condition]
 

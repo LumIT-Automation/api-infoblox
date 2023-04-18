@@ -84,7 +84,7 @@ class RunTriggers:
             for el in l:
                 triggers.append({
                     "destinationAssetId": el["dst_asset_id"],
-                    "action": el["trigger_action"],
+                    "action": el["action"],
                     "conditions": el["conditions"],
                 })
 

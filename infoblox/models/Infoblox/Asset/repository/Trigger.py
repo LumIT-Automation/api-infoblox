@@ -15,7 +15,7 @@ class Trigger:
     # `name` varchar(64) NOT NULL,
     # `src_asset_id` int(11) NOT NULL,
     # `dst_asset_id` int(11) NOT NULL,
-    # `trigger_condition` varchar(255) NOT NULL DEFAULT '',
+    # `condition` varchar(255) NOT NULL DEFAULT '',
     # `enabled` tinyint(1) NOT NULL,
 
 
@@ -30,9 +30,9 @@ class Trigger:
 
         try:
             if id:
-                c.execute("SELECT trigger_data.id, trigger_data.name, "
-                    "trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
-                    "trigger_condition.id as id_trigger_condition, trigger_condition.src_asset_id, trigger_condition.trigger_condition "
+                c.execute("SELECT trigger_data.id, trigger_data.`name`, "
+                    "trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
+                    "trigger_condition.id as id_trigger_condition, trigger_condition.src_asset_id, `trigger_condition.condition` "
                     "FROM trigger_data "
                     "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
                     "WHERE id = %s", [
@@ -121,12 +121,12 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            c.execute("SELECT trigger_data.id, trigger_data.name, trigger_data.dst_asset_id, trigger_data.trigger_action, trigger_data.enabled, "
-                "group_concat(src_asset_id, '::', trigger_condition SEPARATOR ' | ') as conditions "
+            c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
+                "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
                 "FROM trigger_data "
                 "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
                 "WHERE " + filterWhere + " " 
-                "GROUP BY trigger_data.trigger_action ",
+                "GROUP BY trigger_data.`action` ",
                     filterArgs
             )
 
@@ -189,7 +189,7 @@ class Trigger:
         c = connection.cursor()
 
         try:
-            c.execute("INSERT INTO trigger_condition (`trigger_id`, `src_asset_id`, `trigger_condition`) VALUES (%s, %s, %s)", [
+            c.execute("INSERT INTO trigger_condition (`trigger_id`, `src_asset_id`, `condition`) VALUES (%s, %s, %s)", [
                 triggerId, srcAssetId, condition
             ])
 

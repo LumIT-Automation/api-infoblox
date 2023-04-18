@@ -60,21 +60,21 @@ CREATE TABLE `trigger_data` (
   `id` int(11) NOT NULL,
   `name` varchar(64) NOT NULL,
   `dst_asset_id` int(11) DEFAULT NULL,
-  `trigger_action` varchar(255) NOT NULL,
+  `action` varchar(255) NOT NULL,
   `enabled` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `trigger_action`
+-- Struttura della tabella `trigger_condition`
 --
 
 CREATE TABLE `trigger_condition` (
   `id` int(11) NOT NULL,
   `trigger_id` int(11) NOT NULL,
   `src_asset_id` int(11) DEFAULT NULL,
-  `trigger_condition` varchar(255) NOT NULL
+  `condition` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
