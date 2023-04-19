@@ -9,6 +9,12 @@ from infoblox.helpers.Log import Log
 
 class PermissionPrivilege:
 
+    # (IdentityGroupRoleNetworkPrivilege)
+
+    # Tables: group_role_network, identity_group, role, network, privilege, role_privilege.
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################

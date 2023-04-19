@@ -10,7 +10,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class Configuration:
 
-    # Table: configuration
+    # Table: configuration.
 
 
 

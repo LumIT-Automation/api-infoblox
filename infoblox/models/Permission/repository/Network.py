@@ -7,7 +7,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class Network:
 
-    # Table: network
+    # Table: network.
 
 
 

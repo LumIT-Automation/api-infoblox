@@ -8,7 +8,7 @@ class Permission:
 
     # (IdentityGroupRoleNetwork)
 
-    # Table: group_role_network
+    # Tables: group_role_network, identity_group, role, network.
 
 
 

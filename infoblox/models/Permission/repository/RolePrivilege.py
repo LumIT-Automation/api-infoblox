@@ -8,7 +8,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class RolePrivilege:
 
-    # Table: role_privilege
+    # Table: role_privilege, privilege.
 
 
 

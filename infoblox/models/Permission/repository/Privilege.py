@@ -6,7 +6,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class Privilege:
 
-    # Table: privilege
+    # Table: privilege.
 
 
 

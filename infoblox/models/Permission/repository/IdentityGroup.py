@@ -8,7 +8,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class IdentityGroup:
 
-    # Table: identity_group
+    # Table: identity_group.
 
 
 

@@ -8,7 +8,7 @@ from infoblox.helpers.Database import Database as DBHelper
 
 class Role:
 
-    # Table: role
+    # Table: role.
 
 
 

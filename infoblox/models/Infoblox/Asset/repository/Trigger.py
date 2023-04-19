@@ -9,7 +9,7 @@ from infoblox.helpers.Log import Log
 
 class Trigger:
 
-    # Tables: trigger_data, trigger_condition
+    # Tables: trigger_data, trigger_condition.
 
 
 

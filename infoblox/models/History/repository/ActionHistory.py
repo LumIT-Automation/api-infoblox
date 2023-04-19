@@ -8,7 +8,7 @@ from infoblox.helpers.Log import Log
 
 class ActionHistory:
 
-    # Table: log_request
+    # Table: log_request.
 
 
 
