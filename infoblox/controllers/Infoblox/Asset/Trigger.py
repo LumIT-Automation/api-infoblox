@@ -24,7 +24,7 @@ class InfobloxTriggerController(CustomController):
                 Log.actionLog("Trigger information", user)
 
                 serializer = Serializer(
-                    data=Trigger(triggerId).repr()
+                    data=Trigger(triggerId, loadConditions=True).repr()
                 )
 
                 if serializer.is_valid():

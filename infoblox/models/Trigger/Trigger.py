@@ -9,7 +9,7 @@ Condition: Dict[str, Union[str, int]] = {
 }
 
 class Trigger:
-    def __init__(self, id: int, *args, **kwargs):
+    def __init__(self, id: int, loadConditions: bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.id: int = int(id)
@@ -20,7 +20,7 @@ class Trigger:
 
         self.conditions: List[Condition] = []
 
-        self.__load()
+        self.__load(loadConditions=loadConditions)
 
 
 
@@ -59,10 +59,10 @@ class Trigger:
     ####################################################################################################################
 
     @staticmethod
-    def list(filter: dict = None) -> list:
+    def dataList(filter: dict = None, loadConditions: bool = False) -> list:
         filter = filter or {}
 
-        return Repository.list(filter)
+        return Repository.list(filter=filter, loadConditions=loadConditions)
 
 
 
@@ -79,9 +79,12 @@ class Trigger:
     # Private methods
     ####################################################################################################################
 
-    def __load(self) -> None:
+    def __load(self, loadConditions: bool = False) -> None:
         try:
-            for k, v in Repository.get(self.id).items():
+            for k, v in Repository.get(self.id, loadConditions).items():
                 setattr(self, k, v)
+
+            if not loadConditions:
+                del self.conditions
         except Exception as e:
             raise e

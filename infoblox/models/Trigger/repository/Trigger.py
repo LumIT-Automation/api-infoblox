@@ -18,32 +18,42 @@ class Trigger:
     ####################################################################################################################
 
     @staticmethod
-    def get(id: int) -> dict:
+    def get(id: int, loadConditions: bool) -> dict:
+        o = dict()
         c = connection.cursor()
 
         try:
             if id:
-                c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
-                    "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
-                    "FROM trigger_data "
-                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
-                    "WHERE trigger_data.id = %s "
-                    "GROUP BY trigger_data.`action` ", [
-                        id
-                ])
+                if loadConditions:
+                    c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
+                        "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
+                        "FROM trigger_data "
+                        "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
+                        "WHERE trigger_data.id = %s "
+                        "GROUP BY trigger_data.`action` ", [
+                            id
+                    ])
 
-            o = DBHelper.asDict(c)[0]
+                    o = DBHelper.asDict(c)[0]
 
-            conditions = o["conditions"].split("|")
-            o["conditions"] = list()
-            for condition in conditions:
-                try:
-                    o["conditions"].append({
-                        "src_asset_id": int(condition.split("::")[0]),
-                        "condition": condition.split("::")[1].strip()
-                    })
-                except IndexError:
-                    pass
+                    conditions = o["conditions"].split("|")
+                    o["conditions"] = list()
+                    for condition in conditions:
+                        try:
+                            o["conditions"].append({
+                                "src_asset_id": int(condition.split("::")[0]),
+                                "condition": condition.split("::")[1].strip()
+                            })
+                        except IndexError:
+                            pass
+                else:
+                    c.execute(
+                        "SELECT * FROM trigger_data "
+                        "WHERE id = %s ", [
+                            id
+                        ])
+
+                    o = DBHelper.asDict(c)[0]
 
             return o
         except IndexError:
@@ -105,7 +115,7 @@ class Trigger:
 
 
     @staticmethod
-    def list(filter: dict = None) -> list:
+    def list(loadConditions: bool, filter: dict = None) -> list:
         filter = filter or {}
 
         filterWhere = ""
@@ -127,28 +137,37 @@ class Trigger:
             else:
                 filterWhere = "1"
 
-            c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
-                "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
-                "FROM trigger_data "
-                "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
-                "WHERE " + filterWhere + " " 
-                "GROUP BY trigger_data.`action` ",
-                    filterArgs
-            )
+            if loadConditions:
+                c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
+                    "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
+                    "FROM trigger_data "
+                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
+                    "WHERE " + filterWhere + " " 
+                    "GROUP BY trigger_data.`action` ",
+                        filterArgs
+                )
 
-            o = DBHelper.asDict(c)
-            for t in o:
-                conditions = t["conditions"].split("|")
+                o = DBHelper.asDict(c)
+                for t in o:
+                    conditions = t["conditions"].split("|")
+                    t["conditions"] = list()
+                    for condition in conditions:
+                        try:
+                            t["conditions"].append({
+                                "src_asset_id": int(condition.split("::")[0]),
+                                "condition": condition.split("::")[1].strip()
+                            })
+                        except IndexError:
+                            pass
+            else:
+                c.execute(
+                    "SELECT * FROM trigger_data "
+                    "WHERE " + filterWhere + " "
+                    "GROUP BY trigger_data.`action` ",
+                        filterArgs
+                    )
 
-                t["conditions"] = list()
-                for condition in conditions:
-                    try:
-                        t["conditions"].append({
-                            "src_asset_id": int(condition.split("::")[0]),
-                            "condition": condition.split("::")[1].strip()
-                        })
-                    except IndexError:
-                        pass
+                o = DBHelper.asDict(c)
 
             return o
         except Exception as e:

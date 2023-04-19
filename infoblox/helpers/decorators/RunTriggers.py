@@ -75,11 +75,13 @@ class RunTriggers:
         try:
             # Find related triggers:
             # triggers named after the decorated controller's name (via urls.py) + method (get/post/...).
-            l = Trigger.list(filter={
+            l = Trigger.dataList(filter={
                 "name": resolve(self.request.path).url_name + '_' + self.request.method.lower(),
                 "src_asset_id": self.primaryAssetId,
                 "enabled": True
-            })
+            }, loadConditions=True)
+
+            Log.log(l, "_")
 
             # Return relevant information.
             for el in l:
