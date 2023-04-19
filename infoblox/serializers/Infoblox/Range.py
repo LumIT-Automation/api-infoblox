@@ -24,6 +24,7 @@ class InfobloxRangeSerializer(serializers.Serializer):
             self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
+    asset_id = serializers.IntegerField(required=False)
     _ref = serializers.CharField(max_length=255, required=False)
     network = serializers.CharField(max_length=255, required=False)
     network_view = serializers.CharField(max_length=255, required=False)

@@ -1,6 +1,4 @@
-import json
 from typing import Dict
-from django.core.cache import cache
 
 from infoblox.helpers.Exception import CustomException
 
@@ -36,18 +34,6 @@ class Range:
     # Public methods
     ####################################################################################################################
 
-    """
-    def ipv4sData(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
-        try:
-            # Data list.
-            # Not using composition for possible huge dataset.
-            return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
-        except Exception as e:
-            raise e
-    """
-
-
-
     def repr(self) -> dict:
         try:
             return vars(self)
@@ -55,28 +41,6 @@ class Range:
             raise e
 
 
-    """
-    def modify(self, data: dict) -> dict:
-        try:
-            if "network" not in data:
-                data["network"] = self.network
-
-            return {
-                "_ref": Connector.modify(assetId=self.asset_id, _ref=self._ref, data=data, silent=False),
-                "network": data["network"]
-            }
-        except Exception as e:
-            raise e
-
-
-
-    def delete(self) -> None:
-        try:
-            Connector.delete(assetId=self.asset_id, _ref=self._ref, silent=False)
-        except Exception as e:
-            raise e
-
-    """
 
     ####################################################################################################################
     # Public static methods
@@ -95,15 +59,6 @@ class Range:
 
         return o
 
-
-    """
-    @staticmethod
-    def add(assetId: int, data) -> dict:
-        try:
-            return Connector.add(assetId, data)
-        except Exception as e:
-            raise e
-    """
 
 
     ####################################################################################################################

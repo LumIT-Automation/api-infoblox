@@ -33,6 +33,7 @@ class InfobloxIpv4Serializer(serializers.Serializer):
     class InfobloxIpv4UsageInnerSerializer(serializers.ListField):
         usage = serializers.CharField(max_length=255)
 
+    asset_id = serializers.IntegerField(required=False)
     _ref = serializers.CharField(max_length=255, required=True)
     extattrs = InfobloxIpv4ExtattrsInnerSerializer(required=False)
     ip_address = serializers.IPAddressField(required=True)

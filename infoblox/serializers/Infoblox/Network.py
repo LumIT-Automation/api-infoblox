@@ -43,8 +43,7 @@ class InfobloxNetworkSerializer(serializers.Serializer):
             self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
             # self.fields["VLAN"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
-
-
+    asset_id = serializers.IntegerField(required=False)
     _ref = serializers.CharField(max_length=255, required=False)
     network = InfobloxNetworkValueStringSerializer()
     network_container = serializers.CharField(max_length=255, required=False)
