@@ -79,7 +79,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/fixedaddress?_return_as_object=1",
+                endpoint=infoblox.baseurl+"/fixedaddress?_return_fields=mac",
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )
@@ -90,6 +90,9 @@ class Ipv4:
                 },
                 data=json.dumps(data)
             )
+
+            o["result"] = o["_ref"]
+            del(o["_ref"])
         except Exception as e:
             raise e
 

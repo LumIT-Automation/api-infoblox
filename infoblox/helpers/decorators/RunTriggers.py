@@ -49,11 +49,7 @@ class RunTriggers:
                         #     {"destinationAssetId": 1, "action": "ipv4_post", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}
                         # ]
 
-                        try:
-                            Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
-
-                        except Exception as e:
-                            RunTriggers.__raiseFlag("Trigger Exception: " + str(e)) # trigger executed but not successful: raise a flag.
+                        Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
 
             except Exception as e: # if something goes wrong during the trigger process but the primary call was ok, log the error only.
                 Log.log("Trigger Error: " + str(e))
@@ -76,9 +72,6 @@ class RunTriggers:
             return False
         except Exception as e:
             raise e
-
-
-
 
 
 
@@ -120,7 +113,7 @@ class RunTriggers:
 
 
 
-    def __runTrigger(self, t: dict, primaryResponse: Response):
+    def __runTrigger(self, t: dict, primaryResponse: Response) -> list:
         outputList = list()
 
         # t example:
@@ -128,20 +121,25 @@ class RunTriggers:
 
         try:
             # Run trigger t for all response IPv4 addresses.
-            for ip in RunTriggers.__responseIpv4Addresses(primaryResponse):
-                if any(ip_address(ip) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
+            from infoblox.models.Infoblox.Ipv4 import Ipv4
+            for info in RunTriggers.__responseInfo(primaryResponse):
+                if any(ip_address(info["ipAddress"]) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
 
-                    from infoblox.models.Infoblox.Ipv4 import Ipv4
                     data = {
-                        "ipv4addr": ip,
-                        "mac": "00:00:00:00:00:00",
+                        "ipv4addr": info["ipAddress"],
+                        "mac": info["mac"],
                         "extattrs":  self.request.data.get("extattrs", [])
                     }
-                    outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
 
-            return outputList
+                    try:
+                        outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
+                    except Exception as e:
+                        RunTriggers.__raiseFlag("Trigger Exception: " + str(e))  # trigger executed but not successful: raise a flag.
+
         except Exception as e:
             raise e
+
+        return outputList
 
 
 
@@ -150,24 +148,28 @@ class RunTriggers:
     ####################################################################################################################
 
     @staticmethod
-    def __responseIpv4Addresses(response: Response) -> list:
-        ipList = []
+    def __responseInfo(response: Response) -> list:
+        ipMacList = []
 
         try:
             for el in response.data["data"]:
                 if "result" in el:
-                    ipList.extend(
-                        re.findall(
-                            r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
-                            el["result"]
-                        )
-                    )
+                    ipMacList.append({
+                        "ipAddress":
+                            re.findall(
+                                r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
+                                el["result"]
+                            )[0],
+                        "mac": el["mac"]
+                    })
         except KeyError:
+            pass
+        except IndexError:
             pass
         except Exception as e:
             raise e
 
-        return ipList
+        return ipMacList
 
 
     @staticmethod
