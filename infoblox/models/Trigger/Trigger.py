@@ -1,6 +1,6 @@
 from typing import List, Dict, Union
 
-from infoblox.models.Infoblox.Asset.repository.Trigger import Trigger as Repository
+from infoblox.models.Trigger.repository.Trigger import Trigger as Repository
 
 
 Condition: Dict[str, Union[str, int]] = {

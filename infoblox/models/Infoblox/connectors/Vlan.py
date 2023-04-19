@@ -1,7 +1,6 @@
-from infoblox.models.Infoblox.Asset.Asset import Asset
+from infoblox.models.Asset.Asset import Asset
 
 from infoblox.helpers.ApiSupplicant import ApiSupplicant
-from infoblox.helpers.Log import Log
 
 
 class Vlan:

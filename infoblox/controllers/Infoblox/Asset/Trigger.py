@@ -2,7 +2,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Infoblox.Asset.Trigger import Trigger
+from infoblox.models.Trigger.Trigger import Trigger
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Asset.Trigger import InfobloxTriggerSerializer as Serializer

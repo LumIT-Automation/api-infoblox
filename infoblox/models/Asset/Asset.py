@@ -1,4 +1,4 @@
-from infoblox.models.Infoblox.Asset.repository.Asset import Asset as Repository
+from infoblox.models.Asset.repository.Asset import Asset as Repository
 
 from infoblox.helpers.Misc import Misc
 

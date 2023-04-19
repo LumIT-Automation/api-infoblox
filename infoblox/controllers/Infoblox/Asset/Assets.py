@@ -2,7 +2,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Infoblox.Asset.Asset import Asset
+from infoblox.models.Asset.Asset import Asset
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Asset.Assets import InfobloxAssetsSerializer as AssetsSerializer

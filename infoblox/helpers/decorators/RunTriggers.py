@@ -7,7 +7,7 @@ from django.urls import resolve
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from infoblox.models.Infoblox.Asset.Trigger import Trigger
+from infoblox.models.Trigger.Trigger import Trigger
 
 from infoblox.helpers.Log import Log
 
