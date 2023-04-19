@@ -35,7 +35,6 @@ class RunTriggers:
 
                 # Run wrappedMethod with given parameters.
                 primaryResponse = self.wrappedMethod(request, **kwargs)
-
             except Exception as e:
                 raise e
 
@@ -44,14 +43,9 @@ class RunTriggers:
                 if self.__triggerPreCondition(primaryResponse):
                     # Run found triggers if trigger-condition is met.
                     for t in self.__triggers():
-                        # [
-                        #     {"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17 "}, {"src_asset_id": " 1", "condition": "10.8.0.0/17"}]},
-                        #     {"destinationAssetId": 1, "action": "ipv4_post", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}]}
-                        # ]
-
-                        Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
-
-            except Exception as e: # if something goes wrong during the trigger process but the primary call was ok, log the error only.
+                        Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)))
+            except Exception as e:
+                # If something goes wrong during the trigger process but the primary call was ok, log the error only.
                 Log.log("Trigger Error: " + str(e))
 
             return primaryResponse
@@ -101,41 +95,29 @@ class RunTriggers:
 
 
 
-    # def __getTriggerAction(self) -> callable:
-    #     try:
-    #         from infoblox.controllers.Infoblox.Ipv4 import InfobloxIpv4Controller as action
-    #
-    #         m = self.triggerMethod.lower()
-    #         if hasattr(action, m) and callable(getattr(action, m)):
-    #             return getattr(action, m)
-    #     except ImportError as e:
-    #         raise e
-
-
-
     def __runTrigger(self, t: dict, primaryResponse: Response) -> list:
         outputList = list()
 
         # t example:
-        # {"destinationAssetId": 1, "action": "ipv4_get", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
+        # {"destinationAssetId": 1, "action": "dst:ipv4s-replica", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
 
         try:
-            # Run trigger t for all response IPv4 addresses.
-            from infoblox.models.Infoblox.Ipv4 import Ipv4
-            for info in RunTriggers.__responseInfo(primaryResponse):
-                if any(ip_address(info["ipAddress"]) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
+            # Run trigger t.
+            if t["action"] == "dst:ipv4s-replica":
+                # Replicate all IP addresses found in primaryResponse onto destinationAssetId.
+                from infoblox.models.Infoblox.Ipv4 import Ipv4
+                for ipAddressInformation in RunTriggers.__responseInfo(primaryResponse):
+                    if any(ip_address(ipAddressInformation["ipAddress"]) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
+                        data = {
+                            "ipv4addr": ipAddressInformation["ipAddress"],
+                            "mac": ipAddressInformation["mac"],
+                            "extattrs": self.request.data.get("extattrs", [])
+                        }
 
-                    data = {
-                        "ipv4addr": info["ipAddress"],
-                        "mac": info["mac"],
-                        "extattrs":  self.request.data.get("extattrs", [])
-                    }
-
-                    try:
-                        outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
-                    except Exception as e:
-                        RunTriggers.__raiseFlag("Trigger Exception: " + str(e))  # trigger executed but not successful: raise a flag.
-
+                        try:
+                            outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
+                        except Exception as e:
+                            RunTriggers.__raiseFlag("Trigger Exception: " + str(e)) # trigger executed not successfully: raise a flag.
         except Exception as e:
             raise e
 
@@ -153,15 +135,14 @@ class RunTriggers:
 
         try:
             for el in response.data["data"]:
-                if "result" in el:
-                    ipMacList.append({
-                        "ipAddress":
-                            re.findall(
-                                r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
-                                el["result"]
-                            )[0],
-                        "mac": el["mac"]
-                    })
+                ipMacList.append({
+                    "ipAddress":
+                        re.findall(
+                            r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
+                            el["result"]
+                        )[0],
+                    "mac": el["mac"]
+                })
         except KeyError:
             pass
         except IndexError:
@@ -172,8 +153,7 @@ class RunTriggers:
         return ipMacList
 
 
+
     @staticmethod
     def __raiseFlag(message):
-        # Todo: send webex message.
-        Log.log(message, '_')
-
+        Log.log(message)
