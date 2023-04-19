@@ -15,7 +15,10 @@ class Log:
             log.debug(title)
 
         try:
-            log.debug(json.dumps(o))
+            if not isinstance(o, str):
+                log.debug(json.dumps(o))
+            else:
+                log.debug(o)
         except Exception:
             log.debug(o)
 

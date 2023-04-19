@@ -36,6 +36,10 @@ class RunTriggers:
                 # Run wrappedMethod with given parameters.
                 primaryResponse = self.wrappedMethod(request, **kwargs)
 
+            except Exception as e:
+                raise e
+
+            try:
                 # Whatever a particular pre-condition is met, perform found triggers.
                 if self.__triggerPreCondition(primaryResponse):
                     # Run found triggers if trigger-condition is met.
@@ -49,13 +53,12 @@ class RunTriggers:
                             Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)), "_") # add list to list.
 
                         except Exception as e:
-                            RunTriggers.__raiseFlag("Trigger Exception: " + str(e))
-                            pass
+                            RunTriggers.__raiseFlag("Trigger Exception: " + str(e)) # trigger executed but not successful: raise a flag.
 
-                return primaryResponse
-            except Exception as e:
-                raise e
+            except Exception as e: # if something goes wrong during the trigger process but the primary call was ok, log the error only.
+                Log.log("Trigger Error: " + str(e))
 
+            return primaryResponse
         return wrapped()
 
 
@@ -64,12 +67,18 @@ class RunTriggers:
     # Private methods
     ####################################################################################################################
 
-    def __triggerPreCondition(self, primaryResponse: Response):
-        if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
-            if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
-                return True
+    def __triggerPreCondition(self, primaryResponse: Response) -> bool:
+        try:
+            if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+                if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
+                    return True
 
-        return False
+            return False
+        except Exception as e:
+            raise e
+
+
+
 
 
 
