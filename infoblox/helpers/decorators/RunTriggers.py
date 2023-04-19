@@ -81,8 +81,6 @@ class RunTriggers:
                 "enabled": True
             }, loadConditions=True)
 
-            Log.log(l, "_")
-
             # Return relevant information.
             for el in l:
                 triggers.append({

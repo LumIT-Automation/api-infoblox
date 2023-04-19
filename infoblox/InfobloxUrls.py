@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .controllers import Root
-from .controllers.Infoblox.Asset import Asset, Assets, Trigger
+from .controllers.Asset import Asset, Assets
+from .controllers.Trigger import Trigger
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration

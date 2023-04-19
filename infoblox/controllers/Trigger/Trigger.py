@@ -5,7 +5,7 @@ from rest_framework import status
 from infoblox.models.Trigger.Trigger import Trigger
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.serializers.Infoblox.Asset.Trigger import InfobloxTriggerSerializer as Serializer
+from infoblox.serializers.Trigger.Trigger import InfobloxTriggerSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Conditional import Conditional

@@ -4,7 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Asset.Asset import Asset
 from infoblox.models.Permission.Permission import Permission
-from infoblox.serializers.Infoblox.Asset.Asset import InfobloxAssetSerializer as Serializer
+from infoblox.serializers.Asset.Asset import InfobloxAssetSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Log import Log
