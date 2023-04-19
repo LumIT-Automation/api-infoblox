@@ -44,6 +44,15 @@ class InfobloxIpv4sController(CustomController):
                     permissionNetwork = permissionCheckNetwork
 
                 if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork) or user["authDisabled"]:
+                    # If the user cannot request an ip in a range, cleanup the range data and rebuild ipv4CustomReserve. Todo: improve.
+                    if reqType == "post.next-available" and "range_first_ip" in userValidatedData:
+                        if not user["authDisabled"] and not Permission.hasUserPermission(groups=user["groups"], action="range_get", assetId=assetId, container=permissionContainer, network=permissionNetwork):
+                            del userValidatedData["range_first_ip"]
+                            if "range_last_ip" in userValidatedData:
+                                del userValidatedData["range_last_ip"]
+
+                            ipv4CustomReserve = ReserveFactory(assetId, reqType, userValidatedData, user["username"])()
+
                     Log.actionLog("Ipv4 addition", user)
                     Log.actionLog("User data: "+str(request.data), user)
 
