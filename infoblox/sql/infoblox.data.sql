@@ -57,7 +57,9 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (22, 'vlans_get', 'asset', NULL),
 (23, 'vlan_get', 'asset', NULL),
 (24, 'assign_network', 'asset', NULL),
-(25, 'configuration_put', 'global', NULL);
+(25, 'configuration_put', 'global', NULL),
+(26, 'ranges_get', 'asset', NULL),
+(27, 'range_get', 'asset', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -96,6 +98,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 23),
 (1, 24),
 (1, 25),
+(1, 26),
+(1, 27),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -109,6 +113,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (2, 23),
 (2, 24),
 (2, 25),
+(2, 26),
+(2, 27),
 (3, 3),
 (3, 5),
 (3, 6),
