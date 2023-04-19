@@ -8,7 +8,6 @@ from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.serializers.Infoblox.Ranges import InfobloxRangesSerializer as Serializer
-#from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer as NetworkAddSerializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -96,52 +95,3 @@ class InfobloxRangesController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
-
-
-    """
-    @staticmethod
-    def post(request: Request, assetId: int) -> Response:
-        response = None
-        user = CustomController.loggedUser(request)
-
-        try:
-            if Permission.hasUserPermission(groups=user["groups"], action="networks_post", assetId=assetId) or user["authDisabled"]:
-                Log.actionLog("Network addition", user)
-                Log.actionLog("User data: "+str(request.data), user)
-
-                serializer = NetworkAddSerializer(data=request.data["data"])
-                if serializer.is_valid():
-                    data = serializer.validated_data
-
-                    lock = Lock("network", locals(), data["network"])
-                    if lock.isUnlocked():
-                        lock.lock()
-
-                        Range.add(assetId, data)
-
-                        httpStatus = status.HTTP_201_CREATED
-                        lock.release()
-                    else:
-                        httpStatus = status.HTTP_423_LOCKED
-                else:
-                    httpStatus = status.HTTP_400_BAD_REQUEST
-                    response = {
-                        "Infoblox": {
-                            "error": str(serializer.errors)
-                        }
-                    }
-
-                    Log.actionLog("User data incorrect: "+str(response), user)
-            else:
-                httpStatus = status.HTTP_403_FORBIDDEN
-        except Exception as e:
-            if "serializer" in locals():
-                Lock("network", locals(), locals()["serializer"].data["network"]).release()
-
-            data, httpStatus, headers = CustomController.exceptionHandler(e)
-            return Response(data, status=httpStatus, headers=headers)
-
-        return Response(response, status=httpStatus, headers={
-            "Cache-Control": "no-cache"
-        })
-    """

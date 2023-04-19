@@ -10,6 +10,7 @@ from infoblox.models.History.History import History
 
 from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer
 from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer
+from infoblox.serializers.Infoblox.Ranges import InfobloxRangesSerializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -24,7 +25,9 @@ class InfobloxNetworkController(CustomController):
         auth = False
         data = dict()
         showIp = False
+        showRange = False
         ipv4Info = { "data": dict() }
+        rangeInfo = { "data": dict() }
         etagCondition = { "responseEtag": "" }
 
         user = CustomController.loggedUser(request)
@@ -39,6 +42,8 @@ class InfobloxNetworkController(CustomController):
                     rList = request.GET.getlist('related')
                     if "ip" in rList:
                         showIp = True
+                    if "range" in rList:
+                        showRange = True
 
                 lock = Lock("network", locals(), networkAddress)
                 if lock.isUnlocked():
@@ -49,31 +54,57 @@ class InfobloxNetworkController(CustomController):
                         data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
 
-                        if showIp:
-                            ipv4Info["data"]["items"] = n.ipv4sData()
-                            serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
-                            if serializerIpv4.is_valid():
-                                data["data"].update({
-                                    "ipv4Info": serializerIpv4.validated_data["data"]["items"]
-                                })
+                        if showIp or showRange:
+                            if showIp:
+                                ipv4Info["data"]["items"] = n.ipv4sData()
+                                serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
+                                if serializerIpv4.is_valid():
+                                    data["data"].update({
+                                        "ipv4Info": serializerIpv4.validated_data["data"]["items"]
+                                    })
 
-                                # Check the response's ETag validity (against client request).
-                                conditional = Conditional(request)
-                                etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                                if etagCondition["state"] == "fresh":
-                                    data = None
-                                    httpStatus = status.HTTP_304_NOT_MODIFIED
+                                    # Check the response's ETag validity (against client request).
+                                    conditional = Conditional(request)
+                                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                                    if etagCondition["state"] == "fresh":
+                                        data = None
+                                        httpStatus = status.HTTP_304_NOT_MODIFIED
+                                    else:
+                                        httpStatus = status.HTTP_200_OK
                                 else:
-                                    httpStatus = status.HTTP_200_OK
-                            else:
-                                httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-                                data = {
-                                    "Infoblox": {
-                                        "error": "Infoblox upstream data mismatch."
+                                    httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+                                    data = {
+                                        "Infoblox": {
+                                            "error": "Infoblox upstream data mismatch."
+                                        }
                                     }
-                                }
 
-                                Log.log("Upstream data incorrect: " + str(serializer.errors))
+                                    Log.log("Upstream data incorrect: " + str(serializer.errors))
+                            if showRange:
+                                rangeInfo["data"] = n.listRanges()
+                                serializerRange = InfobloxRangesSerializer(data=rangeInfo)
+                                if serializerRange.is_valid():
+                                    data["data"].update({
+                                        "rangeInfo": serializerRange.validated_data["data"]
+                                    })
+
+                                    # Check the response's ETag validity (against client request).
+                                    conditional = Conditional(request)
+                                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                                    if etagCondition["state"] == "fresh":
+                                        data = None
+                                        httpStatus = status.HTTP_304_NOT_MODIFIED
+                                    else:
+                                        httpStatus = status.HTTP_200_OK
+                                else:
+                                    httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+                                    data = {
+                                        "Infoblox": {
+                                            "error": "Infoblox upstream data mismatch."
+                                        }
+                                    }
+
+                                    Log.log("Upstream data incorrect: " + str(serializer.errors))
                         else:
                             # Check the response's ETag validity (against client request).
                             conditional = Conditional(request)

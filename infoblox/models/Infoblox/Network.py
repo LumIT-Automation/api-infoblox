@@ -45,6 +45,17 @@ class Network:
 
 
 
+    def listRanges(self) -> list:
+        try:
+            from infoblox.models.Infoblox.Range import Range
+            filter = {"network": self.network}
+
+            return Range.listData(assetId=self.asset_id, filters=filter)
+        except Exception as e:
+            raise e
+
+
+
     def repr(self) -> dict:
         try:
             return vars(self)
