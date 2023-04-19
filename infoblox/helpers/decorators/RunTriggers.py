@@ -84,7 +84,7 @@ class RunTriggers:
             # Return relevant information.
             for el in l:
                 triggers.append({
-                    "destinationAssetId": el["dst_asset_id"],
+                    "dst_asset_id": el["dst_asset_id"],
                     "action": el["action"],
                     "conditions": el["conditions"],
                 })
@@ -99,12 +99,12 @@ class RunTriggers:
         outputList = list()
 
         # t example:
-        # {"destinationAssetId": 1, "action": "dst:ipv4s-replica", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
+        # {"dst_asset_id": 1, "action": "dst:ipv4s-replica", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
 
         try:
             # Run trigger t.
             if t["action"] == "dst:ipv4s-replica":
-                # Replicate all IP addresses found in primaryResponse onto destinationAssetId.
+                # Replicate all IP addresses found in primaryResponse onto dst_asset_id.
                 from infoblox.models.Infoblox.Ipv4 import Ipv4
                 for ipAddressInformation in RunTriggers.__responseInfo(primaryResponse):
                     if any(ip_address(ipAddressInformation["ipAddress"]) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
@@ -115,7 +115,7 @@ class RunTriggers:
                         }
 
                         try:
-                            outputList.append(Ipv4.reserve(assetId=t["destinationAssetId"], data=data))
+                            outputList.append(Ipv4.reserve(assetId=t["dst_asset_id"], data=data))
                         except Exception as e:
                             RunTriggers.__raiseFlag("Trigger Exception: " + str(e)) # trigger executed not successfully: raise a flag.
         except Exception as e:

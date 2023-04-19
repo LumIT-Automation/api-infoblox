@@ -2,12 +2,16 @@ from django.utils.html import strip_tags
 from django.db import connection
 from django.db import transaction
 
-from infoblox.helpers.Log import Log
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Database import Database as DBHelper
+from infoblox.helpers.Log import Log
 
 
 class History:
+
+    # Table: log.
+
+
 
     ####################################################################################################################
     # Public static methods

@@ -1,13 +1,11 @@
-from typing import List
+from typing import List, Dict, Union
 
 from infoblox.models.Infoblox.Asset.repository.Trigger import Trigger as Repository
 
-from infoblox.helpers.Log import Log
 
-
-Condition = {
-    "src_asset_id": int,
-    "condition": str
+Condition: Dict[str, Union[str, int]] = {
+    "src_asset_id": 0,
+    "condition": ""
 }
 
 class Trigger:
@@ -19,7 +17,8 @@ class Trigger:
         self.dst_asset_id: str = ""
         self.action: str = ""
         self.enabled: bool = False
-        self.conditions = List[Condition]
+
+        self.conditions: List[Condition] = []
 
         self.__load()
 
@@ -29,9 +28,17 @@ class Trigger:
     # Public methods
     ####################################################################################################################
 
-    def modify(self, enabled: bool) -> None:
+    def repr(self) -> dict:
         try:
-            Repository.modify(self.id, enabled)
+            return vars(self)
+        except Exception as e:
+            raise e
+
+
+
+    def enable(self, enabled: bool) -> None:
+        try:
+            Repository.enable(self.id, enabled)
             setattr(self, "enabled", enabled)
         except Exception as e:
             raise e
@@ -74,8 +81,7 @@ class Trigger:
 
     def __load(self) -> None:
         try:
-            data = Repository.get(self.id)
-            for k, v in data.items():
+            for k, v in Repository.get(self.id).items():
                 setattr(self, k, v)
         except Exception as e:
             raise e

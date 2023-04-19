@@ -10,12 +10,6 @@ class RolePrivilege:
 
     # Table: role_privilege
 
-    #  `id_role` int(11) NOT NULL PRIMARY KEY,
-    #  `id_privilege` int(11) NOT NULL KEY
-
-    #   CONSTRAINT `rp_privilege` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-    #   CONSTRAINT `rp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-
 
 
     ####################################################################################################################
