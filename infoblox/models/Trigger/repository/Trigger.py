@@ -230,12 +230,12 @@ class Trigger:
 
 
     @staticmethod
-    def deleteCondition(id: int) -> None:
+    def deleteCondition(triggerId: int, conditionId: int) -> None:
         c = connection.cursor()
 
         try:
             c.execute("DELETE FROM trigger_condition WHERE id = %s", [
-                id
+                conditionId
             ])
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})

@@ -1004,6 +1004,88 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "trigger conditions",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"src_asset_id\": 1,\n        \"condition\": \"10.9.0.0/18\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/conditions/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"trigger",
+										"1",
+										"conditions",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "trigger condition",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/condition/3/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"trigger",
+										"1",
+										"condition",
+										"3",
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},

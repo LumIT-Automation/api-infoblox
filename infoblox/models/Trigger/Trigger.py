@@ -67,6 +67,14 @@ class Trigger:
 
 
 
+    def deleteCondition(self, conditionId: int) -> None:
+        try:
+            Repository.deleteCondition(self.id, conditionId)
+        except Exception as e:
+            raise e
+
+
+
     ####################################################################################################################
     # Public static methods
     ####################################################################################################################
