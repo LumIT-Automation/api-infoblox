@@ -815,6 +815,40 @@
 					"name": "Triggers",
 					"item": [
 						{
+							"name": "triggers",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"triggers",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "trigger",
 							"request": {
 								"auth": {
@@ -855,7 +889,7 @@
 								"auth": {
 									"type": "noauth"
 								},
-								"method": "GET",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
@@ -863,6 +897,15 @@
 										"value": "Bearer {{jwttoken}}"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_patch\",\n        \"dst_asset_id\": 1,\n        \"action\": \"dst:ipv4s-replica\",\n        \"enabled\": 1\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
 									"protocol": "http",
@@ -877,6 +920,85 @@
 										"v1",
 										"infoblox",
 										"triggers",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "trigger",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_get\",\n        \"dst_asset_id\": 2,\n        \"action\": \"dst:ipv4-info\",\n        \"enabled\": 0\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"trigger",
+										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "trigger",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/2/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"trigger",
+										"2",
 										""
 									]
 								}
