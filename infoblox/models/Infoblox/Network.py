@@ -1,6 +1,4 @@
-import json
 from typing import Dict
-from django.core.cache import cache
 
 from infoblox.helpers.Exception import CustomException
 
@@ -37,15 +35,13 @@ class Network:
 
     def ipv4sData(self, maxResults: int = 0, fromIp: str = "", toIp: str = "") -> dict:
         try:
-            # Data list.
-            # Not using composition for possible huge dataset.
             return Connector.addresses(self.asset_id, self.network, maxResults, fromIp, toIp)
         except Exception as e:
             raise e
 
 
 
-    def listRanges(self) -> list:
+    def rangesData(self) -> list:
         try:
             from infoblox.models.Infoblox.Range import Range
             filter = {"network": self.network}

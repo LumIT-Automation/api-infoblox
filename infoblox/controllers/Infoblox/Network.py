@@ -69,7 +69,7 @@ class InfobloxNetworkController(CustomController):
 
                         if showRange and Permission.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n) or user["authDisabled"]:
                             Log.actionLog("Ask also ranges information", user)
-                            rangeInfo["data"] = n.listRanges()
+                            rangeInfo["data"] = n.rangesData()
                             serializerRange = InfobloxRangesSerializer(data=rangeInfo)
                             if serializerRange.is_valid():
                                 data["data"].update({
