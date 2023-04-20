@@ -39,14 +39,18 @@ class RunTriggers:
                 raise e
 
             try:
-                # Whatever a particular pre-condition is met, perform found triggers.
+                # Whatever pre-conditions are met, perform found triggers.
                 if self.__triggerPreCondition(primaryResponse):
-                    # Run found triggers if trigger-condition is met.
-                    for t in self.__triggers():
-                        Log.log("Trigger execution: " + str(self.__runTrigger(t, primaryResponse)))
+                    triggers = self.__triggers()
+                    if triggers:
+                        for t in triggers:
+                            o = self.__runTrigger(t, primaryResponse)
+                            if o:
+                                Log.log("[Triggers] Trigger execution: " + str(o))
+                    else:
+                        Log.log("[Triggers] No trigger found")
             except Exception as e:
-                # If something goes wrong during the trigger process but the primary call was ok, log the error only.
-                Log.log("Trigger Error: " + str(e))
+                Log.log("[Triggers] Trigger error: " + str(e))
 
             return primaryResponse
         return wrapped()
@@ -60,7 +64,7 @@ class RunTriggers:
     def __triggerPreCondition(self, primaryResponse: Response) -> bool:
         try:
             if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
-                if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1 param was passed.
+                if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1/true param was passed.
                     return True
 
             return False
@@ -83,11 +87,14 @@ class RunTriggers:
 
             # Return relevant information.
             for el in l:
-                triggers.append({
-                    "dst_asset_id": el["dst_asset_id"],
-                    "action": el["action"],
-                    "conditions": el["conditions"],
-                })
+                try:
+                    triggers.append({
+                        "dst_asset_id": el["dst_asset_id"],
+                        "action": el["action"],
+                        "conditions": el["conditions"],
+                    })
+                except KeyError:
+                    pass
 
             return triggers
         except Exception as e:
@@ -99,7 +106,7 @@ class RunTriggers:
         outputList = list()
 
         # t example:
-        # {"dst_asset_id": 1, "action": "dst:ipv4s-replica", "conditions": [{"src_asset_id": "1", "condition": "10.9.0.0/17"}, {...}]
+        # {"dst_asset_id": 1, "action": "dst:ipv4s-replica", "conditions": [{"src_asset_id": "1", "condition": "src-ip-in:10.9.0.0/17"}, {...}]
 
         try:
             # Run trigger t.
@@ -107,17 +114,22 @@ class RunTriggers:
                 # Replicate all IP addresses found in primaryResponse onto dst_asset_id.
                 from infoblox.models.Infoblox.Ipv4 import Ipv4
                 for ipAddressInformation in RunTriggers.__responseInfo(primaryResponse):
-                    if any(ip_address(ipAddressInformation["ipAddress"]) in ip_network(condition["condition"]) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
-                        data = {
-                            "ipv4addr": ipAddressInformation["ipAddress"],
-                            "mac": ipAddressInformation["mac"],
-                            "extattrs": self.request.data.get("extattrs", [])
-                        }
+                    try:
+                        if any("src-ip-in" in condition["condition"] and ip_address(ipAddressInformation["ipAddress"]) in ip_network(condition["condition"].split(":")[1].strip()) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
+                            data = {
+                                "ipv4addr": ipAddressInformation["ipAddress"],
+                                "mac": ipAddressInformation["mac"],
+                                "extattrs": self.request.data.get("extattrs", [])
+                            }
 
-                        try:
-                            outputList.append(Ipv4.reserve(assetId=t["dst_asset_id"], data=data))
-                        except Exception as e:
-                            RunTriggers.__raiseFlag("Trigger Exception: " + str(e)) # trigger executed not successfully: raise a flag.
+                            try:
+                                outputList.append(Ipv4.reserve(assetId=t["dst_asset_id"], data=data))
+                            except Exception as e:
+                                RunTriggers.__raiseFlag("[Triggers] Trigger Exception: " + str(e))
+                        else:
+                            Log.log("[Triggers] No suitable trigger found")
+                    except IndexError:
+                        pass
         except Exception as e:
             raise e
 
