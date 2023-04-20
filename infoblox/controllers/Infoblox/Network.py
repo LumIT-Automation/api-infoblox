@@ -29,6 +29,7 @@ class InfobloxNetworkController(CustomController):
         ipv4Info = { "data": dict() }
         rangeInfo = { "data": dict() }
         etagCondition = { "responseEtag": "" }
+        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         user = CustomController.loggedUser(request)
 
@@ -54,81 +55,44 @@ class InfobloxNetworkController(CustomController):
                         data["data"] = serializer.validated_data
                         data["href"] = request.get_full_path()
 
-                        if showIp or showRange:
-                            if showIp:
-                                ipv4Info["data"]["items"] = n.ipv4sData()
-                                serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
-                                if serializerIpv4.is_valid():
-                                    data["data"].update({
-                                        "ipv4Info": serializerIpv4.validated_data["data"]["items"]
-                                    })
-
-                                    # Check the response's ETag validity (against client request).
-                                    conditional = Conditional(request)
-                                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                                    if etagCondition["state"] == "fresh":
-                                        data = None
-                                        httpStatus = status.HTTP_304_NOT_MODIFIED
-                                    else:
-                                        httpStatus = status.HTTP_200_OK
-                                else:
-                                    httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-                                    data = {
-                                        "Infoblox": {
-                                            "error": "Infoblox upstream data mismatch."
-                                        }
-                                    }
-
-                                    Log.log("Upstream data incorrect: " + str(serializer.errors))
-                            if showRange:
-                                if Permission.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n) or user["authDisabled"]:
-                                    Log.actionLog("Ask also ranges information", user)
-
-                                    rangeInfo["data"] = n.listRanges()
-                                    serializerRange = InfobloxRangesSerializer(data=rangeInfo)
-                                    if serializerRange.is_valid():
-                                        data["data"].update({
-                                            "rangeInfo": serializerRange.validated_data["data"]
-                                        })
-
-                                        # Check the response's ETag validity (against client request).
-                                        conditional = Conditional(request)
-                                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                                        if etagCondition["state"] == "fresh":
-                                            data = None
-                                            httpStatus = status.HTTP_304_NOT_MODIFIED
-                                        else:
-                                            httpStatus = status.HTTP_200_OK
-                                    else:
-                                        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-                                        data = {
-                                            "Infoblox": {
-                                                "error": "Infoblox upstream data mismatch."
-                                            }
-                                        }
-
-                                        Log.log("Upstream data incorrect: " + str(serializer.errors))
-                        else:
-                            # Check the response's ETag validity (against client request).
-                            conditional = Conditional(request)
-                            etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                            if etagCondition["state"] == "fresh":
-                                data = None
-                                httpStatus = status.HTTP_304_NOT_MODIFIED
+                        if showIp:
+                            Log.actionLog("Ask also ip data information", user)
+                            ipv4Info["data"]["items"] = n.ipv4sData()
+                            serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
+                            if serializerIpv4.is_valid():
+                                data["data"].update({
+                                    "ipv4Info": serializerIpv4.validated_data["data"]["items"]
+                                })
                             else:
-                                httpStatus = status.HTTP_200_OK
-                    else:
-                        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-                        data = {
-                            "Infoblox": {
-                                "error": "Infoblox upstream data mismatch."
-                            }
-                        }
+                                httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                Log.log("Upstream data incorrect: " + str(serializer.errors))
 
+                        if showRange and Permission.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n) or user["authDisabled"]:
+                            Log.actionLog("Ask also ranges information", user)
+                            rangeInfo["data"] = n.listRanges()
+                            serializerRange = InfobloxRangesSerializer(data=rangeInfo)
+                            if serializerRange.is_valid():
+                                data["data"].update({
+                                    "rangeInfo": serializerRange.validated_data["data"]
+                                })
+                            else:
+                                httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                Log.log("Upstream data incorrect: " + str(serializer.errors))
+                    else:
+                        httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
-                    lock.release()
+                    # Check the response's ETag validity (against client request).
+                    if httpStatus != status.HTTP_400_BAD_REQUEST:
+                        conditional = Conditional(request)
+                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                        if etagCondition["state"] == "fresh":
+                            data = None
+                            httpStatus = status.HTTP_304_NOT_MODIFIED
+                        else:
+                            httpStatus = status.HTTP_200_OK
 
+                    lock.release()
                     CustomController.plugins("network_get", locals())
                 else:
                     data = None
