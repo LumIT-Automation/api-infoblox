@@ -6,6 +6,7 @@ from infoblox.helpers.Misc import Misc
 
 
 Condition: Dict[str, Union[str, int]] = {
+    "condition_id": 0,
     "src_asset_id": 0,
     "condition": ""
 }
@@ -53,6 +54,14 @@ class Trigger:
         try:
             Repository.delete(self.id)
             del self
+        except Exception as e:
+            raise e
+
+
+
+    def addCondition(self, data: dict) -> None:
+        try:
+            Repository.addCondition(triggerId=self.id, srcAssetId=data["src_asset_id"], condition=data["condition"])
         except Exception as e:
             raise e
 

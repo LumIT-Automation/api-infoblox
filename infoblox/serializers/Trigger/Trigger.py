@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 class InfobloxTriggerSerializer(serializers.Serializer):
     class InfobloxTriggerConditionSerializer(serializers.Serializer):
+        condition_id = serializers.IntegerField(required=True)
         src_asset_id = serializers.IntegerField(required=True)
         condition = serializers.CharField(max_length=255, required=True)
 

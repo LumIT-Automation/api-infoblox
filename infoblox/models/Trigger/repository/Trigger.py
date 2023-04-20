@@ -26,7 +26,7 @@ class Trigger:
             if id:
                 if loadConditions:
                     c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
-                        "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
+                        "group_concat(trigger_condition.id, '::', src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
                         "FROM trigger_data "
                         "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
                         "WHERE trigger_data.id = %s "
@@ -41,8 +41,9 @@ class Trigger:
                     for condition in conditions:
                         try:
                             o["conditions"].append({
-                                "src_asset_id": int(condition.split("::")[0]),
-                                "condition": condition.split("::")[1].strip()
+                                "condition_id": int(condition.split("::")[0]),
+                                "src_asset_id": int(condition.split("::")[1]),
+                                "condition": condition.split("::")[2].strip()
                             })
                         except IndexError:
                             pass
@@ -131,7 +132,7 @@ class Trigger:
 
             if loadConditions:
                 c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
-                    "group_concat(src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
+                    "group_concat(trigger_condition.id, '::', src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
                     "FROM trigger_data "
                     "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
                     "WHERE " + filterWhere + " " 
@@ -146,8 +147,9 @@ class Trigger:
                     for condition in conditions:
                         try:
                             t["conditions"].append({
-                                "src_asset_id": int(condition.split("::")[0]),
-                                "condition": condition.split("::")[1].strip()
+                                "condition_id": int(condition.split("::")[0]),
+                                "src_asset_id": int(condition.split("::")[1]),
+                                "condition": condition.split("::")[2].strip()
                             })
                         except IndexError:
                             pass
@@ -218,8 +220,8 @@ class Trigger:
             ])
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
-                    and e.args and e.args[0] and e.args[0] == 1062:
-                raise CustomException(status=400, payload={"database": "duplicated data"})
+                    and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
+                raise CustomException(status=400, payload={"database": "duplicated or wrong data"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:

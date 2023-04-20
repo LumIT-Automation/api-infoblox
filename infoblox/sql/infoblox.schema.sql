@@ -241,7 +241,8 @@ ALTER TABLE `trigger_data`
 -- Indici per le tabelle `trigger_condition`
 --
 ALTER TABLE `trigger_condition`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `condition` (`trigger_id`, `condition`,`src_asset_id`) USING BTREE;
 
 --
 -- Indici per le tabelle `group_role_network`
