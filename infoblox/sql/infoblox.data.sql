@@ -142,7 +142,9 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 22),
 (4, 23),
 (4, 24),
-(4, 25);
+(4, 25),
+(4, 26),
+(4, 27);
 
 
 -- Dump dei dati per la tabella `identity_group`
