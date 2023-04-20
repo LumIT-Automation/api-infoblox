@@ -64,7 +64,7 @@ class InfobloxNetworkController(CustomController):
                                     "ipv4Info": serializerIpv4.validated_data["data"]["items"]
                                 })
                             else:
-                                httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
                                 Log.log("Upstream data incorrect: " + str(serializer.errors))
 
                         if showRange and Permission.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n) or user["authDisabled"]:
@@ -76,14 +76,14 @@ class InfobloxNetworkController(CustomController):
                                     "rangeInfo": serializerRange.validated_data["data"]
                                 })
                             else:
-                                httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
                                 Log.log("Upstream data incorrect: " + str(serializer.errors))
                     else:
-                        httpStatus, data = status.HTTP_400_BAD_REQUEST, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                        httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
                     # Check the response's ETag validity (against client request).
-                    if httpStatus != status.HTTP_400_BAD_REQUEST:
+                    if httpStatus != status.HTTP_500_INTERNAL_SERVER_ERROR:
                         conditional = Conditional(request)
                         etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
                         if etagCondition["state"] == "fresh":
