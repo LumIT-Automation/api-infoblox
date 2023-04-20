@@ -59,3 +59,66 @@ class InfobloxTriggerController(CustomController):
             "ETag": etagCondition["responseEtag"],
             "Cache-Control": "must-revalidate"
         })
+
+
+
+    @staticmethod
+    def delete(request: Request, triggerId: int) -> Response:
+        user = CustomController.loggedUser(request)
+
+        try:
+            if Permission.hasUserPermission(groups=user["groups"], action="trigger_delete") or user["authDisabled"]:
+                Log.actionLog("Trigger deletion", user)
+
+                Trigger(triggerId).delete()
+
+                httpStatus = status.HTTP_200_OK
+            else:
+                httpStatus = status.HTTP_403_FORBIDDEN
+
+        except Exception as e:
+            data, httpStatus, headers = CustomController.exceptionHandler(e)
+            return Response(data, status=httpStatus, headers=headers)
+
+        return Response(None, status=httpStatus, headers={
+            "Cache-Control": "no-cache"
+        })
+
+
+
+    @staticmethod
+    def patch(request: Request, triggerId: int) -> Response:
+        response = None
+        user = CustomController.loggedUser(request)
+
+        try:
+            if Permission.hasUserPermission(groups=user["groups"], action="trigger_patch") or user["authDisabled"]:
+                Log.actionLog("Trigger modification", user)
+                Log.actionLog("User data: "+str(request.data), user)
+
+                serializer = Serializer(data=request.data["data"], partial=True)
+                if serializer.is_valid():
+                    data = serializer.validated_data
+
+                    Trigger(triggerId).modify(data)
+
+                    httpStatus = status.HTTP_200_OK
+                else:
+                    httpStatus = status.HTTP_400_BAD_REQUEST
+                    response = {
+                        "Infoblox": {
+                            "error": str(serializer.errors)
+                        }
+                    }
+
+                    Log.actionLog("User data incorrect: "+str(response), user)
+            else:
+                httpStatus = status.HTTP_403_FORBIDDEN
+
+        except Exception as e:
+            data, httpStatus, headers = CustomController.exceptionHandler(e)
+            return Response(data, status=httpStatus, headers=headers)
+
+        return Response(response, status=httpStatus, headers={
+            "Cache-Control": "no-cache"
+        })

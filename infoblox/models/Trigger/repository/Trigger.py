@@ -81,34 +81,26 @@ class Trigger:
 
 
     @staticmethod
-    def deleteCondition(id: int) -> None:
+    def modify(id: int, data: dict) -> None:
+        sql = ""
+        values = []
         c = connection.cursor()
 
-        try:
-            c.execute("DELETE FROM trigger_condition WHERE id = %s", [
-                id
-            ])
-        except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
-        finally:
-            c.close()
+        # %s placeholders and values for SET.
+        for k, v in data.items():
+            sql += k + "=%s,"
+            values.append(strip_tags(v)) # no HTML allowed.
 
-
-
-    @staticmethod
-    def enable(id: int, enabled: bool) -> None:
-        c = connection.cursor()
+        values.append(id)
 
         try:
-            c.execute(
-                "UPDATE trigger_data SET enabled = %s "
-                "WHERE id = %s", [
-                    int(enabled),
-                    id
-                ]
-            )
+            c.execute("UPDATE trigger_data SET " + sql[:-1] + " WHERE id = %s", values) # user data are filtered by the serializer.
         except Exception as e:
-            raise CustomException(status=400, payload={"database": e.__str__()})
+            if e.__class__.__name__ == "IntegrityError" \
+                    and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
+                        raise CustomException(status=400, payload={"database": "duplicated trigger or non existent asset"})
+            else:
+                raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
             c.close()
 
@@ -200,8 +192,8 @@ class Trigger:
                 return c.lastrowid
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
-                    and e.args and e.args[0] and e.args[0] == 1062:
-                        raise CustomException(status=400, payload={"database": "duplicated data"})
+                    and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
+                        raise CustomException(status=400, payload={"database": "duplicated trigger or non existent asset"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -226,5 +218,20 @@ class Trigger:
                 raise CustomException(status=400, payload={"database": "duplicated data"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
+        finally:
+            c.close()
+
+
+
+    @staticmethod
+    def deleteCondition(id: int) -> None:
+        c = connection.cursor()
+
+        try:
+            c.execute("DELETE FROM trigger_condition WHERE id = %s", [
+                id
+            ])
+        except Exception as e:
+            raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
             c.close()

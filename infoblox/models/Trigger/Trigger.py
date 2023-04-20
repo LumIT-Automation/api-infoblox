@@ -2,6 +2,8 @@ from typing import List, Dict, Union
 
 from infoblox.models.Trigger.repository.Trigger import Trigger as Repository
 
+from infoblox.helpers.Misc import Misc
+
 
 Condition: Dict[str, Union[str, int]] = {
     "src_asset_id": 0,
@@ -36,10 +38,12 @@ class Trigger:
 
 
 
-    def enable(self, enabled: bool) -> None:
+    def modify(self, data: dict) -> None:
         try:
-            Repository.enable(self.id, enabled)
-            setattr(self, "enabled", enabled)
+            Repository.modify(self.id, data)
+
+            for k, v in Misc.toDict(data).items():
+                setattr(self, k, v)
         except Exception as e:
             raise e
 
