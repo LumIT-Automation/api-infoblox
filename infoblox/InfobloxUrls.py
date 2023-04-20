@@ -2,7 +2,7 @@ from django.urls import path
 
 from .controllers import Root
 from .controllers.Asset import Asset, Assets
-from .controllers.Trigger import Trigger
+from .controllers.Trigger import Trigger, Triggers
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
@@ -25,6 +25,7 @@ urlpatterns = [
     path('assets/', Assets.InfobloxAssetsController.as_view(), name='infoblox-assets'),
     path('asset/<int:assetId>/', Asset.InfobloxAssetController.as_view(), name='infoblox-asset'),
 
+    path('triggers/', Triggers.InfobloxTriggersController.as_view(), name='infoblox-triggers'),
     path('trigger/<int:triggerId>/', Trigger.InfobloxTriggerController.as_view(), name='infoblox-trigger'),
 
     path('<int:assetId>/tree/', NetworksTree.InfobloxNetworksTreeController.as_view(), name='infoblox-network-tree'),

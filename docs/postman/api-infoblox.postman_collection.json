@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "aba895db-75e7-4b1a-9034-89ccaf2f50bb",
+		"_postman_id": "c190e66c-47f0-4dcf-b031-ddd6522686ab",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -843,6 +843,40 @@
 										"infoblox",
 										"trigger",
 										"1",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "triggers",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									}
+								],
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"triggers",
 										""
 									]
 								}
