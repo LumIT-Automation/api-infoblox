@@ -59,7 +59,12 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (24, 'assign_network', 'asset', NULL),
 (25, 'configuration_put', 'global', NULL),
 (26, 'ranges_get', 'asset', NULL),
-(27, 'range_get', 'asset', NULL);
+(27, 'range_get', 'asset', NULL),
+(28, 'triggers_post', 'global', NULL),
+(29, 'triggers_get', 'global', NULL),
+(30, 'trigger_get', 'global', NULL),
+(31, 'trigger_patch', 'global', NULL),
+(32, 'trigger_delete', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`

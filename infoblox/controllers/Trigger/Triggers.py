@@ -23,7 +23,7 @@ class InfobloxTriggersController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="triggers_get") or user["authDisabled"]: # @todo/db: superadmin only.
+            if Permission.hasUserPermission(groups=user["groups"], action="triggers_get") or user["authDisabled"]:
                 Log.actionLog("Triggers list", user)
 
                 itemData["items"] = Trigger.dataList(loadConditions=True)
@@ -67,7 +67,7 @@ class InfobloxTriggersController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="triggers_post") or user["authDisabled"]: # @todo/db: superadmin only.
+            if Permission.hasUserPermission(groups=user["groups"], action="triggers_post") or user["authDisabled"]:
                 Log.actionLog("Trigger addition", user)
                 Log.actionLog("User data: "+str(request.data), user)
 

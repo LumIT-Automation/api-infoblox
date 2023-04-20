@@ -20,7 +20,7 @@ class InfobloxTriggerController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="trigger_get") or user["authDisabled"]: # @todo/db: superadmin only.
+            if Permission.hasUserPermission(groups=user["groups"], action="trigger_get") or user["authDisabled"]:
                 Log.actionLog("Trigger information", user)
 
                 serializer = Serializer(
