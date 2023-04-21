@@ -29,8 +29,7 @@ class InfobloxNetworkController(CustomController):
         ipv4Info = { "data": dict() }
         rangeInfo = { "data": dict() }
         etagCondition = { "responseEtag": "" }
-        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-
+        httpStatus = None
         user = CustomController.loggedUser(request)
 
         try:
