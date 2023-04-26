@@ -67,13 +67,13 @@ def run(controller: str, o: dict):
     if controller in ("ipv4s_post", "ipv4_get", "ipv4_delete", "ipv4_patch"):
         Log.log("Running CiscoSpark plugin")
 
-        if "GET" in str(o["request"]):
-            action = "read"
-        if "POST" in str(o["request"]):
+        if controller == "ipv4s_post":
             action = "created"
-        if "PATCH" in str(o["request"]):
+        if controller == "ipv4_get":
+            action = "read"
+        if controller == "ipv4_patch":
             action = "modified"
-        if "DELETE" in str(o["request"]):
+        if controller == "ipv4_delete":
             action = "deleted"
 
         if "data" in o:
@@ -111,8 +111,8 @@ def run(controller: str, o: dict):
                     ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
                     message = "IPv4 address "+ip+" has been "+action+" by "+o["user"]["username"]+".\n"
 
-                    if "mac" in o["userValidatedData"]:
-                        message += "MAC: "+o["userValidatedData"]["mac"][j]+"\n"
+                    if "mac" in data:
+                        message += "MAC: "+data["mac"][j]+"\n"
                     if "actualNetwork" in o and o["actualNetwork"]:
                         message += "Network: "+o["actualNetwork"]+"\n"
                     if "gateway" in o and o["gateway"]:
@@ -120,16 +120,24 @@ def run(controller: str, o: dict):
                     if "mask" in o and o["mask"]:
                         message += "Mask: "+o["mask"]+"\n"
 
-                    if "object_type" in o["userValidatedData"]:
-                        if o["userValidatedData"]["object_type"] != "undefined":
-                            message += "Type: "+o["userValidatedData"]["object_type"]+"\n"
-                    if "extattrs" in o["userValidatedData"]:
-                        if "Name Server" in o["userValidatedData"]["extattrs"][j]:
-                            message += "Hostname: "+o["userValidatedData"]["extattrs"][j]["Name Server"]["value"]+"\n"
-                        if "Reference" in o["userValidatedData"]["extattrs"][j]:
-                            message += "Reference: "+o["userValidatedData"]["extattrs"][j]["Reference"]["value"]+"\n"
+                    if "object_type" in data:
+                        if data["object_type"] != "undefined":
+                            message += "Type: "+data["object_type"]+"\n"
+                    if "extattrs" in data:
+                        if "Name Server" in data["extattrs"][j]:
+                            message += "Hostname: "+data["extattrs"][j]["Name Server"]["value"]+"\n"
+                        if "Reference" in data["extattrs"][j]:
+                            message += "Reference: "+data["extattrs"][j]["Reference"]["value"]+"\n"
                     if "historyId" in o:
                         message += "Unique operation ID: "+str(o["historyId"])+"\n"
                     j += 1
 
                     CiscoSpark.send(o["user"], message)
+
+            if o["reqType"] == "replica.specified-ip":
+                if o["reqStatus"] == "success":
+                    message = "IPv4 address "+data["ipv4addr"]+" has been "+action+".\n"
+                else:
+                    message = "Error replicating IPv4 address "+data["ipv4addr"]+" on disaster recovery asset.\n"
+
+                CiscoSpark.send(o.get("user", ""), message)

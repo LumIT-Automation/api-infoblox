@@ -122,7 +122,7 @@ class RunTriggers:
                             data = {
                                 "ipv4addr": ipAddressInformation["ipAddress"],
                                 "mac": ipAddressInformation["mac"],
-                                "extattrs": self.request.data.get("extattrs", [])
+                                "extattrs": self.request.data.get("data", {}).get("extattrs", [])[0] # @todo: only the first IPv4 is replicated.
                             }
 
                             try:
@@ -131,9 +131,16 @@ class RunTriggers:
                                 )
 
                                 # Run registered plugins.
+                                reqType = "replica.specified-ip"
+                                reqStatus = "success"
                                 CustomController.plugins("ipv4s_post", locals())
                             except Exception as e:
                                 RunTriggers.__raiseFlag("[Triggers] Trigger Exception: " + str(e))
+
+                                # Run registered plugins.
+                                reqType = "replica.specified-ip"
+                                reqStatus = "failure"
+                                CustomController.plugins("ipv4s_post", locals())
                         else:
                             Log.log("[Triggers] No suitable trigger found")
                     except IndexError:
