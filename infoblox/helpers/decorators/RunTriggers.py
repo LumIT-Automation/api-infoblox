@@ -63,7 +63,7 @@ class RunTriggers:
 
     def __triggerPreCondition(self, primaryResponse: Response) -> bool:
         try:
-            if primaryResponse.status_code in (200, 201, 202, 204): # trigger the action in dr only if it was successful.
+            if primaryResponse.status_code in (200, 201): # trigger the action in dr only if it was successful.
                 if "rep" in self.request.query_params and self.request.query_params["rep"]: # trigger action in dr only if rep=1/true param was passed.
                     return True
 
@@ -112,7 +112,10 @@ class RunTriggers:
             # Run trigger t.
             if t["action"] == "dst:ipv4s-replica":
                 # Replicate all IP addresses found in primaryResponse onto dst_asset_id.
+                # @todo: locks.
                 from infoblox.models.Infoblox.Ipv4 import Ipv4
+                from infoblox.controllers.CustomController import CustomController
+
                 for ipAddressInformation in RunTriggers.__responseInfo(primaryResponse):
                     try:
                         if any("src-ip-in" in condition["condition"] and ip_address(ipAddressInformation["ipAddress"]) in ip_network(condition["condition"].split(":")[1].strip()) and self.primaryAssetId == condition["src_asset_id"] for condition in t["conditions"]):
@@ -123,7 +126,12 @@ class RunTriggers:
                             }
 
                             try:
-                                outputList.append(Ipv4.reserve(assetId=t["dst_asset_id"], data=data))
+                                outputList.append(
+                                    Ipv4.reserve(assetId=t["dst_asset_id"], data=data)
+                                )
+
+                                # Run registered plugins.
+                                CustomController.plugins("ipv4s_post", locals())
                             except Exception as e:
                                 RunTriggers.__raiseFlag("[Triggers] Trigger Exception: " + str(e))
                         else:

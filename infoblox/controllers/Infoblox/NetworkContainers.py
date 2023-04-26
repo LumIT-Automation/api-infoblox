@@ -74,6 +74,7 @@ class InfobloxNetworkContainersController(CustomController):
 
                     lock.release()
 
+                    # Run registered plugins.
                     CustomController.plugins("network_containers_get", locals())
                 else:
                     data = None

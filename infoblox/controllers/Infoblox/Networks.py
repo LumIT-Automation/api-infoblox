@@ -78,6 +78,7 @@ class InfobloxNetworksController(CustomController):
 
                     lock.release()
 
+                    # Run registered plugins.
                     CustomController.plugins("networks_get", locals())
                 else:
                     data = None

@@ -47,6 +47,9 @@ class InfobloxVlanController(CustomController):
                             httpStatus = status.HTTP_200_OK
 
                         lock.release()
+
+                        # Run registered plugins.
+                        CustomController.plugins("vlan_get", locals())
                     else:
                         httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
                         data = {

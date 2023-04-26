@@ -66,6 +66,9 @@ class InfobloxVlansController(CustomController):
                         Log.log("Upstream data incorrect: "+str(serializer.errors))
 
                     lock.release()
+
+                    # Run registered plugins.
+                    CustomController.plugins("vlans_get", locals())
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED

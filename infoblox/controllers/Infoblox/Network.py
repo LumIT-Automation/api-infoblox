@@ -92,6 +92,8 @@ class InfobloxNetworkController(CustomController):
                             httpStatus = status.HTTP_200_OK
 
                     lock.release()
+
+                    # Run registered plugins.
                     CustomController.plugins("network_get", locals())
                 else:
                     data = None

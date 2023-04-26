@@ -62,6 +62,7 @@ class InfobloxRangeController(CustomController):
 
                     lock.release()
 
+                    # Run registered plugins.
                     CustomController.plugins("range_get", locals())
                 else:
                     data = None
