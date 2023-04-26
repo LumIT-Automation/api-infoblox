@@ -78,7 +78,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/fixedaddress?_return_fields=mac",
+                endpoint=infoblox.baseurl+"/fixedaddress?_return_fields=mac,extattrs",
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )

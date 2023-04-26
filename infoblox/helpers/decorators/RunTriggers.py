@@ -122,7 +122,7 @@ class RunTriggers:
                             data = {
                                 "ipv4addr": ipAddressInformation["ipAddress"],
                                 "mac": ipAddressInformation["mac"],
-                                "extattrs": self.request.data.get("data", {}).get("extattrs", [])[0] # @todo: only the first IPv4 is replicated.
+                                "extattrs": ipAddressInformation["extattrs"]
                             }
 
                             try:
@@ -168,7 +168,8 @@ class RunTriggers:
                             r'fixedaddress/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/[A-Za-z]+$', # example: "fixedaddress/ZG5zLmZpeGVkX2FkZHJlc3MkMTAuOC4wLjIzMS4wLi4:10.8.0.231/default"
                             el["result"]
                         )[0],
-                    "mac": el["mac"]
+                    "mac": el["mac"],
+                    "extattrs": el["extattrs"]
                 })
         except KeyError:
             pass
