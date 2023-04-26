@@ -74,7 +74,8 @@ INSERT INTO `role` (`id`, `role`, `description`) VALUES
 (1, 'admin', 'admin'),
 (2, 'staff', 'read / write, excluding assets'),
 (3, 'readonly', 'readonly'),
-(4, 'workflow', 'workflow system user');
+(4, 'workflow', 'workflow system user'),
+(5, 'powerstaff', 'read / write, excluding assets');
 
 --
 -- Dump dei dati per la tabella `role_privilege`
@@ -144,7 +145,22 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 24),
 (4, 25),
 (4, 26),
-(4, 27);
+(4, 27),
+(5, 3),
+(5, 5),
+(5, 6),
+(5, 7),
+(5, 10),
+(5, 11),
+(5, 12),
+(5, 13),
+(5, 14),
+(5, 22),
+(5, 23),
+(5, 24),
+(5, 25),
+(5, 26),
+(5, 27);
 
 
 -- Dump dei dati per la tabella `identity_group`
