@@ -41,11 +41,11 @@ class CustomController(APIView):
 
 
     @staticmethod
-    def plugins(controller: str, requestType: str = "", requestStatus: str = "", data: dict = None, response: dict = None, ipv4Address: str = "", network: str = "", gateway: str = "", mask: str = "", user: dict = None, historyId: int = 0) -> None:
+    def plugins(controller: str, **kwargs) -> None:
         for plugin in settings.PLUGINS:
             try:
                 p = import_module(plugin)
-                p.run(controller, requestType, requestStatus, data, response, ipv4Address, network, gateway, mask, user, historyId)
+                p.run(controller, **kwargs)
             except Exception:
                 pass
 

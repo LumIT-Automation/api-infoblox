@@ -57,7 +57,7 @@ class InfobloxNetworkContainerNetworksController(CustomController):
                     lock.release()
 
                     # Run registered plugins.
-                    CustomController.plugins("network_container_get", locals())
+                    CustomController.plugins("network_container_get")
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED

@@ -63,7 +63,7 @@ class InfobloxRangeController(CustomController):
                     lock.release()
 
                     # Run registered plugins.
-                    CustomController.plugins("range_get", locals())
+                    CustomController.plugins("range_get")
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED

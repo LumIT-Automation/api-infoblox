@@ -39,7 +39,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
                         lock.release()
 
                         # Run registered plugins.
-                        CustomController.plugins("assign_network", locals())
+                        CustomController.plugins("assign_network")
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:

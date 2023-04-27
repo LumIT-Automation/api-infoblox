@@ -68,7 +68,7 @@ class InfobloxVlansController(CustomController):
                     lock.release()
 
                     # Run registered plugins.
-                    CustomController.plugins("vlans_get", locals())
+                    CustomController.plugins("vlans_get")
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED
