@@ -66,7 +66,7 @@ class InfobloxIpv4sController(CustomController):
                         lock.release()
 
                         # Run registered plugins.
-                        CustomController.plugins("ipv4s_post", locals())
+                        CustomController.plugins("ipv4s_post", requestType=reqType, data=data, response=response, network=actualNetwork, gateway=gateway, mask=mask, historyId=historyId, user=user)
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                         Log.actionLog("Ipv4 locked: "+str(lock), user)

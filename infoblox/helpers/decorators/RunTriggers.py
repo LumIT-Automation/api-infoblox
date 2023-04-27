@@ -112,7 +112,6 @@ class RunTriggers:
             # Run trigger t.
             if t["action"] == "dst:ipv4s-replica":
                 # Replicate all IP addresses found in primaryResponse onto dst_asset_id.
-                # @todo: locks.
                 from infoblox.models.Infoblox.Ipv4 import Ipv4
                 from infoblox.controllers.CustomController import CustomController
 
@@ -131,16 +130,10 @@ class RunTriggers:
                                 )
 
                                 # Run registered plugins.
-                                reqType = "replica.specified-ip"
-                                reqStatus = "success"
-                                CustomController.plugins("ipv4s_post", locals())
+                                CustomController.plugins("ipv4s_post", requestType="replica.specified-ip", requestStatus="success", ipv4Address=data["ipv4addr"])
                             except Exception as e:
                                 RunTriggers.__raiseFlag("[Triggers] Trigger Exception: " + str(e))
-
-                                # Run registered plugins.
-                                reqType = "replica.specified-ip"
-                                reqStatus = "failure"
-                                CustomController.plugins("ipv4s_post", locals())
+                                CustomController.plugins("ipv4s_post", requestType="replica.specified-ip", requestStatus="failure", ipv4Address=data["ipv4addr"])
                         else:
                             Log.log("[Triggers] No suitable trigger found")
                     except IndexError:

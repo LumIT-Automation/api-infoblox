@@ -69,7 +69,7 @@ class InfobloxIpv4Controller(CustomController):
                     lock.release()
 
                     # Run registered plugins.
-                    CustomController.plugins("ipv4_get", locals())
+                    CustomController.plugins("ipv4_get", data=data, ipv4Address=ipv4address, user=user)
                 else:
                     data = None
                     httpStatus = status.HTTP_423_LOCKED
@@ -122,7 +122,7 @@ class InfobloxIpv4Controller(CustomController):
                     Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
 
                     # Run registered plugins.
-                    CustomController.plugins("ipv4_delete", locals())
+                    CustomController.plugins("ipv4_delete", ipv4Address=ipv4address, user=user)
                 else:
                     httpStatus = status.HTTP_423_LOCKED
                     Log.actionLog("Ipv4 locked: "+str(lock), user)
@@ -177,7 +177,7 @@ class InfobloxIpv4Controller(CustomController):
                         historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
 
                         # Run registered plugins.
-                        CustomController.plugins("ipv4_patch", locals())
+                        CustomController.plugins("ipv4_patch", ipv4Address=ipv4address, user=user)
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:

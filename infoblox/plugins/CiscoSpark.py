@@ -28,7 +28,7 @@ class CiscoSpark:
 
         # On KO status codes, a CustomException is raised, with response status and body.
         try:
-            Log.actionLog("Sending Spark notice", user)
+            Log.actionLog("[Plugins] Sending Spark notice", user)
 
             response = requests.post(
                 settings.CISCO_SPARK_URL+"/messages",
@@ -56,16 +56,19 @@ class CiscoSpark:
             if responseStatus != 201 and responseStatus != 200:
                 raise CustomException(status=responseStatus, payload={"Cisco Spark": str(responseStatus)+", "+str(responseObject)})
         except Exception as e:
-            Log.log("Sending Spark notice failed: "+str(e.__str__()))
+            Log.log("[Plugins] Sending Spark notice failed: "+str(e.__str__()))
 
 
 
-def run(controller: str, o: dict):
+def run(controller: str, requestType: str = "", requestStatus: str = "", data: dict = None, response: dict = None, ipv4Address: str = "", network: str = "", gateway: str = "", mask: str = "", user: dict = None, historyId: int = 0):
+    data = data or {}
+    user = user or {}
+    response = response or {}
+
     action = ""
-    data = dict()
 
     if controller in ("ipv4s_post", "ipv4_get", "ipv4_delete", "ipv4_patch"):
-        Log.log("Running CiscoSpark plugin")
+        Log.log("[Plugins] Running CiscoSpark plugin")
 
         if controller == "ipv4s_post":
             action = "created"
@@ -74,13 +77,10 @@ def run(controller: str, o: dict):
         if controller == "ipv4_patch":
             action = "modified"
         if controller == "ipv4_delete":
-            action = "deleted"
+            action = "released"
 
-        if "data" in o:
-            data = o["data"]
-
-        if action in ("read", "modified", "deleted"):
-            message = "IPv4 address "+o["ipv4address"]+" has been "+action+" by "+o["user"]["username"]+".\n"
+        if action in ("read", "modified", "released"):
+            message = "IPv4 address "+ipv4Address+" has been "+action+" by "+user.get("username", "--")+".\n"
 
             if "mac" in data:
                 mac = data["mac"]
@@ -98,27 +98,27 @@ def run(controller: str, o: dict):
                 if "Reference" in data["extattrs"]:
                     ref = data["extattrs"]["Reference"]["value"]
                     message += "Reference: "+ref+"\n"
-            if "historyId" in o:
-                message += "Unique operation ID: "+str(o["historyId"])+"\n"
+            if historyId:
+                message += "Unique operation ID: "+str(historyId)+"\n"
 
-            CiscoSpark.send(o["user"], message)
+            CiscoSpark.send(user, message)
 
         if action == "created":
-            if o["reqType"] == "post.next-available":
+            if requestType == "post.next-available":
                 j = 0
 
-                for createdObject in o["response"]["data"]:
+                for createdObject in response.get("data", {}):
                     ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', createdObject["result"])[0]
-                    message = "IPv4 address "+ip+" has been "+action+" by "+o["user"]["username"]+".\n"
+                    message = "IPv4 address "+ip+" has been "+action+" by "+user.get("username", "--")+".\n"
 
                     if "mac" in data:
                         message += "MAC: "+data["mac"][j]+"\n"
-                    if "actualNetwork" in o and o["actualNetwork"]:
-                        message += "Network: "+o["actualNetwork"]+"\n"
-                    if "gateway" in o and o["gateway"]:
-                        message += "Gateway: "+o["gateway"]+"\n"
-                    if "mask" in o and o["mask"]:
-                        message += "Mask: "+o["mask"]+"\n"
+                    if network:
+                        message += "Network: "+network+"\n"
+                    if gateway:
+                        message += "Gateway: "+gateway+"\n"
+                    if mask:
+                        message += "Mask: "+mask+"\n"
 
                     if "object_type" in data:
                         if data["object_type"] != "undefined":
@@ -128,16 +128,16 @@ def run(controller: str, o: dict):
                             message += "Hostname: "+data["extattrs"][j]["Name Server"]["value"]+"\n"
                         if "Reference" in data["extattrs"][j]:
                             message += "Reference: "+data["extattrs"][j]["Reference"]["value"]+"\n"
-                    if "historyId" in o:
-                        message += "Unique operation ID: "+str(o["historyId"])+"\n"
+                    if historyId:
+                        message += "Unique operation ID: "+str(historyId)+"\n"
                     j += 1
 
-                    CiscoSpark.send(o["user"], message)
+                    CiscoSpark.send(user, message)
 
-            if o["reqType"] == "replica.specified-ip":
-                if o["reqStatus"] == "success":
-                    message = "IPv4 address "+data["ipv4addr"]+" has been "+action+".\n"
+            if requestType == "replica.specified-ip":
+                if requestStatus == "success":
+                    message = "IPv4 address "+ipv4Address+" has been "+action+".\n"
                 else:
-                    message = "Error replicating IPv4 address "+data["ipv4addr"]+" on disaster recovery asset.\n"
+                    message = "Error replicating IPv4 address "+ipv4Address+" on disaster recovery asset.\n"
 
-                CiscoSpark.send(o.get("user", ""), message)
+                CiscoSpark.send(user, message)

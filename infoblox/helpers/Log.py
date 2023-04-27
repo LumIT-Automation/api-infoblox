@@ -43,7 +43,9 @@ class Log:
 
 
     @staticmethod
-    def actionLog(o: any, user: dict = {}) -> None:
+    def actionLog(o: any, user: dict = None) -> None:
+        user = user or {}
+
         # Sends input logs to the configured logger (settings).
         log = logging.getLogger("django")
         try:
