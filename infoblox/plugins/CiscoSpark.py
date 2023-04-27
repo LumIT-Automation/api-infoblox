@@ -86,17 +86,18 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
                 mac = data["mac"]
                 message += "MAC: "+mac+"\n"
             if "extattrs" in data:
-                if "Mask" in data["extattrs"]:
-                    mask = data["extattrs"]["Mask"]["value"]
+                extAttrsData = data["extattrs"]
+                if "Mask" in extAttrsData:
+                    mask = extAttrsData["Mask"]["value"]
                     message += "Mask: "+mask+"\n"
-                if "Gateway" in data["extattrs"]:
-                    gw = data["extattrs"]["Gateway"]["value"]
+                if "Gateway" in extAttrsData:
+                    gw = extAttrsData["Gateway"]["value"]
                     message += "Gateway: "+gw+"\n"
-                if "Name Server" in data["extattrs"]:
-                    ns = data["extattrs"]["Name Server"]["value"]
+                if "Name Server" in extAttrsData:
+                    ns = extAttrsData["Name Server"]["value"]
                     message += "Hostname: "+ns+"\n"
-                if "Reference" in data["extattrs"]:
-                    ref = data["extattrs"]["Reference"]["value"]
+                if "Reference" in extAttrsData:
+                    ref = extAttrsData["Reference"]["value"]
                     message += "Reference: "+ref+"\n"
             if historyId:
                 message += "Unique operation ID: "+str(historyId)+"\n"
@@ -124,10 +125,11 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
                         if data["object_type"] != "undefined":
                             message += "Type: "+data["object_type"]+"\n"
                     if "extattrs" in data:
-                        if "Name Server" in data["extattrs"][j]:
-                            message += "Hostname: "+data["extattrs"][j]["Name Server"]["value"]+"\n"
-                        if "Reference" in data["extattrs"][j]:
-                            message += "Reference: "+data["extattrs"][j]["Reference"]["value"]+"\n"
+                        extAttrsData = data["extattrs"]
+                        if "Name Server" in extAttrsData[j]:
+                            message += "Hostname: "+extAttrsData[j]["Name Server"]["value"]+"\n"
+                        if "Reference" in extAttrsData[j]:
+                            message += "Reference: "+extAttrsData[j]["Reference"]["value"]+"\n"
                     if historyId:
                         message += "Unique operation ID: "+str(historyId)+"\n"
                     j += 1
