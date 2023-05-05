@@ -1,684 +1,1121 @@
 {
 	"info": {
-		"_postman_id": "c190e66c-47f0-4dcf-b031-ddd6522686ab",
+		"_postman_id": "5068b3f5-1c58-4656-81ef-7b6412452e32",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Infoblox",
+			"name": "Assets",
 			"item": [
 				{
-					"name": "Permissions",
-					"item": [
-						{
-							"name": "authorizations",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/authorizations/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"authorizations",
-										""
-									]
-								}
-							},
-							"response": []
+					"name": "assets",
+					"request": {
+						"auth": {
+							"type": "noauth"
 						},
-						{
-							"name": "permissions",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/permissions/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"permissions",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "permissions",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupStaff\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=local\",\n        \"role\": \"staff\",\n        \"network\": {\n            \"name\": \"10.8.128.0/17\",\n            \"id_asset\": 1\n        }\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/permissions/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"permissions",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "permission",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/permission/3/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"permission",
-										"3",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "permission",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PATCH",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupStaff\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=local\",\n        \"role\": \"readonly\",\n        \"network\": {\n            \"name\": \"10.8.0.0/24\",\n            \"id_asset\": 1\n        }\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/permission/6/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"permission",
-										"6",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "identity-groups",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"identity-groups",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "identity-groups (privileges)",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/?related=privileges",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"identity-groups",
-										""
-									],
-									"query": [
-										{
-											"key": "related",
-											"value": "privileges"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "identity-groups",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"groupLocalNew\",\n        \"identity_group_identifier\": \"cn=groupStaff,cn=users,dc=lab,dc=localNew\"\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"identity-groups",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "identity-group",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"identity-group",
-										"cn=groupStaff,cn=users,dc=lab,dc=localNew",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "identity-group",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PATCH",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"groupNewModified\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=localNewModified\"\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"identity-group",
-										"cn=groupStaff,cn=users,dc=lab,dc=localNew",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "roles",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/roles",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"roles"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "roles  (privileges)",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "c485212f298abe5f8b867ca42617292a",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/roles/?related=privileges",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"roles",
-										""
-									],
-									"query": [
-										{
-											"key": "related",
-											"value": "privileges"
-										}
-									]
-								}
-							},
-							"response": []
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/assets/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"assets",
+								""
+							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "Assets",
-					"item": [
-						{
-							"name": "assets",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/assets/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"assets",
-										""
-									]
-								}
-							},
-							"response": []
+					"name": "assets",
+					"request": {
+						"auth": {
+							"type": "noauth"
 						},
-						{
-							"name": "assets",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"192.168.12.159\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"tlsverify\": 0,\n        \"datacenter\": \"Milano\",\n        \"environment\": \"Developement\",\n        \"position\": \"RACK 1\",\n        \"username\": \"admin\",\n        \"password\": \"infoblox\"\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/assets/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"assets",
-										""
-									]
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"192.168.12.159\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"tlsverify\": 0,\n        \"datacenter\": \"Milano\",\n        \"environment\": \"Developement\",\n        \"position\": \"RACK 1\",\n        \"username\": \"admin\",\n        \"password\": \"infoblox\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"response": []
+							}
 						},
-						{
-							"name": "asset",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PATCH",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"infocoso.lumitlab.internal\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"datacenter\": \"Verona\",\n        \"environment\": \"Produzione\"\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/asset/1/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"asset",
-										"1",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "asset",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/asset/1/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"asset",
-										"1",
-										""
-									]
-								}
-							},
-							"response": []
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/assets/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"assets",
+								""
+							]
 						}
-					]
+					},
+					"response": []
 				},
+				{
+					"name": "asset",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"infocoso.lumitlab.internal\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"datacenter\": \"Verona\",\n        \"environment\": \"Produzione\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/asset/1/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"asset",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "asset",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/asset/1/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"asset",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Permissions",
+			"item": [
+				{
+					"name": "authorizations",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/authorizations/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"authorizations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permissions",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/permissions/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"permissions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permissions",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupStaff\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=local\",\n        \"role\": \"staff\",\n        \"network\": {\n            \"name\": \"10.8.128.0/17\",\n            \"id_asset\": 1\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/permissions/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"permissions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permission",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/permission/3/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"permission",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permission",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupStaff\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=local\",\n        \"role\": \"readonly\",\n        \"network\": {\n            \"name\": \"10.8.0.0/24\",\n            \"id_asset\": 1\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/permission/6/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"permission",
+								"6",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "identity-groups",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"identity-groups",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "identity-groups (privileges)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/?related=privileges",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"identity-groups",
+								""
+							],
+							"query": [
+								{
+									"key": "related",
+									"value": "privileges"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "identity-groups",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"name\": \"groupLocalNew\",\n        \"identity_group_identifier\": \"cn=groupStaff,cn=users,dc=lab,dc=localNew\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"identity-groups",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "identity-group",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"identity-group",
+								"cn=groupStaff,cn=users,dc=lab,dc=localNew",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "identity-group",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"name\": \"groupNewModified\",\n        \"identity_group_identifier\": \"cn=groupstaff,cn=users,dc=lab,dc=localNewModified\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/identity-group/cn=groupStaff,cn=users,dc=lab,dc=localNew/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"identity-group",
+								"cn=groupStaff,cn=users,dc=lab,dc=localNew",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "roles",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/roles",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "roles  (privileges)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/roles/?related=privileges",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"roles",
+								""
+							],
+							"query": [
+								{
+									"key": "related",
+									"value": "privileges"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Configuration",
+			"item": [
+				{
+					"name": "configuration",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"configuration",
+								"global",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "configuration",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"configuration\": [\n            {\n                \"key\": \"key1\",\n                \"value\": \"value1\"\n            },\n            {\n                \"key\": \"key2\",\n                \"value\": \"value2\"\n            }\n        ]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"configuration",
+								"global",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History",
+			"item": [
+				{
+					"name": "history",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/history/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"history",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "action history",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/action-history/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"action-history",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Triggers",
+			"item": [
+				{
+					"name": "triggers",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"triggers",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "trigger",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"trigger",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "triggers",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_patch\",\n        \"dst_asset_id\": 1,\n        \"action\": \"dst:ipv4s-replica\",\n        \"enabled\": 1\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"triggers",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "trigger",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_get\",\n        \"dst_asset_id\": 2,\n        \"action\": \"dst:ipv4-info\",\n        \"enabled\": 0\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"trigger",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "trigger",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/trigger/2/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"trigger",
+								"2",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "trigger conditions",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"src_asset_id\": 1,\n        \"condition\": \"10.9.0.0/18\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/conditions/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"trigger",
+								"1",
+								"conditions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "trigger condition",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							}
+						],
+						"url": {
+							"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/condition/3/",
+							"protocol": "http",
+							"host": [
+								"10",
+								"0",
+								"111",
+								"21"
+							],
+							"path": [
+								"api",
+								"v1",
+								"infoblox",
+								"trigger",
+								"1",
+								"condition",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Infoblox",
+			"item": [
 				{
 					"name": "Use cases",
 					"item": [
@@ -725,362 +1162,6 @@
 										"infoblox",
 										"1",
 										"assign-cloud-network",
-										""
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Configuration",
-					"item": [
-						{
-							"name": "configuration",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwttoken}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"configuration",
-										"global",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "configuration",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{jwttoken}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"configuration\": [\n            {\n                \"key\": \"key1\",\n                \"value\": \"value1\"\n            },\n            {\n                \"key\": \"key2\",\n                \"value\": \"value2\"\n            }\n        ]\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/configuration/global/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"configuration",
-										"global",
-										""
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "Triggers",
-					"item": [
-						{
-							"name": "triggers",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"triggers",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "trigger",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"trigger",
-										"1",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "triggers",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_patch\",\n        \"dst_asset_id\": 1,\n        \"action\": \"dst:ipv4s-replica\",\n        \"enabled\": 1\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/triggers/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"triggers",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "trigger",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PATCH",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"name\": \"infoblox-ipv4s_get\",\n        \"dst_asset_id\": 2,\n        \"action\": \"dst:ipv4-info\",\n        \"enabled\": 0\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"trigger",
-										"1",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "trigger",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/2/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"trigger",
-										"2",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "trigger conditions",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"src_asset_id\": 1,\n        \"condition\": \"10.9.0.0/18\"\n    }\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/conditions/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"trigger",
-										"1",
-										"conditions",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "trigger condition",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									}
-								],
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/trigger/1/condition/3/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"trigger",
-										"1",
-										"condition",
-										"3",
 										""
 									]
 								}
@@ -2535,82 +2616,6 @@
 								"1",
 								"ipv4",
 								"10.8.1.100",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "history",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "Bearer {{jwttoken}}"
-							}
-						],
-						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/history/",
-							"protocol": "http",
-							"host": [
-								"10",
-								"0",
-								"111",
-								"21"
-							],
-							"path": [
-								"api",
-								"v1",
-								"infoblox",
-								"history",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "action history",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "Bearer {{jwttoken}}"
-							}
-						],
-						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/action-history/",
-							"protocol": "http",
-							"host": [
-								"10",
-								"0",
-								"111",
-								"21"
-							],
-							"path": [
-								"api",
-								"v1",
-								"infoblox",
-								"action-history",
 								""
 							]
 						}
