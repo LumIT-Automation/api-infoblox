@@ -1045,7 +1045,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"src_asset_id\": 1,\n        \"condition\": \"10.9.0.0/18\"\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"src_asset_id\": 1,\n        \"condition\": \"src-ip-in:10.9.0.0/18\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
