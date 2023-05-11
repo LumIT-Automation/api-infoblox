@@ -134,25 +134,28 @@ class Trigger:
                 c.execute("SELECT trigger_data.id, trigger_data.`name`, trigger_data.dst_asset_id, trigger_data.`action`, trigger_data.enabled, "
                     "group_concat(trigger_condition.id, '::', src_asset_id, '::', `condition` SEPARATOR ' | ') as conditions "
                     "FROM trigger_data "
-                    "INNER JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "                
+                    "LEFT JOIN trigger_condition ON trigger_condition.trigger_id = trigger_data.id "
                     "WHERE " + filterWhere + " " 
-                    "GROUP BY trigger_data.`action` ",
+                    "GROUP BY trigger_data.`name`, trigger_data.`action` ",
                         filterArgs
                 )
 
                 o = DBHelper.asDict(c)
                 for t in o:
-                    conditions = t["conditions"].split("|")
-                    t["conditions"] = list()
-                    for condition in conditions:
-                        try:
-                            t["conditions"].append({
-                                "condition_id": int(condition.split("::")[0]),
-                                "src_asset_id": int(condition.split("::")[1]),
-                                "condition": condition.split("::")[2].strip()
-                            })
-                        except IndexError:
-                            pass
+                    try:
+                        conditions = t.get("conditions", "").split("|")
+                        t["conditions"] = list()
+                        for condition in conditions:
+                            try:
+                                t["conditions"].append({
+                                    "condition_id": int(condition.split("::")[0]),
+                                    "src_asset_id": int(condition.split("::")[1]),
+                                    "condition": condition.split("::")[2].strip()
+                                })
+                            except IndexError:
+                                pass
+                    except AttributeError:
+                        t["conditions"] = list()
             else:
                 c.execute(
                     "SELECT * FROM trigger_data "
