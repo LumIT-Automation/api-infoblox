@@ -1194,7 +1194,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"network_data\": {\n            \"network\": \"10.0.10.0/24\",\n            \"extattrs\": {\n                \"Region\": {\n                    \"value\": \"aws-eu-west-1\"\n                },\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"network_data\": {\n            \"Region\": \"aws-eu-west-1\",\n            \"Account ID\": \"Oh Sensei\",\n            \"Account Name\": \"Oh Sensei\"\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/1/dismiss-cloud-networks/",
@@ -1484,7 +1484,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.11.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.29.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1498,7 +1498,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.9.11.0",
+								"10.9.29.0",
 								""
 							]
 						}

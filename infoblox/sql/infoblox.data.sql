@@ -64,7 +64,8 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (29, 'triggers_get', 'global', NULL),
 (30, 'trigger_get', 'global', NULL),
 (31, 'trigger_patch', 'global', NULL),
-(32, 'trigger_delete', 'global', NULL);
+(32, 'trigger_delete', 'global', NULL),
+(33, 'dismiss_network', 'object', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -106,6 +107,12 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 25),
 (1, 26),
 (1, 27),
+(1, 28),
+(1, 29),
+(1, 30),
+(1, 31),
+(1, 32),
+(1, 33),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -121,6 +128,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (2, 25),
 (2, 26),
 (2, 27),
+(2, 33),
 (3, 3),
 (3, 5),
 (3, 6),
@@ -146,6 +154,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 25),
 (4, 26),
 (4, 27),
+(4, 33),
 (5, 3),
 (5, 5),
 (5, 6),
@@ -160,7 +169,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (5, 24),
 (5, 25),
 (5, 26),
-(5, 27);
+(5, 27),
+(5, 33);
 
 
 -- Dump dei dati per la tabella `identity_group`

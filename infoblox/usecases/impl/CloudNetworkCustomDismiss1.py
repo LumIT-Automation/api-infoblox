@@ -51,17 +51,25 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
 
     def __getNetworks(self, data: dict) -> list:
         data = data or {}
-        filter = {
-            "*Environment": "Cloud",
-            "*Country": "Cloud-" + self.provider
-        }
+        filter = {}
 
         if "network" in data:
-            filter.update({"network": data["network"]})
-        elif data["extattrs"]:
-            if "Region" in data["extattrs"] and data["extattrs"]["Region"] == "any":
-                del data["extattrs"]["region"]
-            filter.update(data["extattrs"])
+            filter = {
+                "network": data["network"]
+            }
+        else:
+            if "Region" in data and data["Region"] != "any":
+                filter.update({"*City": data["Region"]})
+            if "Account ID" in data and data["Account ID"]:
+                filter.update({"*Account ID": data["Account ID"]})
+            if "Account Name" in data and data["Account Name"]:
+                filter.update({"*Account Name": data["Account Name"]})
+
+        if filter:
+            filter.update({
+                "*Environment": "Cloud",
+                "*Country": "Cloud-" + self.provider
+            })
         else:
             raise CustomException(status=400, payload={"Infoblox": "Missing parameters, you don't wanna delete all the cloud networks."})
 

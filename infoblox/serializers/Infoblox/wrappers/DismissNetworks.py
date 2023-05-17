@@ -7,19 +7,14 @@ class InfobloxDismissCloudNetworkStringSerializer(serializers.RegexField):
 
 
 class InfobloxDismissCloudNetworkSerializer(serializers.Serializer):
-    class InfobloxNetworkInnerExtattrsSerializer(serializers.Serializer):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-            class InfobloxNetworkInnerExtattrsValueStringSerializer(serializers.Serializer):
-                value = serializers.CharField(max_length=255)
-
-            self.fields["Region"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
-            self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
-            self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
+        self.fields["Account ID"] = serializers.CharField(max_length=64, required=False)
+        self.fields["Account Name"] = serializers.CharField(max_length=64, required=False)
 
     network = InfobloxDismissCloudNetworkStringSerializer(required=False)
-    extattrs = InfobloxNetworkInnerExtattrsSerializer(required=False)
+    Region = serializers.CharField(max_length=64, required=False)
 
 
 class InfobloxDismissNetworksSerializer(serializers.Serializer):
