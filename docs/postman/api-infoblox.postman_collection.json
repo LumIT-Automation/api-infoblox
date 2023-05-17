@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5068b3f5-1c58-4656-81ef-7b6412452e32",
+		"_postman_id": "cffe0613-a645-45ea-9ef6-3222604129c7",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1162,6 +1162,55 @@
 										"infoblox",
 										"1",
 										"assign-cloud-network",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dismiss-cloud-networks",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									},
+									{
+										"key": "If-None-Match",
+										"value": "851847cbe30d3d64e74703cac5fa8992",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"network_data\": {\n            \"network\": \"10.0.10.0/24\",\n            \"extattrs\": {\n                \"Region\": {\n                    \"value\": \"aws-eu-west-1\"\n                },\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/dismiss-cloud-networks/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"1",
+										"dismiss-cloud-networks",
 										""
 									]
 								}

@@ -233,6 +233,7 @@ INHERIT_GRANDPARENTS_PERMISSIONS = True
 # Plugins and configuration.
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")
 CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomAssign1", "CloudNetworkCustomAssign1")
+CLOUD_DISMISS_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDismiss1", "CloudNetworkCustomDismiss1")
 
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'
