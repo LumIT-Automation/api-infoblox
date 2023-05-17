@@ -29,15 +29,15 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
                 try:
                     Log.log(f"Trying {net}...")
 
-                    if Permission.hasUserPermission(groups=self.user["groups"], action="dismiss_network", assetId=self.assetId, network=net) or self.user["authDisabled"]:
-                        Network(self.assetId, net).delete()
-                        status.append({net: 200})
+                    if Permission.hasUserPermission(groups=self.user["groups"], action="dismiss_network", assetId=self.assetId, network=net["network"]) or self.user["authDisabled"]:
+                        Network(self.assetId, net["network"]).delete()
+                        status.append({net["network"]: "200 OK"})
                     else:
-                        status.append({net: 403})
+                        status.append({net["network"]: "403 FORBIDDEN"})
                 except CustomException as e:
-                    status.append({net: e.payload.get("Infoblox", e.payload)}) # Infoblox error response, as full network.
+                    status.append({net["network"]: e.payload.get("Infoblox", e.payload)}) # Infoblox error response, as full network.
                 except Exception as e:
-                    status.append({net: e.__str__()})
+                    status.append({net["network"]: e.__str__()})
 
             return status
         else:
@@ -55,7 +55,6 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
             "*Environment": "Cloud",
             "*Country": "Cloud-" + self.provider
         }
-
 
         if "network" in data:
             filter.update({"network": data["network"]})
