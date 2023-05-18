@@ -1120,55 +1120,6 @@
 					"name": "Use cases",
 					"item": [
 						{
-							"name": "assign-cloud-network",
-							"request": {
-								"auth": {
-									"type": "noauth"
-								},
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									},
-									{
-										"key": "Authorization",
-										"type": "text",
-										"value": "Bearer {{jwttoken}}"
-									},
-									{
-										"key": "If-None-Match",
-										"value": "851847cbe30d3d64e74703cac5fa8992",
-										"type": "text",
-										"disabled": true
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
-								},
-								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
-									"protocol": "http",
-									"host": [
-										"10",
-										"0",
-										"111",
-										"21"
-									],
-									"path": [
-										"api",
-										"v1",
-										"infoblox",
-										"1",
-										"assign-cloud-network",
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "dismiss-cloud-networks",
 							"request": {
 								"auth": {
@@ -1211,6 +1162,55 @@
 										"infoblox",
 										"1",
 										"dismiss-cloud-networks",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "assign-cloud-network",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									},
+									{
+										"key": "If-None-Match",
+										"value": "851847cbe30d3d64e74703cac5fa8992",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"1",
+										"assign-cloud-network",
 										""
 									]
 								}
@@ -2540,7 +2540,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.1.100/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.0.41/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -2554,7 +2554,7 @@
 								"infoblox",
 								"1",
 								"ipv4",
-								"10.8.1.100",
+								"10.8.0.41",
 								""
 							]
 						}
@@ -2650,7 +2650,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.1.100/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.0.41/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -2664,7 +2664,7 @@
 								"infoblox",
 								"1",
 								"ipv4",
-								"10.8.1.100",
+								"10.8.0.41",
 								""
 							]
 						}
