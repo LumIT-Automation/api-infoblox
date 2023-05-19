@@ -31,9 +31,9 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
 
                     if Permission.hasUserPermission(groups=self.user["groups"], action="dismiss_network", assetId=self.assetId, network=net["network"]) or self.user["authDisabled"]:
                         Network(self.assetId, net["network"]).delete()
-                        status.append({net["network"]: "200 OK"})
+                        status.append({net["network"]: "Deleted"})
                     else:
-                        status.append({net["network"]: "403 FORBIDDEN"})
+                        status.append({net["network"]: "Forbidden"})
                 except CustomException as e:
                     status.append({net["network"]: e.payload.get("Infoblox", e.payload)}) # Infoblox error response, as full network.
                 except Exception as e:
