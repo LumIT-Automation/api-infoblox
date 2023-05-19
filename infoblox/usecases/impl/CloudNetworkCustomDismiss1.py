@@ -1,5 +1,6 @@
 from infoblox.usecases.impl.CloudNetworkDismiss import CloudNetworkDismiss
 from infoblox.models.Infoblox.Network import Network
+from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.helpers.Exception import CustomException
@@ -32,12 +33,16 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
                     if Permission.hasUserPermission(groups=self.user["groups"], action="dismiss_network", assetId=self.assetId, network=net["network"]) or self.user["authDisabled"]:
                         Network(self.assetId, net["network"]).delete()
                         status.append({net["network"]: "Deleted"})
+                        self.__historyLog(net["network"], 'deleted')
                     else:
                         status.append({net["network"]: "Forbidden"})
+                        self.__historyLog(net["network"], 'forbidden')
                 except CustomException as e:
-                    status.append({net["network"]: e.payload.get("Infoblox", e.payload)}) # Infoblox error response, as full network.
+                    status.append({net["network"]: e.payload.get("Infoblox", e.payload)})
+                    self.__historyLog(net["network"], e.payload.get("Infoblox", e.payload))
                 except Exception as e:
                     status.append({net["network"]: e.__str__()})
+                    self.__historyLog(net["network"], e.__str__())
 
             return status
         else:
@@ -78,3 +83,30 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
             return Network.listData(self.assetId, filter)
         except Exception as e:
             raise e
+
+
+
+    def __historyLog(self, network, status) -> int:
+        historyId = 0
+
+        try:
+            data = {
+                "log": {
+                    "username": self.user["username"],
+                    "action": "dismiss",
+                    "asset_id": self.assetId,
+                    "status": status
+                },
+                "log_object": {
+                    "type": "network",
+                    "address": network.split('/')[0],
+                    "network": network,
+                    "mask": network.split('/')[1],
+                    "gateway": ""
+                }
+            }
+            historyId = History.add(data)
+
+            return historyId
+        except Exception:
+            pass
