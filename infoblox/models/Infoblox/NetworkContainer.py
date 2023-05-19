@@ -48,7 +48,7 @@ class NetworkContainer:
 
 
 
-    def addNextAvailableNetwork(self, subnetMaskCidr: int, data: dict) -> dict:
+    def addNextAvailableNetwork(self, subnetMaskCidr: int, data: dict) -> str:
         try:
             # Next available network in this container.
             data["network"] = "func:nextavailablenetwork:" + self.network + ", " + str(subnetMaskCidr)

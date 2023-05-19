@@ -102,7 +102,7 @@ class Network:
 
 
     @staticmethod
-    def add(assetId: int, data) -> dict:
+    def add(assetId: int, data) -> str:
         try:
             return Connector.add(assetId, data)
         except Exception as e:

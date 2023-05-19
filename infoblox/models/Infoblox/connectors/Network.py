@@ -148,7 +148,7 @@ class Network:
 
 
     @staticmethod
-    def add(assetId: int, data: dict, silent: bool = False) -> dict:
+    def add(assetId: int, data: dict, silent: bool = False) -> str:
 
         try:
             infoblox = Asset(assetId)
