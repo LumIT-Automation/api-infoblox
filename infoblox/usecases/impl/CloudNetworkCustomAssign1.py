@@ -40,7 +40,9 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                         )
 
                         network = re.findall(r'network/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/[0-9][0-9]?)/default$', o)[0]
-                        self.__historyLog(network, 'created')
+                        hid = self.__historyLog(network, 'created')
+                        from infoblox.controllers.CustomController import CustomController
+                        CustomController.plugins(controller="assign-cloud-network_put", requestType="network.assign", requestStatus="success", network=network, user=self.user, historyId=hid)
                         return o
                     else:
                         status = "forbidden"

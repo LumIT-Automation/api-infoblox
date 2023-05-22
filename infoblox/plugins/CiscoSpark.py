@@ -158,3 +158,9 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
 
     elif controller == "assign-cloud-network_put":
         Log.log("[Plugins] Running CiscoSpark plugin")
+
+        if requestStatus == "success":
+            message = f"Network {network}: action {requestType} was requested from user " + user.get("username", "--") + f": {requestStatus}."
+            if historyId:
+                message += "Unique operation ID: " + str(historyId) + "\n"
+            CiscoSpark.send(user, message)
