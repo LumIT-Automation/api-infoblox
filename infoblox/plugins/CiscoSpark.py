@@ -143,3 +143,18 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
                     message = "Error replicating IPv4 address "+ipv4Address+" on disaster recovery asset.\n"
 
                 CiscoSpark.send(user, message)
+
+    elif controller == "dismiss-cloud-network_put":
+        Log.log("[Plugins] Running CiscoSpark plugin")
+
+        if requestStatus == "success" or requestStatus == "forbidden":
+            message = f"Network {network}: action {requestType} was requested from user "+user.get("username", "--")+f": {requestStatus}."
+        else:
+            message = f"Network {network}: action {requestType}"
+            pass
+        if historyId:
+            message += "Unique operation ID: " + str(historyId) + "\n"
+        CiscoSpark.send(user, message)
+
+    elif controller == "assign-cloud-network_put":
+        Log.log("[Plugins] Running CiscoSpark plugin")

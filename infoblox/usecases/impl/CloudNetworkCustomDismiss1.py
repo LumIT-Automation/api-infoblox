@@ -26,6 +26,7 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
 
         networks = self.__getNetworks(data)
         if networks:
+            from infoblox.controllers.CustomController import CustomController
             for net in networks:
                 try:
                     Log.log(f"Trying {net}...")
@@ -33,16 +34,20 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
                     if Permission.hasUserPermission(groups=self.user["groups"], action="dismiss_network", assetId=self.assetId, network=net["network"]) or self.user["authDisabled"]:
                         Network(self.assetId, net["network"]).delete()
                         status.append({net["network"]: "Deleted"})
-                        self.__historyLog(net["network"], 'deleted')
+                        hid = self.__historyLog(net["network"], 'deleted')
+                        CustomController.plugins(controller="dismiss-cloud-network_put", requestType="network.dismiss", requestStatus="success", network=net["network"], user=self.user, historyId=hid)
                     else:
                         status.append({net["network"]: "Forbidden"})
-                        self.__historyLog(net["network"], 'forbidden')
+                        hid = self.__historyLog(net["network"], 'forbidden')
+                        CustomController.plugins(controller="dismiss-cloud-network_put", requestType="network.dismiss", requestStatus="forbidden", network=net["network"], user=self.user, historyId=hid)
                 except CustomException as e:
                     status.append({net["network"]: e.payload.get("Infoblox", e.payload)})
-                    self.__historyLog(net["network"], e.payload.get("Infoblox", e.payload))
+                    hid = self.__historyLog(net["network"], e.payload.get("Infoblox", e.payload))
+                    CustomController.plugins(controller="dismiss-cloud-network_put", requestType="network.dismiss", requestStatus="Exception: "+e.payload.get("Infoblox", e.payload), network=net["network"], user=self.user, historyId=hid)
                 except Exception as e:
                     status.append({net["network"]: e.__str__()})
-                    self.__historyLog(net["network"], e.__str__())
+                    hid = self.__historyLog(net["network"], e.__str__())
+                    CustomController.plugins(controller="dismiss-cloud-network_put", requestType="network.dismiss", requestStatus="Exception: "+ e.__str__(), network=net["network"], user=self.user, historyId=hid)
 
             return status
         else:
@@ -67,7 +72,7 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
                 filter.update({"*City": data["Region"]})
             if "Account ID" in data and data["Account ID"]:
                 filter.update({"*Account ID": data["Account ID"]})
-            if "Account Name" in data and data["Account Name"]:
+            elif "Account Name" in data and data["Account Name"]:
                 filter.update({"*Account Name": data["Account Name"]})
 
         if filter:
