@@ -2,6 +2,7 @@ import re
 
 from infoblox.usecases.impl.CloudNetworkAssign import CloudNetworkAssign
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
+from infoblox.models.Infoblox.Network import Network
 from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
 
@@ -26,6 +27,17 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def assignNetwork(self, data: dict, *args, **kwargs) -> str:
         status = ""
+
+        # If there are some previous networks with the same account id, check the account name (check against the first entry).
+        previousNetworks = self.__getAccountIdNetworks(data)
+        if previousNetworks:
+            try:
+                if previousNetworks[0]["extattrs"]["Account Name"]["value"] != data["extattrs"]["Account Name"]["value"]:
+                    raise CustomException(status=400, payload={"Infoblox": "A network with the same Account ID but different Account Name exists: "+previousNetworks[0]["network"]})
+            except KeyError:
+                raise CustomException(status=400, payload={"Infoblox": "Missing field in data given or in a previous assigned network."})
+            except Exception as e:
+                raise e
 
         containers = self.__getContainers()
         if containers:
@@ -72,6 +84,17 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 "*Country": "Cloud-" + self.provider,
                 "*City": self.region
             })
+        except Exception as e:
+            raise e
+
+
+
+    def __getAccountIdNetworks(self, data):
+        try:
+            return Network.listData(self.assetId, {
+                "*Account ID": data["extattrs"]["Account ID"]["value"]
+            })
+
         except Exception as e:
             raise e
 
