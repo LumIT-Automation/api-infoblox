@@ -25,7 +25,24 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
     # Public methods
     ####################################################################################################################
 
-    def assignNetwork(self, data: dict, *args, **kwargs) -> str:
+    def assignNetwork(self, data: dict, number: int = 2,  *args, **kwargs) -> dict:
+        o = list()
+
+        for n in range(number):
+            try:
+                o.append({"Infoblox": self.assign(data)})
+            except CustomException as c:
+                o.append(c.payload)
+                raise CustomException(status=c.status, payload={"Items": o})
+            except Exception as e:
+                o.append( e.__str__())
+                raise CustomException(status=500, payload={"Items": o})
+
+        return {"Items": o}
+
+
+
+    def assign(self, data: dict, *args, **kwargs) -> str:
         status = ""
 
         # If there are some previous networks with the same account id, check the account name (check against the first entry).
