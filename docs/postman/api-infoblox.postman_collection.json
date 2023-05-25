@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0fd0a19a-476a-45c2-a02b-c92f64083587",
+		"_postman_id": "1a1c7dc8-2316-4e29-980f-d74fbdf52a65",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -424,46 +424,6 @@
 								"infoblox",
 								"identity-groups",
 								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "identity-groups (privileges)",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "Bearer {{jwttoken}}"
-							}
-						],
-						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/identity-groups/?related=privileges",
-							"protocol": "http",
-							"host": [
-								"10",
-								"0",
-								"111",
-								"21"
-							],
-							"path": [
-								"api",
-								"v1",
-								"infoblox",
-								"identity-groups",
-								""
-							],
-							"query": [
-								{
-									"key": "related",
-									"value": "privileges"
-								}
 							]
 						}
 					},
