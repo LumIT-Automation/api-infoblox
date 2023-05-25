@@ -1,9 +1,12 @@
+from __future__ import annotations
 from typing import List
 
 from infoblox.models.Permission.Privilege import Privilege
 
 from infoblox.models.Permission.repository.Role import Role as Repository
 from infoblox.models.Permission.repository.RolePrivilege import RolePrivilege as RolePrivilegeRepository
+
+from infoblox.helpers.Misc import Misc
 
 
 class Role:
@@ -21,11 +24,20 @@ class Role:
 
 
     ####################################################################################################################
+    # Public methods
+    ####################################################################################################################
+
+    def repr(self):
+        return Misc.deepRepr(self)
+
+
+
+    ####################################################################################################################
     # Public static methods
     ####################################################################################################################
 
     @staticmethod
-    def list(loadPrivilege: bool = False) -> list:
+    def list(loadPrivilege: bool = False) -> List[Role]:
         roles = []
 
         try:
@@ -41,12 +53,9 @@ class Role:
 
 
     @staticmethod
-    def dataList(loadPrivilege: bool = False) -> list:
+    def dataList() -> list:
         try:
-            if loadPrivilege:
-                return RolePrivilegeRepository.list()
-            else:
-                return Repository.list()
+            return Repository.list()
         except Exception as e:
             raise e
 
@@ -65,6 +74,8 @@ class Role:
                     self.privileges.append(
                         Privilege(privilegeId)
                     )
+            else:
+                del self.privileges
 
             # Set attributes.
             for k, v in info.items():

@@ -16,7 +16,7 @@ class PermissionRolesController(CustomController):
     @staticmethod
     def get(request: Request) -> Response:
         data = dict()
-        itemData = {"data": dict()}
+        itemData = {"data": {"items": list()}}
         loadPrivilege = False
         etagCondition = {"responseEtag": ""}
 
@@ -32,8 +32,8 @@ class PermissionRolesController(CustomController):
                     if "privileges" in rList:
                         loadPrivilege = True
 
-                itemData["items"] = Role.dataList(loadPrivilege=loadPrivilege)
-                serializer = Serializer(data=itemData)
+                itemData["data"]["items"] = [r.repr() for r in Role.list(loadPrivilege=loadPrivilege)]
+                serializer = Serializer(data=itemData["data"])
                 if serializer.is_valid():
                     data["data"] = serializer.validated_data
                     data["href"] = request.get_full_path()
