@@ -91,7 +91,7 @@ class Permission:
 
             for el in l:
                 el["network"] = {
-                    "asset_id": el["network_asset"],
+                    "id_asset": el["network_asset"],
                     "name": el["network_name"]
                 }
 

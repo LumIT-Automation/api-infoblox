@@ -100,16 +100,6 @@ class Permission:
 
     @staticmethod
     def permissionsDataList() -> list:
-
-        #         "id": 4,
-        #         "identity_group_name": "groupStaff",
-        #         "identity_group_identifier": "cn=groupstaff,cn=users,dc=lab,dc=local",
-        #         "role": "staff",
-        #         "network": {
-        #             "name": "10.8.0.0/17",
-        #             "asset_id": 1
-        #         }
-
         try:
             return Repository.list()
         except Exception as e:
@@ -119,21 +109,6 @@ class Permission:
 
     @staticmethod
     def authorizationsList(groups: list) -> dict:
-
-        #     "assets_get": [
-        #         {
-        #             "assetId": "1",
-        #             "network": "any"
-        #         }
-        #     ],
-        #     "networks_get": [
-        #         {
-        #             "assetId": "1",
-        #             "network": "any"
-        #         }
-        #     ],
-        #     ...
-
         superadmin = False
         for gr in groups:
             if gr.lower() == "automation.local":
