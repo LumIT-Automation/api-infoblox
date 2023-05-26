@@ -19,6 +19,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
         self.provider: str = provider
         self.region: str = region
         self.user = user
+        self.containers = None
 
 
 
@@ -26,7 +27,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
     # Public methods
     ####################################################################################################################
 
-    def assignNetwork(self, data: dict, number: int = 1,  *args, **kwargs) -> dict:
+    def assignNetworks(self, data: dict, number: int = 1,  *args, **kwargs) -> dict:
         o = list()
         numForced = ""
 
@@ -57,57 +58,67 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
             for n in range(number):
                 try:
-                    o.append({"Infoblox": self.assign(data)})
+                    o.append({"network "+str(n+1): self.assignNetwork(data)})
                 except CustomException as c:
-                    o.append(c.payload)
-                    raise CustomException(status=c.status, payload={"Items": o})
+                    o.append({"network "+str(n+1): c.payload.get("Infoblox", c.payload)})
                 except Exception as e:
-                    o.append( e.__str__())
-                    raise CustomException(status=500, payload={"Items": o})
+                    o.append({"network "+str(n+1): e.__str__()})
 
             return {
+                "region": self.region,
                 "Number of networks requested": str(number) + numForced,
-                "Networks": o
+                "Result": o
             }
         except Exception as e:
             raise e
 
 
-
-    def assign(self, data: dict, *args, **kwargs) -> str:
-        status = ""
+    def assignNetwork(self, data: dict, *args, **kwargs) -> list:
+        out = []
 
         try:
-            containers = self.__getContainers()
-            if containers:
-                for container in containers:
-                    try:
-                        Log.log(f"Trying {container}...")
+            if self.containers is None:
+                self.containers = self.__getContainers()
+        except Exception as e:
+            raise e
 
-                        if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, network=container) or self.user["authDisabled"]:
-                            o = NetworkContainer(self.assetId, container["network"]).addNextAvailableNetwork(
-                                subnetMaskCidr=24,
-                                data=data
-                            )
+        if self.containers:
+            faliedContainers = []
+            for container in self.containers:
+                networkContainer = container["network"]
+                try:
+                    Log.log(f"Trying {networkContainer}...")
+                    out.append({"container "+networkContainer: self.__assign(networkContainer, data)})
+                except CustomException as c:
+                    faliedContainers.append(container)
+                    out.append({"container "+networkContainer: c.payload.get("Infoblox", str(c.payload))})
+                except Exception as e:
+                    faliedContainers.append(container)
+                    out.append({"container "+networkContainer: e.__str__()})
 
-                            network = re.findall(r'network/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/[0-9][0-9]?)/default$', o)[0]
-                            hid = self.__historyLog(network, 'created')
-                            from infoblox.controllers.CustomController import CustomController
-                            CustomController.plugins(controller="assign-cloud-network_put", requestType="network.assign", requestStatus="success", network=network, user=self.user, historyId=hid)
-                            return o
-                        else:
-                            status = "forbidden"
-                    except CustomException as e:
-                        status = e.payload.get("Infoblox", e.payload) # Infoblox error response, as full network.
-                    except Exception as e:
-                        status = e.__str__()
+            if faliedContainers:
+                self.containers = [ c for c in self.containers if c not in faliedContainers] # do not try to reuse failed containers.
+        else:
+            raise CustomException(status=400, payload={"Infoblox": "no container network available with the specified parameters"})
 
-                if status == "forbidden":
-                    raise CustomException(status=403)
-                elif status != "":
-                    raise CustomException(status=400, payload={"Infoblox": status})
+        return out
+
+
+    def __assign(self, container: str, data: dict):
+        try:
+            if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, network=container) or self.user["authDisabled"]:
+                n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
+                        subnetMaskCidr=24,
+                        data=data
+                    )
+
+                network = re.findall(r'network/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/[0-9][0-9]?)/default$', n)[0]
+                hid = self.__historyLog(network, 'created')
+                from infoblox.controllers.CustomController import CustomController
+                CustomController.plugins(controller="assign-cloud-network_put", requestType="network.assign", requestStatus="success", network=network, user=self.user, historyId=hid)
+                return n
             else:
-                raise CustomException(status=400, payload={"Infoblox": "no container network available with specified parameters"})
+                raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
 
         except Exception as e:
             raise e

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1a1c7dc8-2316-4e29-980f-d74fbdf52a65",
+		"_postman_id": "72bc76c5-220e-43a8-b005-b5c536fca00d",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1154,7 +1154,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"number\": 2,\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
@@ -1490,7 +1490,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.11.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.31.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1504,7 +1504,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.9.11.0",
+								"10.9.31.0",
 								""
 							]
 						}
