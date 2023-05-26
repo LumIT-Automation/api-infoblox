@@ -74,7 +74,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
 
     def assignNetwork(self, data: dict, *args, **kwargs) -> list:
-        out = []
+        out = ""
 
         try:
             if self.containers is None:
@@ -88,13 +88,13 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 networkContainer = container["network"]
                 try:
                     Log.log(f"Trying {networkContainer}...")
-                    out.append({"container "+networkContainer: self.__assign(networkContainer, data)})
+                    out = self.__assign(networkContainer, data)
                 except CustomException as c:
                     faliedContainers.append(container)
-                    out.append({"container "+networkContainer: c.payload.get("Infoblox", str(c.payload))})
+                    out = c.payload.get("Infoblox", str(c.payload)) # this message is overwritten if there are other containers to which ask the network.
                 except Exception as e:
                     faliedContainers.append(container)
-                    out.append({"container "+networkContainer: e.__str__()})
+                    out = e.__str__() # this message is overwritten if there are other containers to which ask the network.
 
             if faliedContainers:
                 self.containers = [ c for c in self.containers if c not in faliedContainers] # do not try to reuse failed containers.
@@ -104,7 +104,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
         return out
 
 
-    def __assign(self, container: str, data: dict):
+    def __assign(self, container: str, data: dict) -> str:
         try:
             if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, network=container) or self.user["authDisabled"]:
                 n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
