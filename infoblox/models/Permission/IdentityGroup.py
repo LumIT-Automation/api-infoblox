@@ -1,5 +1,7 @@
+from __future__ import annotations
+from typing import List
+
 from infoblox.models.Permission.repository.IdentityGroup import IdentityGroup as Repository
-from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
 
 from infoblox.helpers.Misc import Misc
 
@@ -19,6 +21,11 @@ class IdentityGroup:
     ####################################################################################################################
     # Public methods
     ####################################################################################################################
+
+    def repr(self):
+        return vars(self)
+
+
 
     def modify(self, data: dict) -> None:
         try:
@@ -45,22 +52,16 @@ class IdentityGroup:
     ####################################################################################################################
 
     @staticmethod
-    def dataList() -> list:
-        try:
-            return Repository.list()
-        except Exception as e:
-            raise e
-
-
-
-    @staticmethod
-    def listWithPermissionsPrivileges(showPrivileges: bool = False, filterGroups: list = None) -> list:
-        # List identity groups with related information regarding the associated roles on networks,
-        # and optionally detailed privileges' descriptions.
-        filterGroups = filterGroups or []
+    def list() -> List[IdentityGroup]:
+        identityGroups = []
 
         try:
-            return PermissionPrivilegeRepository.list(filterGroups, showPrivileges)
+            for ig in Repository.list():
+                identityGroups.append(
+                    IdentityGroup(id=ig["id"])
+                )
+
+            return identityGroups
         except Exception as e:
             raise e
 
