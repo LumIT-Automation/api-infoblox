@@ -9,5 +9,5 @@ class CloudNetworkAssign(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def assignNetworks(self, data: dict, number: int = 1, *args, **kwargs) -> dict:
+    def assignNetworks(self, data: dict, *args, **kwargs) -> dict:
         return {}

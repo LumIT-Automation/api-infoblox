@@ -28,16 +28,12 @@ class InfobloxAssignCloudNetworkController(CustomController):
                 serializer = Serializer(data=request.data["data"])
                 if serializer.is_valid():
                     data = serializer.validated_data
-                    if "number" in data and data["number"] > 1:
-                        number = data["number"]
-                    else:
-                        number = 1
 
                     lock = Lock("networkContainer", locals())
                     if lock.isUnlocked():
                         lock.lock()
 
-                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data["region"], user)().assignNetworks(data["network_data"], number)
+                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data["region"], user)().assignNetworks(data["network_data"])
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
