@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "72bc76c5-220e-43a8-b005-b5c536fca00d",
+		"_postman_id": "b4b15a60-201a-4444-9aff-46db22b77064",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1638,7 +1638,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.8.1.0/?related=range",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.8.3.0/?related=range",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1652,7 +1652,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.8.1.0",
+								"10.8.3.0",
 								""
 							],
 							"query": [
@@ -2276,7 +2276,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.128.0\",\n        \"object_type\": \"Server\",\n        \"range_first_ip\": \"10.8.3.35\",\n        \"range_last_ip\": \"10.8.3.111\",\n        \"number\": 1,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"network\": \"10.8.0.0\",\n        \"object_type\": \"Server\",\n        \"range_by_reference\": \"Lo Zio Pino\",\n        \"number\": 2,\n        \"mac\": [\n            \"00:00:00:00:00:00\"\n        ],\n        \"extattrs\": [\n            {\n                \"Name Server\": {\n                    \"value\": \"Server\"\n                },\n                \"Reference\": {\n                    \"value\": \"LumIT S.p.A.\"\n                }\n            }\n        ]\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2501,7 +2501,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.0.41/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/ipv4/10.8.3.35/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -2515,7 +2515,7 @@
 								"infoblox",
 								"1",
 								"ipv4",
-								"10.8.0.41",
+								"10.8.3.35",
 								""
 							]
 						}

@@ -128,15 +128,16 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 except Exception:
                     self.mask = ipaddress.IPv4Network(targetNetwork).netmask
 
-            if "range_first_ip" in self.data and "range_last_ip" in self.data:
-                if not ipaddress.ip_address(self.data["range_first_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork) or \
-                        not ipaddress.ip_address(self.data["range_last_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork):
-                    raise CustomException(status=400, payload={"message": "range_first_ip and range_last_ip cannot be outside of network."})
-                if not (ipaddress.ip_address(self.data["range_first_ip"]) <= ipaddress.ip_address(self.data["range_last_ip"])):
-                    raise CustomException(status=400, payload={"message": "must be: range_first_ip <= range_last_ip."})
+            if not self.data.get("rangeByReference", False):
+                if "range_first_ip" in self.data and "range_last_ip" in self.data:
+                    if not ipaddress.ip_address(self.data["range_first_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork) or \
+                            not ipaddress.ip_address(self.data["range_last_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork):
+                        raise CustomException(status=400, payload={"message": "range_first_ip and range_last_ip cannot be outside of network."})
+                    if not (ipaddress.ip_address(self.data["range_first_ip"]) <= ipaddress.ip_address(self.data["range_last_ip"])):
+                        raise CustomException(status=400, payload={"message": "must be: range_first_ip <= range_last_ip."})
 
-                self.rangeFirstIp = self.data["range_first_ip"]
-                self.rangeLastIp = self.data["range_last_ip"]
+                    self.rangeFirstIp = self.data["range_first_ip"]
+                    self.rangeLastIp = self.data["range_last_ip"]
 
         except Exception as e:
             raise e
@@ -272,7 +273,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
             raise CustomException(status=400, payload={"message": "Cannot discriminate network."})
         except Exception as e:
-            raise CustomException(status=400, payload={"message": "Cannot discriminate network: "+str(e.payload)})
+            raise CustomException(status=400, payload={"message": "Cannot discriminate network: " + e.__str__()})
 
 
 
@@ -391,29 +392,47 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
 
-    @staticmethod
-    def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, rangeFirstIp: str, rangeLastIp: str ,number, objectType) -> tuple:
+    #@staticmethod
+    #def getNextAvailableIpv4Addresses(assetId: int, networkLogic: str, targetNetwork: str, networkContainer: str, rangeFirstIp: str, rangeLastIp: str, number: int, objectType: str, rangeByReference: bool = False, reference: str = "") -> tuple:
+    def getNextAvailableIpv4Addresses(self, number: int, objectType: str, rangeByReference: str = ""):
         # Get the next available IP address within allSubnetworks.
         # Select the first IPv4 among them which is:
         # * unused or used but with usage == "DNS" (only "DNS")
         # * not ending in 0 or 255.
-        allSubnetworks = Ipv4CustomReserve1.getTargetSubnetworks(assetId, networkLogic, targetNetwork, networkContainer, objectType)
+        allSubnetworks = Ipv4CustomReserve1.getTargetSubnetworks(self.assetId, self.networkLogic, self.targetNetwork, self.networkContainer, objectType)
+        addresses = []
 
         try:
             for n in allSubnetworks:
-                # Find the first <number> free IPv4(s) in the subnet.
-                addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
-                    assetId,
-                    Network(assetId, n).network,
-                    number,
-                    rangeFirstIp,
-                    rangeLastIp
-                )
+                oNetwork = Network(self.assetId, n)
+                if rangeByReference:
+                    for range in oNetwork.rangesData():
+                        if range.get("extattrs", "").get("Reference", "").get("value", "") == rangeByReference:
+                            rangeFirstIp = range.get("start_addr", "")
+                            rangeLastIp = range.get("end_addr", "")
+                            if rangeFirstIp and rangeLastIp:
+                                # Find the first <number> free IPv4(s) in the subnet.
+                                addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
+                                    self.assetId,
+                                    oNetwork.network,
+                                    number,
+                                    rangeFirstIp,
+                                    rangeLastIp
+                                )
+                else:
+                    # Find the first <number> free IPv4(s) in the subnet.
+                    addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
+                        self.assetId,
+                        oNetwork.network,
+                        number,
+                        self.rangeFirstIp,
+                        self.rangeLastIp
+                    )
 
                 if len(addresses) == number:
                     return n, addresses
         except Exception as e:
-            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: "+e.payload})
+            raise CustomException(status=400, payload={"message": "Cannot get next available IPv4 address: " + e.__str__()})
 
         raise CustomException(status=400, payload={"message": "No available IPv4 addresses found."})
 
@@ -438,15 +457,11 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         if "options" in self.data and self.data["options"]:
             options = self.data["options"]
 
-        actualNetwork, addresses = Ipv4CustomReserve1.getNextAvailableIpv4Addresses(
-            self.assetId,
-            self.networkLogic,
-            self.targetNetwork,
-            self.networkContainer,
-            self.rangeFirstIp,
-            self.rangeLastIp,
+        rangeByReference = self.data.get("range_by_reference", "")
+        actualNetwork, addresses = self.getNextAvailableIpv4Addresses(
             number,
-            objectType
+            objectType,
+            rangeByReference
         )
 
         for address in addresses:
