@@ -484,8 +484,9 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 extattrs = self.data["extattrs"][0]
 
             # Override Reference extattr.
+            reference = ''.join([", " + s for s in [ self.data.get("reference_prefix", ""), self.username, str(datetime.today().strftime("%Y-%m-%d %H:%M:%S"))] if s])
             extattrs["Reference"] = {
-                "value": self.username + ", " + str(datetime.today().strftime("%Y-%m-%d %H:%M:%S"))
+                "value": reference[2:]
             }
 
             try:

@@ -49,6 +49,7 @@ class InfobloxIpv4sSerializer(serializers.Serializer):
                     self.fields["range_first_ip"] = serializers.IPAddressField(protocol='IPv4', required=False)
                     self.fields["range_last_ip"] = serializers.IPAddressField(protocol='IPv4', required=False)
                     self.fields["range_by_reference"] = serializers.CharField(max_length=255, required=False)
+                    self.fields["reference_prefix"] = serializers.CharField(max_length=255, required=False)
                     self.fields["object_type"] = serializers.CharField(max_length=255, required=False)
                     self.fields["mac"] = serializers.ListField(
                         child=serializers.RegexField(regex='^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', required=True)
