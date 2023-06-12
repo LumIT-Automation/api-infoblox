@@ -350,8 +350,10 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
             ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
             if rangeFirstIp and rangeLastIp:
-                rangeIpList = [ ipaddress.ip_address(ip_int) for ip_int in range(int(ipaddress.ip_address(rangeFirstIp)), int( ipaddress.ip_address(rangeLastIp))) ] # explode the ip range in a list of ipaddress.ip_address.
+                # explode the ip range in a list of ipaddress.ip_address. The last ip is missed, so it should be appended.
+                rangeIpList = [ ipaddress.ip_address(ip_int) for ip_int in range(int(ipaddress.ip_address(rangeFirstIp)), int( ipaddress.ip_address(rangeLastIp))) ]
                 ipList = [ str(ip) for ip in rangeIpList if ip in ipaddressNetworkObj ]
+                ipList.append(rangeLastIp)
             else:
                 ipList = list(ipaddressNetworkObj.hosts())
 
@@ -366,7 +368,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 endIp = chunk[-1]
 
                 addresses = Network(assetId, network).ipv4sData(maxResults=100, fromIp=startIp, toIp=endIp)
-
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 
                 if isinstance(addresses, list):
@@ -383,12 +384,10 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
                                     j += 1
 
-                if len(cleanAddresses) == number:
-                    return cleanAddresses
         except Exception as e:
             raise e
 
-        return []
+        return cleanAddresses
 
 
 
@@ -406,19 +405,27 @@ class Ipv4CustomReserve1(Ipv4Reserve):
             for n in allSubnetworks:
                 oNetwork = Network(self.assetId, n)
                 if rangeByReference:
+                    numRange = number
                     for range in oNetwork.rangesData():
                         if range.get("extattrs", "").get("Reference", "").get("value", "") == rangeByReference:
                             rangeFirstIp = range.get("start_addr", "")
                             rangeLastIp = range.get("end_addr", "")
                             if rangeFirstIp and rangeLastIp:
                                 # Find the first <number> free IPv4(s) in the subnet.
-                                addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
-                                    self.assetId,
-                                    oNetwork.network,
-                                    number,
-                                    rangeFirstIp,
-                                    rangeLastIp
+                                # There can be more than one range with the same Reference in the same network.
+                                addresses.extend(
+                                    Ipv4CustomReserve1.findFirstIpByAttrs(
+                                        self.assetId,
+                                        oNetwork.network,
+                                        numRange,
+                                        rangeFirstIp,
+                                        rangeLastIp
+                                    )
                                 )
+                                if len(addresses) == number:
+                                    break
+                                else:
+                                    numRange = numRange - len(addresses)
                 else:
                     # Find the first <number> free IPv4(s) in the subnet.
                     addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
@@ -429,6 +436,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                         self.rangeLastIp
                     )
 
+                # If less than number addresses are found, raise an Exception.
                 if len(addresses) == number:
                     return n, addresses
         except Exception as e:
