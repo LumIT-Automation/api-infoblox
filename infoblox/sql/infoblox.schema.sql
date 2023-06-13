@@ -224,7 +224,7 @@ ALTER TABLE `configuration`
 --
 ALTER TABLE `asset`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `address` (`address`);
+  ADD UNIQUE KEY `fqdn` (`fqdn`);
 
 --
 -- AUTO_INCREMENT per la tabella `configuration`
