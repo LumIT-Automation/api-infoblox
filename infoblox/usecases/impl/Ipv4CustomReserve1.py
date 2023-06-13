@@ -51,8 +51,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         self.networkLogic: str = ""
         self.targetNetwork: str = ""
         self.networkContainer: str = ""
-        self.rangeFirstIp: str = ""
-        self.rangeLastIp: str = ""
         self.gateway: str = ""
         self.mask: str = ""
         self.options: list = []
@@ -127,17 +125,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     self.gateway = info.extattrs["Gateway"]["value"]
                 except Exception:
                     self.mask = ipaddress.IPv4Network(targetNetwork).netmask
-
-            if not self.data.get("rangeByReference", False):
-                if "range_first_ip" in self.data and "range_last_ip" in self.data:
-                    if not ipaddress.ip_address(self.data["range_first_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork) or \
-                            not ipaddress.ip_address(self.data["range_last_ip"]) in ipaddress.ip_network(self.permissionCheckNetwork):
-                        raise CustomException(status=400, payload={"message": "range_first_ip and range_last_ip cannot be outside of network."})
-                    if not (ipaddress.ip_address(self.data["range_first_ip"]) <= ipaddress.ip_address(self.data["range_last_ip"])):
-                        raise CustomException(status=400, payload={"message": "must be: range_first_ip <= range_last_ip."})
-
-                    self.rangeFirstIp = self.data["range_first_ip"]
-                    self.rangeLastIp = self.data["range_last_ip"]
 
         except Exception as e:
             raise e
@@ -340,12 +327,12 @@ class Ipv4CustomReserve1(Ipv4Reserve):
 
 
     @staticmethod
-    def findFirstIpByAttrs(assetId: int, network: str, number: int, rangeFirstIp: str ="", rangeLastIp: str = "") -> list:
+    def findFirstIpByAttrs(oNetwork: Network, number: int, rangeFirstIp: str ="", rangeLastIp: str = "") -> list:
         j = 0
         cleanAddresses = list()
 
         try:
-            networkCidr = network
+            networkCidr = oNetwork.network
             n, mask = networkCidr.split('/')
 
             ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
@@ -354,8 +341,10 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 rangeIpList = [ ipaddress.ip_address(ip_int) for ip_int in range(int(ipaddress.ip_address(rangeFirstIp)), int( ipaddress.ip_address(rangeLastIp))) ]
                 ipList = [ str(ip) for ip in rangeIpList if ip in ipaddressNetworkObj ]
                 ipList.append(rangeLastIp)
+                rangeCondition = True
             else:
                 ipList = list(ipaddressNetworkObj.hosts())
+                rangeCondition = False
 
             # Use ipaddress library to split the ip list in ranges of max 100 in order to make smaller calls.
             if int(mask) > 22 or (rangeFirstIp and rangeLastIp):
@@ -367,7 +356,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 startIp = chunk[0]
                 endIp = chunk[-1]
 
-                addresses = Network(assetId, network).ipv4sData(maxResults=100, fromIp=startIp, toIp=endIp)
+                addresses = oNetwork.ipv4sData(maxResults=500, fromIp=startIp, toIp=endIp)
                 # [{'_ref': 'ipv4address/Li5pcHY0X2FkZHJlc3MkMTAuOC4zLjAvMA:10.8.3.0','ip_address': '10.8.3.0', 'status': 'USED', 'usage': []}, {}, ...]
 
                 if isinstance(addresses, list):
@@ -375,14 +364,15 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     for address in addresses:
                         # Until <number> suitable addresses is found.
                         if j < number:
-                            if "ip_address" in address and ("status" in address and address["status"] == "UNUSED") or ("usage" in address and address["usage"] == ["DNS"]):
-                                # Addresses not ending in 0 or 255.
-                                matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
-                                if matches:
-                                    cleanAddress = str(matches.group(0)).strip()
-                                    cleanAddresses.append(cleanAddress)
+                            if "ip_address" in address and (("status" in address and address["status"] == "UNUSED") or ("usage" in address and address["usage"] == ["DNS"])):
+                                if rangeCondition or ("types" not in address or not address["types"]):
+                                    # Addresses not ending in 0 or 255.
+                                    matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
+                                    if matches:
+                                        cleanAddress = str(matches.group(0)).strip()
+                                        cleanAddresses.append(cleanAddress)
 
-                                    j += 1
+                                        j += 1
 
         except Exception as e:
             raise e
@@ -415,8 +405,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                                 # There can be more than one range with the same Reference in the same network.
                                 addresses.extend(
                                     Ipv4CustomReserve1.findFirstIpByAttrs(
-                                        self.assetId,
-                                        oNetwork.network,
+                                        oNetwork,
                                         numRange,
                                         rangeFirstIp,
                                         rangeLastIp
@@ -429,11 +418,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 else:
                     # Find the first <number> free IPv4(s) in the subnet.
                     addresses = Ipv4CustomReserve1.findFirstIpByAttrs(
-                        self.assetId,
-                        oNetwork.network,
-                        number,
-                        self.rangeFirstIp,
-                        self.rangeLastIp
+                        oNetwork,
+                        number
                     )
 
                 # If less than number addresses are found, raise an Exception.
