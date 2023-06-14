@@ -27,7 +27,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
     # Public methods
     ####################################################################################################################
 
-    def assignNetworks(self, data: dict, *args, **kwargs) -> str:
+    def assignNetwork(self, data: dict, *args, **kwargs) -> str:
         try:
             previousNetworks = self.__getAccountIdNetworks(data["extattrs"]["Account ID"]["value"])
             if previousNetworks:
@@ -46,12 +46,12 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                     if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in previousNetworks if net["extattrs"]["City"]["value"] == self.region]): # subtrack the existent networks.
                         raise CustomException(status=400, payload={"Infoblox": "Maximun number of networks for this Accoun ID in this region already reached."})
 
-            return self.assignNetwork(data)
+            return self.__pickContainer(data)
         except Exception as e:
             raise e
 
 
-    def assignNetwork(self, data: dict, *args, **kwargs) -> str:
+    def __pickContainer(self, data: dict, *args, **kwargs) -> str:
         out = ""
 
         try:
