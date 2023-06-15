@@ -397,7 +397,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                 if rangeByReference:
                     numRange = number
                     for range in oNetwork.rangesData():
-                        if range.get("extattrs", "").get("Reference", "").get("value", "") == rangeByReference:
+                        if range.get("extattrs", {}).get("Reference", {}).get("value", "") == rangeByReference:
                             rangeFirstIp = range.get("start_addr", "")
                             rangeLastIp = range.get("end_addr", "")
                             if rangeFirstIp and rangeLastIp:
