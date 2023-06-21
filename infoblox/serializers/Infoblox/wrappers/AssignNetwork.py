@@ -24,5 +24,5 @@ class InfobloxAssignNetworkSerializer(serializers.Serializer):
 
 
     provider = serializers.CharField(max_length=255, required=True)
-    region = serializers.CharField(max_length=255, required=True)
+    region = serializers.CharField(max_length=255, required=False, allow_blank=True)
     network_data = InfobloxAssignNetworkDataSerializer(required=True)

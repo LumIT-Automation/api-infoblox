@@ -104,12 +104,15 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def __getContainers(self) -> list:
         try:
-            # Eligible container networks.
-            return NetworkContainer.listData(self.assetId, {
+            filter = {
                 "*Environment": "Cloud",
-                "*Country": "Cloud-" + self.provider,
-                "*City": self.region
-            })
+                "*Country": "Cloud-" + self.provider
+            }
+            if self.region:
+                filter.update({"*City": self.region})
+
+            # Eligible container networks.
+            return NetworkContainer.listData(self.assetId, filter)
         except Exception as e:
             raise e
 
