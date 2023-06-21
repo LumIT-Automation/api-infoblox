@@ -110,9 +110,13 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
             }
             if self.region:
                 filter.update({"*City": self.region})
+                nc = NetworkContainer.listData(self.assetId, filter)
+            else:
+                l = NetworkContainer.listData(self.assetId, filter)
+                nc = [container for container in l if not container.get("extattrs", {}).get("City", {}).get("value", "")]
 
             # Eligible container networks.
-            return NetworkContainer.listData(self.assetId, filter)
+            return nc
         except Exception as e:
             raise e
 
