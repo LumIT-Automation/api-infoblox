@@ -34,7 +34,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 try:
                     # Check the given account name against the entries in previousNetworks.
                     for net in previousNetworks:
-                        if net["extattrs"]["Account Name"]["value"] != data["extattrs"]["Account Name"]["value"]:
+                        if net.get("extattrs", {}).get("Account Name", {}).get("value", "") != data.get("extattrs", {}).get("Account Name", {}).get("value", ""):
                             raise CustomException(status=400, payload={"Infoblox": "A network with the same Account ID but different Account Name exists: "+net["network"]})
                 except KeyError:
                     raise CustomException(status=400, payload={"Infoblox": "Missing field in data given or in a previous assigned network."})
@@ -43,8 +43,9 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
                 # CLOUD_ASSIGN_MAX_ACCOUNT_NETS is the maximum number of networks for Account ID in a region.
                 if hasattr(settings, "CLOUD_ASSIGN_MAX_ACCOUNT_NETS"):
-                    if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in previousNetworks if net["extattrs"]["City"]["value"] == self.region]): # subtrack the existent networks.
+                    if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in previousNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
                         raise CustomException(status=400, payload={"Infoblox": "Maximun number of networks for this Accoun ID in this region already reached."})
+
 
             return self.__pickContainer(data)
         except Exception as e:

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "93b81242-f82a-4441-bb32-10edf40f6230",
+		"_postman_id": "dc334738-fefb-41c8-9916-6cd436ce74e4",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1444,7 +1444,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.29.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.11.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1458,7 +1458,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.9.29.0",
+								"10.9.11.0",
 								""
 							]
 						}
@@ -1735,7 +1735,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-containers/?fby=*CloudEnvironment&fval=cloud&fby=*CloudCountry&fval=cloud-AWS&fby=*CloudCity&fval=aws-eu-west-1",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network-containers/?fby=*Environment&fval=Cloud&fby=*Country&fval=Cloud-AWS&fby=*City&fval=aws-eu-west-1",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1754,23 +1754,23 @@
 							"query": [
 								{
 									"key": "fby",
-									"value": "*CloudEnvironment"
+									"value": "*Environment"
 								},
 								{
 									"key": "fval",
-									"value": "cloud"
+									"value": "Cloud"
 								},
 								{
 									"key": "fby",
-									"value": "*CloudCountry"
+									"value": "*Country"
 								},
 								{
 									"key": "fval",
-									"value": "cloud-AWS"
+									"value": "Cloud-AWS"
 								},
 								{
 									"key": "fby",
-									"value": "*CloudCity"
+									"value": "*City"
 								},
 								{
 									"key": "fval",
