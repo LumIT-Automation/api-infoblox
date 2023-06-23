@@ -26,7 +26,7 @@ class Range:
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/range",
+                endpoint=infoblox.baseurl+"range",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
@@ -60,7 +60,7 @@ class Range:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/range",
+                endpoint=infoblox.baseurl+"range",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,

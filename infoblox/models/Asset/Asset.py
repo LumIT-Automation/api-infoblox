@@ -19,7 +19,7 @@ class Asset:
         self.username = ""
         self.password = ""
 
-        self.__load()
+        self.__load(showPassword=True)
 
 
 
@@ -52,9 +52,9 @@ class Asset:
     ####################################################################################################################
 
     @staticmethod
-    def list() -> list:
+    def list(showPassword: bool) -> list:
         try:
-            return Repository.list()
+            return Repository.list(showPassword=showPassword)
         except Exception as e:
             raise e
 
@@ -89,9 +89,9 @@ class Asset:
     # Private methods
     ####################################################################################################################
 
-    def __load(self) -> None:
+    def __load(self, showPassword: bool) -> None:
         try:
-            data = Repository.get(self.id)
+            data = Repository.get(self.id, showPassword=showPassword)
             for k, v in data.items():
                 setattr(self, k, v)
         except Exception as e:

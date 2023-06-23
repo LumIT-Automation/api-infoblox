@@ -14,7 +14,7 @@ class Vlan:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/vlan",
+                endpoint=infoblox.baseurl+"vlan",
                 params={
                     "id": id,
                     "_max_results": 65535,
@@ -50,7 +50,7 @@ class Vlan:
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/vlan",
+                endpoint=infoblox.baseurl+"vlan",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,

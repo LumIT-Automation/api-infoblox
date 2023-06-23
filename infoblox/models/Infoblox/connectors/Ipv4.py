@@ -18,7 +18,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
+                endpoint=infoblox.baseurl+"ipv4address",
                 params={
                     "ip_address": address,
                     "_return_fields+": "network,extattrs"
@@ -59,7 +59,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/"+ref,
+                endpoint=infoblox.baseurl+""+ref,
                 auth=(infoblox.username, infoblox.password),
                 params={
                     "_return_as_object": 1
@@ -78,7 +78,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/fixedaddress?_return_fields=mac,extattrs",
+                endpoint=infoblox.baseurl+"fixedaddress?_return_fields=mac,extattrs",
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
             )
