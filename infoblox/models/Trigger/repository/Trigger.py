@@ -61,7 +61,7 @@ class Trigger:
 
             return o
         except IndexError:
-            raise CustomException(status=404, payload={"database": "non existent trigger"})
+            raise CustomException(status=404, payload={"database": "Non existent trigger"})
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -102,7 +102,7 @@ class Trigger:
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
                     and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
-                        raise CustomException(status=400, payload={"database": "duplicated trigger or non existent asset"})
+                        raise CustomException(status=400, payload={"database": "Duplicated trigger or non existent asset"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -201,7 +201,7 @@ class Trigger:
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
                     and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
-                        raise CustomException(status=400, payload={"database": "duplicated trigger or non existent asset"})
+                        raise CustomException(status=400, payload={"database": "Duplicated trigger or non existent asset"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
@@ -227,7 +227,7 @@ class Trigger:
         except Exception as e:
             if e.__class__.__name__ == "IntegrityError" \
                     and e.args and e.args[0] and (e.args[0] == 1062 or e.args[0] == 1452):
-                raise CustomException(status=400, payload={"database": "duplicated or wrong data"})
+                raise CustomException(status=400, payload={"database": "Duplicated or wrong data"})
             else:
                 raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
