@@ -25,7 +25,7 @@ class InfobloxAssetsController(CustomController):
             if Permission.hasUserPermission(groups=user["groups"], action="assets_get") or user["authDisabled"]:
                 Log.actionLog("Asset list", user)
 
-                itemData = Asset.list()
+                itemData = Asset.list(showPassword=False)
 
                 # Filter assets' list basing on actual permissions.
                 for p in itemData:

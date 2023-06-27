@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dc334738-fefb-41c8-9916-6cd436ce74e4",
+		"_postman_id": "e902e22d-1a1b-410f-bd12-37cc533cc5b3",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -58,7 +58,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"192.168.12.159\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"tlsverify\": 0,\n        \"datacenter\": \"Milano\",\n        \"environment\": \"Developement\",\n        \"position\": \"RACK 1\",\n        \"username\": \"admin\",\n        \"password\": \"infoblox\"\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"fqdn\": \"192.168.12.150\",\n        \"datacenter\": \"Milano\",\n        \"environment\": \"Developement\",\n        \"position\": \"RACK 1\",\n        \"username\": \"admin\",\n        \"password\": \"password\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -101,7 +101,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"data\": \n    {\n        \"address\": \"192.168.12.159\",\n        \"fqdn\": \"infocoso.lumitlab.internal\",\n        \"baseurl\": \"https://192.168.12.159/wapi/v2.10\",\n        \"datacenter\": \"Verona\",\n        \"environment\": \"Produzione\"\n    }\n}",
+							"raw": "{\n    \"data\": {\n        \"path\": \"/\",\n        \"port\": 80,\n        \"protocol\": \"http\"\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -109,7 +109,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/asset/1/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/asset/2/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -122,7 +122,7 @@
 								"v1",
 								"infoblox",
 								"asset",
-								"1",
+								"2",
 								""
 							]
 						}

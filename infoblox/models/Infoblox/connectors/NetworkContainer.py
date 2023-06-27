@@ -24,7 +24,7 @@ class NetworkContainer:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/networkcontainer",
+                endpoint=infoblox.baseurl+"networkcontainer",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
@@ -51,7 +51,7 @@ class NetworkContainer:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
+                endpoint=infoblox.baseurl+"network",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
@@ -78,7 +78,7 @@ class NetworkContainer:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/networkcontainer",
+                endpoint=infoblox.baseurl+"networkcontainer",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,

@@ -51,7 +51,7 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
 
             return status
         else:
-            raise CustomException(status=400, payload={"Infoblox": "no network with specified parameters was found."})
+            raise CustomException(status=400, payload={"Infoblox": "No network with specified parameters was found."})
 
 
 

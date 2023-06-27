@@ -27,7 +27,7 @@ class Network:
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
+                endpoint=infoblox.baseurl+"network",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
@@ -57,8 +57,8 @@ class Network:
                 endpoint=infoblox.baseurl + "/" + _ref,
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
-                tlsVerify = infoblox.tlsverify,
-                silent = silent
+                tlsVerify=infoblox.tlsverify,
+                silent=silent
             )
 
             return api.put(
@@ -80,7 +80,7 @@ class Network:
                 endpoint=infoblox.baseurl + "/" + _ref,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
-                silent = silent
+                silent=silent
             )
 
             api.delete()
@@ -107,7 +107,7 @@ class Network:
 
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/ipv4address",
+                endpoint=infoblox.baseurl+"ipv4address",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify
@@ -134,11 +134,11 @@ class Network:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
+                endpoint=infoblox.baseurl+"network",
                 params=apiParams,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
-                silent = silent
+                silent=silent
             )
 
             return api.get()
@@ -153,7 +153,7 @@ class Network:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+"/network",
+                endpoint=infoblox.baseurl+"network",
                 params={
                     "_max_results": 65535,
                     "_return_fields+": "network,network_container,extattrs"
