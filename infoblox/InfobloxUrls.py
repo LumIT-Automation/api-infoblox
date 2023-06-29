@@ -3,7 +3,7 @@ from django.urls import path
 from .controllers import Root
 from .controllers.Asset import Asset, Assets
 from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerConditions
-from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range, DismissCloudNetworks
+from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range, DismissCloudNetworks, ModifyCloudNetwork
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
@@ -44,6 +44,7 @@ urlpatterns = [
 
     # Use cases.
     path('<int:assetId>/assign-cloud-network/', AssignCloudNetwork.InfobloxAssignCloudNetworkController.as_view(), name='infoblox-network-assign-network'),
+    path('<int:assetId>/modify-cloud-network/<str:networkAddress>/', ModifyCloudNetwork.InfobloxModifyCloudNetworkController.as_view(), name='infoblox-network-modify-network'),
     path('<int:assetId>/dismiss-cloud-networks/', DismissCloudNetworks.InfobloxDismissCloudNetworksController.as_view(), name='infoblox-network-dismiss-networks'),
 
     # Log history.
