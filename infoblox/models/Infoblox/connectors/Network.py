@@ -77,7 +77,7 @@ class Network:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl + "/" + _ref,
+                endpoint=infoblox.baseurl + _ref,
                 auth=(infoblox.username, infoblox.password),
                 tlsVerify=infoblox.tlsverify,
                 silent=silent

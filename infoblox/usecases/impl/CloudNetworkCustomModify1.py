@@ -61,24 +61,31 @@ class CloudNetworkCustomModify1(CloudNetworkModify):
             if self.region:
                 extattrs.update({"City": {"value": self.region}})
 
-            if data.get("extattrs", {}):
-                accountId = data.get("extattrs", {}).get("Account ID", "")
+            if extattrs:
+                accountId = extattrs.get("Account ID", {}).get("value", "")
                 if accountId:
                     previousNetworks = self.__getAccountNetworks(accountId=accountId)
                     if previousNetworks:
                         # Get the Account Name from the first occurrence.
-                        accountName = previousNetworks[0].get("extattrs", {}).get("Account Name", {}).get("value", "")
+                        accountName = previousNetworks[1].get("extattrs", {}).get("Account Name", {}).get("value", "")
                         extattrs.update({"Account Name": {"value": accountName}})
                 else:
-                    accountName = data.get("extattrs", {}).get("Account Name", "")
+                    accountName = extattrs.get("Account Name", {}).get("value", "")
                     if accountName:
                         previousNetworks = self.__getAccountNetworks(accountName=accountName)
                         # Get the Account ID from the first occurrence.
                         accountId = previousNetworks[0].get("extattrs", {}).get("Account ID", {}).get("value", "")
                         extattrs.update({"Account ID": {"value": accountId}})
 
+            # Add existing extattrs fields of the network that are missing in the input data.
+            Log.log(self.networkData, 'NNNNNNNNNNNNNNN')
+            for k, v in self.networkData["extattrs"].items():
+                if k not in extattrs:
+                    extattrs[k] = v
+
             if extattrs:
                 data["extattrs"] = extattrs
+
             return data
         except Exception as e:
             raise e
