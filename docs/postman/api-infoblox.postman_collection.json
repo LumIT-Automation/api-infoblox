@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e902e22d-1a1b-410f-bd12-37cc533cc5b3",
+		"_postman_id": "594516d9-1f6c-46fb-95af-bb66cd2a79cf",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1340,7 +1340,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/?fby=*Account ID&fval=Oh Sensei",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/networks/?fby=*Account ID&fval=Oh Sensei&fby=*Environment&fval=Cloud",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1364,6 +1364,14 @@
 								{
 									"key": "fval",
 									"value": "Oh Sensei"
+								},
+								{
+									"key": "fby",
+									"value": "*Environment"
+								},
+								{
+									"key": "fval",
+									"value": "Cloud"
 								}
 							]
 						}
