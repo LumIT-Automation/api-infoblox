@@ -30,7 +30,7 @@ class Ipv4:
 
             # Get children objects (ipv4, host, dns records ...)
             for objRef in ipv4AddressInfo["objects"]:
-                endpoint = infoblox.baseurl + objRef
+                endpoint = infoblox.baseurl+objRef
                 returnFields = "extattrs"
                 if "fixedaddress" in objRef:
                     returnFields = "network,network_view,extattrs,options,name,mac,comment,ipv4addr,use_options"
@@ -59,7 +59,7 @@ class Ipv4:
         try:
             infoblox = Asset(assetId)
             api = ApiSupplicant(
-                endpoint=infoblox.baseurl+""+ref,
+                endpoint=infoblox.baseurl+ref,
                 auth=(infoblox.username, infoblox.password),
                 params={
                     "_return_as_object": 1
