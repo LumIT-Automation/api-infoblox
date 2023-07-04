@@ -4,7 +4,7 @@ certifi==2023.5.7
 cffi==1.15.1
 charset-normalizer==2.0.12
 cryptography==36.0.2
-Django==4.2.2
+Django==4.2.3
 django-redis==5.2.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
@@ -21,5 +21,5 @@ redis==4.3.6
 requests==2.27.1
 setuptools==44.1.1
 sqlparse==0.4.4
-typing_extensions==4.6.3
+typing_extensions==4.7.1
 urllib3==1.26.16
