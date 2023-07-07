@@ -234,9 +234,10 @@ INHERIT_GRANDPARENTS_PERMISSIONS = True
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")
 CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomAssign1", "CloudNetworkCustomAssign1")
 CLOUD_ASSIGN_MAX_ACCOUNT_NETS = 3 # Number of maximum networks for Account in a region.
-CLOUD_DISMISS_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDismiss1", "CloudNetworkCustomDismiss1")
 CLOUD_MODIFY_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomModify1", "CloudNetworkCustomModify1")
+CLOUD_NETWORK_DELETE_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDelete1", "CloudNetworkCustomDelete1")
 CLOUD_EXTATTR_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomExtAttr1", "CloudNetworkCustomExtAttr1")
+CLOUD_DISMISS_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDismiss1", "CloudNetworkCustomDismiss1")
 
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'

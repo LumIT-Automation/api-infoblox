@@ -24,7 +24,7 @@ class InfobloxCloudNetworkExtAttrsController(CustomController):
         filters = dict()
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="extattrs_get", assetId=assetId) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="cloud_extattrs_get", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("Get networks list", user)
 
                 if 'fby' in request.GET and 'fval' in request.GET:

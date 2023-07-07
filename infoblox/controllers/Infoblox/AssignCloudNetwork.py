@@ -21,7 +21,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="assign_network", assetId=assetId) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="cloud_network_assign_put", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("assign network in container use case", user)
                 Log.actionLog("User data: "+str(request.data), user)
 

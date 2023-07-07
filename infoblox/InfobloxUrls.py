@@ -4,7 +4,7 @@ from .controllers import Root
 from .controllers.Asset import Asset, Assets
 from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerConditions
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
-from .controllers.Infoblox import AssignCloudNetwork, DismissCloudNetworks, ModifyCloudNetwork, CloudNetworkExtAttrs
+from .controllers.Infoblox import AssignCloudNetwork, ModifyCloudNetwork, DeleteCloudNetworks, CloudNetworkExtAttrs, DismissCloudNetworks
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
@@ -44,9 +44,10 @@ urlpatterns = [
     path('<int:assetId>/ipv4s/', Ipv4s.InfobloxIpv4sController.as_view(), name='infoblox-ipv4s'),
 
     # Use cases.
-    path('<int:assetId>/assign-cloud-network/', AssignCloudNetwork.InfobloxAssignCloudNetworkController.as_view(), name='infoblox-network-assign-network'),
-    path('<int:assetId>/modify-cloud-network/<str:networkAddress>/', ModifyCloudNetwork.InfobloxModifyCloudNetworkController.as_view(), name='infoblox-network-modify-network'),
-    path('<int:assetId>/dismiss-cloud-networks/', DismissCloudNetworks.InfobloxDismissCloudNetworksController.as_view(), name='infoblox-network-dismiss-networks'),
+    path('<int:assetId>/assign-cloud-network/', AssignCloudNetwork.InfobloxAssignCloudNetworkController.as_view(), name='infoblox-assign-cloud-network'),
+    path('<int:assetId>/modify-cloud-network/<str:networkAddress>/', ModifyCloudNetwork.InfobloxModifyCloudNetworkController.as_view(), name='infoblox-modify-cloud-network'),
+    path('<int:assetId>/delete-cloud-network/<str:networkAddress>/', DeleteCloudNetworks.InfobloxDeleteCloudNetworksController.as_view(), name='infoblox-delete-cloud-network'),
+    path('<int:assetId>/dismiss-cloud-networks/', DismissCloudNetworks.InfobloxDismissCloudNetworksController.as_view(), name='infoblox-dismiss-cloud-networks'),
     path('<int:assetId>/list-cloud-extattrs/<str:extattr>/', CloudNetworkExtAttrs.InfobloxCloudNetworkExtAttrsController.as_view(), name='infoblox-cloud-extattrs'),
 
     # Log history.
