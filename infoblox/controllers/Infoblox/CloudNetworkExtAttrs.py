@@ -8,6 +8,7 @@ from infoblox.usecases.CloudExtAttrFactory import CloudExtAttrFactory
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Lock import Lock
+from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
 
@@ -43,7 +44,15 @@ class InfobloxCloudNetworkExtAttrsController(CustomController):
                         elif extattr == "account+provider":
                             data["data"]["items"] = CloudExtAttrFactory(assetId, user)().listAccountsProviders(filters)
 
-                    httpStatus = status.HTTP_200_OK
+                        # Check the response's ETag validity (against client request).
+                        conditional = Conditional(request)
+                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                        Log.log(etagCondition, '_')
+                        if etagCondition["state"] == "fresh":
+                            data = None
+                            httpStatus = status.HTTP_304_NOT_MODIFIED
+                        else:
+                            httpStatus = status.HTTP_200_OK
                     lock.release()
                 else:
                     data = None
