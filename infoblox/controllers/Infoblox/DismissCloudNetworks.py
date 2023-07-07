@@ -21,7 +21,7 @@ class InfobloxDismissCloudNetworksController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="dismiss_network", assetId=assetId) or user["authDisabled"]:
+            if Permission.hasUserPermission(groups=user["groups"], action="dismiss_cloud_network_put", assetId=assetId) or user["authDisabled"]:
                 Log.actionLog("dismiss cloud networks", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
