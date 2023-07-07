@@ -14,7 +14,7 @@ from infoblox.helpers.Log import Log
 class InfobloxCloudNetworkExtAttrsController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int, extattr: str) -> Response:
-        data = dict()
+        data = {"data": {}}
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
 
@@ -39,9 +39,9 @@ class InfobloxCloudNetworkExtAttrsController(CustomController):
 
                     if extattr:
                         if extattr == "provider":
-                            data["data"] = CloudExtAttrFactory(assetId, user)().listProviders(filters)
+                            data["data"]["items"] = CloudExtAttrFactory(assetId, user)().listProviders(filters)
                         elif extattr == "account+provider":
-                            data["data"] = CloudExtAttrFactory(assetId, user)().listAccountsProviders(filters)
+                            data["data"]["items"] = CloudExtAttrFactory(assetId, user)().listAccountsProviders(filters)
 
                     httpStatus = status.HTTP_200_OK
                     lock.release()

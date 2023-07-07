@@ -21,37 +21,47 @@ class CloudNetworkCustomExtAttr1(CloudNetworkExtAttr):
     # Public methods
     ####################################################################################################################
 
-    def listProviders(self, filter: dict = None, *args, **kwargs) -> set:
+    def listProviders(self, filter: dict = None, *args, **kwargs) -> list:
         filter = filter or {}
+        l = list()
 
         try:
             if not filter:
                 containers = self.__getContainers() # optimization.
-                return set(
-                    [ container.get("extattrs", {}).get("Country", {}).get("value", "")[6:] for container in containers ]
-                )
+                for container in containers:
+                    d = {"Country": container.get("extattrs", {}).get("Country", {}).get("value", "")}
+                    if d not in l:
+                        l.append(d)
+
             else:
                 networks = self.__getNetworks(filter) # can't optimize.
-                return set(
-                    [ network.get("extattrs", {}).get("Country", {}).get("value", "")[6:] for network in networks ]
-                )
+                for network in networks:
+                    d = {"Country": network.get("extattrs", {}).get("Country", {}).get("value", "")}
+                    if d not in l:
+                        l.append(d)
 
+            return l
         except Exception as e:
             raise e
 
 
 
-    def listAccountsProviders(self, filter: dict = None, *args, **kwargs) -> set:
+    def listAccountsProviders(self, filter: dict = None, *args, **kwargs) -> list:
         filter = filter or {}
+        l = list()
 
         try:
             networks = self.__getNetworks(filter)
-            return set([
-                network.get("extattrs", {}).get("Account ID", {}).get("value", "") + "::" + \
-                network.get("extattrs", {}).get("Account Name", {}).get("value", "") + "::" + \
-                network.get("extattrs", {}).get("Country", {}).get("value", "")[6:] \
-                for network in networks
-            ])
+            for network in networks:
+                d = {
+                    "Account ID": network.get("extattrs", {}).get("Account ID", {}).get("value", ""),
+                    "Account Name": network.get("extattrs", {}).get("Account Name", {}).get("value", ""),
+                    "Country": network.get("extattrs", {}).get("Country", {}).get("value", "")
+                }
+                if d not in l:
+                    l.append(d)
+
+            return l
         except Exception as e:
             raise e
 
