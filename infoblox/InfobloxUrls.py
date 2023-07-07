@@ -3,7 +3,8 @@ from django.urls import path
 from .controllers import Root
 from .controllers.Asset import Asset, Assets
 from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerConditions
-from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, AssignCloudNetwork, Ranges, Range, DismissCloudNetworks, ModifyCloudNetwork
+from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
+from .controllers.Infoblox import AssignCloudNetwork, DismissCloudNetworks, ModifyCloudNetwork, CloudNetworkExtAttrs
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
@@ -46,6 +47,7 @@ urlpatterns = [
     path('<int:assetId>/assign-cloud-network/', AssignCloudNetwork.InfobloxAssignCloudNetworkController.as_view(), name='infoblox-network-assign-network'),
     path('<int:assetId>/modify-cloud-network/<str:networkAddress>/', ModifyCloudNetwork.InfobloxModifyCloudNetworkController.as_view(), name='infoblox-network-modify-network'),
     path('<int:assetId>/dismiss-cloud-networks/', DismissCloudNetworks.InfobloxDismissCloudNetworksController.as_view(), name='infoblox-network-dismiss-networks'),
+    path('<int:assetId>/list-cloud-extattrs/<str:extattr>/', CloudNetworkExtAttrs.InfobloxCloudNetworkExtAttrsController.as_view(), name='infoblox-cloud-extattrs'),
 
     # Log history.
     path('history/', History.HistoryLogsController.as_view(), name='f5-log-history'),

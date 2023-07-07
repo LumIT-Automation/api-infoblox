@@ -78,7 +78,6 @@ class CloudNetworkCustomModify1(CloudNetworkModify):
                         extattrs.update({"Account ID": {"value": accountId}})
 
             # Add existing extattrs fields of the network that are missing in the input data.
-            Log.log(self.networkData, 'NNNNNNNNNNNNNNN')
             for k, v in self.networkData["extattrs"].items():
                 if k not in extattrs:
                     extattrs[k] = v
