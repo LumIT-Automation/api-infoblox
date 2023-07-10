@@ -6,7 +6,7 @@ from infoblox.models.Permission.Permission import Permission
 
 from infoblox.usecases.ModifycloudNetworkFactory import ModifyCloudNetworkFactory
 
-from infoblox.serializers.Infoblox.wrappers.AssignNetwork import InfobloxAssignNetworkSerializer as Serializer
+from infoblox.serializers.Infoblox.wrappers.ModifyCloudNetwork import InfobloxModifyCloudNetworkSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -25,11 +25,9 @@ class InfobloxModifyCloudNetworkController(CustomController):
                 Log.actionLog("modify cloud network use case", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                #serializer = Serializer(data=request.data["data"])
-                #if serializer.is_valid():
-                #    data = serializer.validated_data
-                if True:
-                    data = request.data["data"]
+                serializer = Serializer(data=request.data["data"])
+                if serializer.is_valid():
+                    data = serializer.validated_data
                     lock = Lock("network", locals(), networkAddress)
                     if lock.isUnlocked():
                         lock.lock()

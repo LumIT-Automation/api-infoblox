@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-class InfobloxExtAttrSerializer(serializers.Serializer):
-    class InfobloxExtAttrInnerSerializer(serializers.Serializer):
+class InfobloxCloudExtAttrSerializer(serializers.Serializer):
+    class InfobloxCloudExtAttrInnerSerializer(serializers.Serializer):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
@@ -9,4 +9,4 @@ class InfobloxExtAttrSerializer(serializers.Serializer):
             self.fields["Account Name"] = serializers.CharField(max_length=64, required=False)
             self.fields["Country"] = serializers.CharField(max_length=64, required=False)
 
-    data = InfobloxExtAttrInnerSerializer(many=True, required=False)
+    data = InfobloxCloudExtAttrInnerSerializer(many=True, required=False)

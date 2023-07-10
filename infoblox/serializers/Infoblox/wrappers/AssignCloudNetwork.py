@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-class InfobloxAssignNetworkSerializer(serializers.Serializer):
+class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
     class InfobloxAssignNetworkDataSerializer(serializers.Serializer):
         class InfobloxNetworkValueStringSerializer(serializers.RegexField):
             def __init__(self, *args, **kwargs):

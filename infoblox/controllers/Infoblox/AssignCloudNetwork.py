@@ -6,7 +6,7 @@ from infoblox.models.Permission.Permission import Permission
 
 from infoblox.usecases.AssigncloudNetworkFactory import AssignCloudNetworkFactory
 
-from infoblox.serializers.Infoblox.wrappers.AssignNetwork import InfobloxAssignNetworkSerializer as Serializer
+from infoblox.serializers.Infoblox.wrappers.AssignCloudNetwork import InfobloxAssignCloudNetworkSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 

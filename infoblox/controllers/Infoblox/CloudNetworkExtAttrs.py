@@ -6,7 +6,7 @@ from infoblox.models.Permission.Permission import Permission
 
 from infoblox.usecases.CloudExtAttrFactory import CloudExtAttrFactory
 
-from infoblox.serializers.Infoblox.wrappers.Extattr import InfobloxExtAttrSerializer as Serializer
+from infoblox.serializers.Infoblox.wrappers.CloudExtattr import InfobloxCloudExtAttrSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Lock import Lock
