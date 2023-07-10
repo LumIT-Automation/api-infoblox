@@ -6,8 +6,11 @@ from infoblox.models.Permission.Permission import Permission
 
 from infoblox.usecases.CloudExtAttrFactory import CloudExtAttrFactory
 
+from infoblox.serializers.Infoblox.wrappers.Extattr import InfobloxExtAttrSerializer as Serializer
+
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Lock import Lock
+from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
@@ -40,9 +43,16 @@ class InfobloxCloudNetworkExtAttrsController(CustomController):
 
                     if extattr:
                         if extattr == "provider":
-                            data["data"]["items"] = CloudExtAttrFactory(assetId, user)().listProviders(filters)
+                            data["data"] = CloudExtAttrFactory(assetId, user)().listProviders(filters)
                         elif extattr == "account+provider":
-                            data["data"]["items"] = CloudExtAttrFactory(assetId, user)().listAccountsProviders(filters)
+                            data["data"] = CloudExtAttrFactory(assetId, user)().listAccountsProviders(filters)
+                        else:
+                            raise CustomException(status=403, payload={"Infoblox": "Wrong extattr param."})
+
+                        serializer = Serializer(data=data["data"])
+                        if serializer.is_valid():
+                            data["data"]["items"] = serializer.validated_data["data"]
+                            data["href"] = request.get_full_path()
 
                         # Check the response's ETag validity (against client request).
                         conditional = Conditional(request)
