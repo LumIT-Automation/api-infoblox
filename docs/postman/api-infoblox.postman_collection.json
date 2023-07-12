@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d40bcd50-c95a-42a1-8b55-662ca6bd9aaf",
+		"_postman_id": "d7e90862-127b-45b7-acfe-41fff3a838ea",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1178,7 +1178,7 @@
 							"response": []
 						},
 						{
-							"name": "modify-cloud-network Copy",
+							"name": "modify-cloud-network",
 							"request": {
 								"auth": {
 									"type": "noauth"
