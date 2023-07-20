@@ -29,14 +29,14 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def assignNetwork(self, data: dict, *args, **kwargs) -> str:
         try:
-            # Get networks assigned to Account ID.
+            # Get networks assigned to Account ID (extattr).
             accountIdNetworks = Network.listData(self.assetId, {
-                "*Account ID": data["extattrs"]["Account ID"]["value"]
+                "*Account ID": data.get("extattrs", {}).get("Account ID", {}).get("value", "-")
             })
 
             if accountIdNetworks:
                 try:
-                    # Forbid networks with same Account ID but different Account Name.
+                    # Forbid Account ID with different Account Name.
                     for net in accountIdNetworks:
                         if net.get("extattrs", {}).get("Account Name", {}).get("value", "") != data.get("extattrs", {}).get("Account Name", {}).get("value", ""):
                             raise CustomException(status=400, payload={"Infoblox": "A network with the same Account ID but different Account Name exists: "+net["network"]})
@@ -46,7 +46,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 # CLOUD_ASSIGN_MAX_ACCOUNT_NETS is the maximum number of networks for Account ID in a region.
                 if hasattr(settings, "CLOUD_ASSIGN_MAX_ACCOUNT_NETS"):
                     if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in accountIdNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
-                        raise CustomException(status=400, payload={"Infoblox": "Maximum number of networks for this Account ID in this region already reached."})
+                        raise CustomException(status=400, payload={"Infoblox": "The maximum number of networks for this Account ID in this region has been reached."})
 
             return self.__pickContainer(data)
         except Exception as e:
@@ -58,11 +58,31 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
     # Private methods
     ####################################################################################################################
 
+    def __getEligibleContainers(self) -> list:
+        try:
+            filter = {
+                "*Environment": "Cloud",
+                "*Country": "Cloud-" + self.provider
+            }
+            if self.region:
+                filter.update({"*City": self.region})
+                nc = NetworkContainer.listData(self.assetId, filter)
+            else:
+                l = NetworkContainer.listData(self.assetId, filter)
+                nc = [container for container in l if not container.get("extattrs", {}).get("City", {}).get("value", "")]
+
+            # Eligible container networks.
+            return nc
+        except Exception as e:
+            raise e
+
+
+
     def __pickContainer(self, data: dict) -> str:
         out = ""
 
         try:
-            containers = self.__getContainers()
+            containers = self.__getEligibleContainers()
             if containers:
                 for container in containers:
                     networkContainer = container["network"]
@@ -97,26 +117,6 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 return n
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
-        except Exception as e:
-            raise e
-
-
-
-    def __getContainers(self) -> list:
-        try:
-            filter = {
-                "*Environment": "Cloud",
-                "*Country": "Cloud-" + self.provider
-            }
-            if self.region:
-                filter.update({"*City": self.region})
-                nc = NetworkContainer.listData(self.assetId, filter)
-            else:
-                l = NetworkContainer.listData(self.assetId, filter)
-                nc = [container for container in l if not container.get("extattrs", {}).get("City", {}).get("value", "")]
-
-            # Eligible container networks.
-            return nc
         except Exception as e:
             raise e
 
