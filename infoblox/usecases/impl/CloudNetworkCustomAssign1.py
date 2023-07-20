@@ -29,52 +29,57 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def assignNetwork(self, data: dict, *args, **kwargs) -> str:
         try:
-            previousNetworks = self.__getAccountIdNetworks(data["extattrs"]["Account ID"]["value"])
-            if previousNetworks:
+            # Get networks assigned to Account ID.
+            accountIdNetworks = Network.listData(self.assetId, {
+                "*Account ID": data["extattrs"]["Account ID"]["value"]
+            })
+
+            if accountIdNetworks:
                 try:
-                    # Check the given account name against the entries in previousNetworks.
-                    for net in previousNetworks:
+                    # Forbid networks with same Account ID but different Account Name.
+                    for net in accountIdNetworks:
                         if net.get("extattrs", {}).get("Account Name", {}).get("value", "") != data.get("extattrs", {}).get("Account Name", {}).get("value", ""):
                             raise CustomException(status=400, payload={"Infoblox": "A network with the same Account ID but different Account Name exists: "+net["network"]})
-                except KeyError:
-                    raise CustomException(status=400, payload={"Infoblox": "Missing field in data given or in a previous assigned network."})
                 except Exception as e:
                     raise e
 
                 # CLOUD_ASSIGN_MAX_ACCOUNT_NETS is the maximum number of networks for Account ID in a region.
                 if hasattr(settings, "CLOUD_ASSIGN_MAX_ACCOUNT_NETS"):
-                    if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in previousNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
-                        raise CustomException(status=400, payload={"Infoblox": "Maximun number of networks for this Accoun ID in this region already reached."})
-
+                    if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in accountIdNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
+                        raise CustomException(status=400, payload={"Infoblox": "Maximum number of networks for this Account ID in this region already reached."})
 
             return self.__pickContainer(data)
         except Exception as e:
             raise e
 
 
-    def __pickContainer(self, data: dict, *args, **kwargs) -> str:
+
+    ####################################################################################################################
+    # Private methods
+    ####################################################################################################################
+
+    def __pickContainer(self, data: dict) -> str:
         out = ""
 
         try:
-            if self.containers is None:
-                self.containers = self.__getContainers()
+            containers = self.__getContainers()
+            if containers:
+                for container in containers:
+                    networkContainer = container["network"]
+                    try:
+                        Log.log(f"Trying {networkContainer}...")
+                        return self.__assign(networkContainer, data)
+                    except CustomException as c:
+                        out = c.payload.get("Infoblox", str(c.payload)) # this message is overwritten if there are other containers to which ask for the network.
+                    except Exception as e:
+                        out = e.__str__() # this message is overwritten if there are other containers to which ask for the network.
+            else:
+                raise CustomException(status=400, payload={"Infoblox": "No network container with the specified parameters found."})
         except Exception as e:
             raise e
 
-        if self.containers:
-            for container in self.containers:
-                networkContainer = container["network"]
-                try:
-                    Log.log(f"Trying {networkContainer}...")
-                    return self.__assign(networkContainer, data)
-                except CustomException as c:
-                    out = c.payload.get("Infoblox", str(c.payload)) # this message is overwritten if there are other containers to which ask for the network.
-                except Exception as e:
-                    out = e.__str__() # this message is overwritten if there are other containers to which ask for the network.
-        else:
-            raise CustomException(status=400, payload={"Infoblox": "No network container with the specified parameters found."})
-
         return out
+
 
 
     def __assign(self, container: str, data: dict) -> str:
@@ -92,15 +97,10 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 return n
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
-
         except Exception as e:
             raise e
 
 
-
-    ####################################################################################################################
-    # Private methods
-    ####################################################################################################################
 
     def __getContainers(self) -> list:
         try:
@@ -122,20 +122,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
 
 
-    def __getAccountIdNetworks(self, accountId: str):
-        try:
-            return Network.listData(self.assetId, {
-                "*Account ID": accountId
-            })
-
-        except Exception as e:
-            raise e
-
-
-
     def __historyLog(self, network, status) -> int:
-        historyId = 0
-
         try:
             data = {
                 "log": {

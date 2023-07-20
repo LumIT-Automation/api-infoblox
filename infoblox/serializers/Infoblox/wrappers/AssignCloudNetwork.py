@@ -22,7 +22,6 @@ class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
         extattrs = InfobloxNetworkInnerExtattrsSerializer(required=True)
         comment = serializers.CharField(max_length=255, allow_blank=True, required=True)
 
-
     provider = serializers.CharField(max_length=255, required=True)
     region = serializers.CharField(max_length=255, required=False, allow_blank=True)
     network_data = InfobloxAssignNetworkDataSerializer(required=True)

@@ -33,7 +33,9 @@ class InfobloxAssignCloudNetworkController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data.get("region", ""), user)().assignNetwork(data["network_data"])
+                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data.get("region", ""), user)().assignNetwork(
+                            data["network_data"]
+                        )
 
                         httpStatus = status.HTTP_201_CREATED
                         lock.release()
