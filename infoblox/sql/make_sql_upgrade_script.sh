@@ -4,7 +4,7 @@ set -e
 HELP="usage: $0 -o [The commit of the old schema version] (mandatory)\\n
 -n [Commit or branch at which make the update] (mandatory)\\n
 -d [dev-setup directory] (mandatory)\\n
--r [git repository directory] (mandatory)\\n
+-r [git repository directory]\\n
 -v [prepare VM for db comparison]\\n
 -w [workdir] (default: /tmp)\\n
 [-h] this help
@@ -26,7 +26,7 @@ while getopts "o:n:d:r:w:vh" opt
 done
 shift $(($OPTIND - 1))
 
-if [ -z "$oldCommit" ] || [ -z "$newCommit" ] || [ -z "$devSetupDir" ] || [ -z "$repoDir" ]; then
+if [ -z "$oldCommit" ] || [ -z "$newCommit" ] || [ -z "$devSetupDir" ]; then
     echo "Argument missing."
     echo
     echo -e ${HELP}
@@ -37,15 +37,24 @@ if [ -z "$workDir" ]; then
     workDir=/tmp
 fi
 
+if [ -z "$repoDir" ]; then
+    repoDir=$(cd ../.. && pwd)
+    if [ ! -f ${repoDir}/.git/config ]; then
+        echo "\$repoDir: $repoDir is not a git repo, please use the -r option."
+        exit 1
+    fi
+fi
+
+api=infoblox
 # db schema file in the git repo.
-sqlSchemaFile=infoblox/sql/infoblox.schema.sql
+sqlSchemaFile=${api}/sql/${api}.schema.sql
 # db data file in the git repo.
-sqlDataFile=infoblox/sql/infoblox.data.sql
+sqlDataFile=${api}/sql/${api}.data.sql
 # Tables that need data update.
 updateTables='privilege role_privilege role'
 
-sqlFileOld=${workDir}/infoblox_old.sql
-sqlFileNew=${workDir}/infoblox_new.sql
+sqlFileOld=${workDir}/${api}_old.sql
+sqlFileNew=${workDir}/${api}_new.sql
 
 dbUser=migrator
 dbPassword=`uuidgen -r | tr -d '-' | head -c 12`
