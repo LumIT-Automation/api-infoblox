@@ -67,7 +67,7 @@ class CloudNetworkCustomModify1(CloudNetworkModify):
                     previousNetworks = self.__getAccountNetworks(accountId=accountId)
                     if previousNetworks:
                         # Get the Account Name from the first occurrence.
-                        accountName = previousNetworks[1].get("extattrs", {}).get("Account Name", {}).get("value", "")
+                        accountName = previousNetworks[0].get("extattrs", {}).get("Account Name", {}).get("value", "")
                         extattrs.update({"Account Name": {"value": accountName}})
                 else:
                     accountName = extattrs.get("Account Name", {}).get("value", "")
