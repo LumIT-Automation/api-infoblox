@@ -23,5 +23,5 @@ class InfobloxModifyCloudNetworkSerializer(serializers.Serializer):
 
 
     #provider = serializers.CharField(max_length=255, required=False)
-    region = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    #region = serializers.CharField(max_length=255, required=False, allow_blank=True)
     network_data = InfobloxModifyNetworkDataSerializer(required=True)
