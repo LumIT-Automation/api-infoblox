@@ -29,9 +29,14 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def assignNetwork(self, data: dict, *args, **kwargs) -> str:
         try:
-            # Get networks assigned to Account ID (extattr).
+            # Get networks assigned to the given Account ID (extattr).
             accountIdNetworks = Network.listData(self.assetId, {
                 "*Account ID": data.get("extattrs", {}).get("Account ID", {}).get("value", "-")
+            })
+
+            # Get networks assigned to the given Account Name (extattr).
+            accountNameNetworks = Network.listData(self.assetId, {
+                "*Account Name": data.get("extattrs", {}).get("Account Name", {}).get("value", "-")
             })
 
             if accountIdNetworks:
@@ -39,7 +44,17 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                     # Forbid Account ID with different Account Name.
                     for net in accountIdNetworks:
                         if net.get("extattrs", {}).get("Account Name", {}).get("value", "") != data.get("extattrs", {}).get("Account Name", {}).get("value", ""):
-                            raise CustomException(status=400, payload={"Infoblox": "A network with the same Account ID but different Account Name exists: "+net["network"]})
+                            raise CustomException(status=400, payload={"Infoblox": "A network with the Account ID "+data.get("extattrs", {}).get("Account ID", {}).get("value", "" )+" but different Account Name exists: "+net["network"]})
+                        if net.get("extattrs", {}).get("Reference", {}).get("value", "") != data.get("extattrs", {}).get("Reference", {}).get("value", ""):
+                            raise CustomException(status=400, payload={"Infoblox": "A network with the Account ID "+data.get("extattrs", {}).get("Account ID", {}).get("value", "" )+" but different Reference exists: "+net["network"]})
+                except Exception as e:
+                    raise e
+
+            if accountNameNetworks:
+                try:
+                    for net in accountNameNetworks:
+                        if net.get("extattrs", {}).get("Account ID", {}).get("value", "") != data.get("extattrs", {}).get("Account ID", {}).get("value", ""):
+                            raise CustomException(status=400, payload={"Infoblox": "A network with the Account Name "+data.get("extattrs", {}).get("Account Name", {}).get("value", "" )+" but different Account ID exists: "+net["network"]})
                 except Exception as e:
                     raise e
 
