@@ -80,6 +80,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def __pickContainer(self, data: dict) -> str:
         out = ""
+        status = 0
 
         try:
             containers = self.__getEligibleContainers()
@@ -91,13 +92,17 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                         return self.__assign(networkContainer, data)
                     except CustomException as c:
                         out = c.payload.get("Infoblox", str(c.payload)) # this message is overwritten if there are other containers to which ask for the network.
+                        status = c.status
                     except Exception as e:
                         out = e.__str__() # this message is overwritten if there are other containers to which ask for the network.
+                        status = 500
             else:
                 raise CustomException(status=400, payload={"Infoblox": "No network container with the specified parameters found."})
         except Exception as e:
             raise e
 
+        if status:
+            raise CustomException(status=status, payload={"Infoblox": out})
         return out
 
 

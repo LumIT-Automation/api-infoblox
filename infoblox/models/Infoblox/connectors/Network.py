@@ -172,4 +172,4 @@ class Network:
         except Exception as e:
             raise e
 
-        return o
+        return str(o)
