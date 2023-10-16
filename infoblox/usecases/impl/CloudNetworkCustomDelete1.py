@@ -31,7 +31,7 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
                 from infoblox.controllers.CustomController import CustomController
                 network.delete()
                 hid = self.__historyLog(network.network, 'deleted')
-                CustomController.plugins(controller="cloud-network_delete", requestType="network.delete", requestStatus="success", network=network.network, user=self.user, historyId=hid)
+                CustomController.plugins(controller="delete-cloud-networks_delete", requestType="network.delete", requestStatus="success", network=network.network, user=self.user, historyId=hid)
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
 
