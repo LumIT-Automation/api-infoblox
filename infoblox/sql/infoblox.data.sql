@@ -132,8 +132,6 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (2, 22),
 (2, 23),
 (2, 25),
-(2, 33),
-(2, 34),
 (2, 35),
 (3, 3),
 (3, 5),
