@@ -66,7 +66,6 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
     response = response or {}
 
     action = ""
-
     if controller in ("ipv4s_post", "ipv4_get", "ipv4_delete", "ipv4_patch"):
         Log.log("[Plugins] Running CiscoSpark plugin")
 
@@ -144,7 +143,8 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
 
                 CiscoSpark.send(user, message)
 
-    elif controller == "dismiss-cloud-network_put":
+
+    elif controller == "delete-cloud-networks_delete":
         Log.log("[Plugins] Running CiscoSpark plugin")
 
         if requestStatus == "success" or requestStatus == "forbidden":
@@ -164,3 +164,4 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
             if historyId:
                 message += "Unique operation ID: " + str(historyId) + "\n"
             CiscoSpark.send(user, message)
+
