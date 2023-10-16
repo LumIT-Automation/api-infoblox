@@ -124,7 +124,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def __assign(self, container: str, data: dict) -> str:
         try:
-            if Permission.hasUserPermission(groups=self.user["groups"], action="assign_network", assetId=self.assetId, network=container) or self.user["authDisabled"]:
+            if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_assign_put", assetId=self.assetId, container=container) or self.user["authDisabled"]:
                 n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
                         subnetMaskCidr=24,
                         data=data
