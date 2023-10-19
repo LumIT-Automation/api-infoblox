@@ -56,7 +56,8 @@ class CloudNetworkCustomExtAttr1(CloudNetworkExtAttr):
                 d = {
                     "Account ID": network.get("extattrs", {}).get("Account ID", {}).get("value", ""),
                     "Account Name": network.get("extattrs", {}).get("Account Name", {}).get("value", ""),
-                    "Country": network.get("extattrs", {}).get("Country", {}).get("value", "")
+                    "Country": network.get("extattrs", {}).get("Country", {}).get("value", ""),
+                    "Reference": network.get("extattrs", {}).get("Reference", {}).get("value", "")
                 }
                 if d not in l:
                     l.append(d)
