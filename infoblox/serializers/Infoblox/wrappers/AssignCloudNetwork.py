@@ -19,6 +19,7 @@ class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
                 self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
 
         network = InfobloxNetworkValueStringSerializer(required=True)
+        subnetMaskCidr = serializers.IntegerField(required=False)
         extattrs = InfobloxNetworkInnerExtattrsSerializer(required=True)
         comment = serializers.CharField(max_length=255, allow_blank=True, required=False)
 

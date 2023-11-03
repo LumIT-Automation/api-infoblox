@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "d7e90862-127b-45b7-acfe-41fff3a838ea",
+		"_postman_id": "9ec34f4f-2470-426f-9380-bed46ff38d77",
 		"name": "api-infoblox",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30146130"
 	},
 	"item": [
 		{
@@ -1154,7 +1155,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"subnetMaskCidr\": 24,\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Sensei\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "http://10.0.111.21/api/v1/infoblox/1/assign-cloud-network/",
@@ -1203,10 +1204,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"comment\": \"Nella vecchia fattoria ia ia oooooooooooh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Senseio\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Senseio\"\n                },\n                \"Reference\": {\n                    \"value\": \"Oh Sensei\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"comment\": \"Nella vecchia fattoria ia ia oooooooooooh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"Oh Senseio\"\n                },\n                \"Account Name\": {\n                    \"value\": \"Oh Senseio\"\n                },\n                \"Reference\": {\n                    \"value\": \"parolaio\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/1/modify-cloud-network/10.9.27.0/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/modify-cloud-network/172.16.0.0/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -1220,7 +1221,7 @@
 										"infoblox",
 										"1",
 										"modify-cloud-network",
-										"10.9.27.0",
+										"172.16.0.0",
 										""
 									]
 								}
@@ -1400,7 +1401,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/1/delete-cloud-network/10.9.29.0/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/delete-cloud-network/172.16.2.0/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -1414,7 +1415,7 @@
 										"infoblox",
 										"1",
 										"delete-cloud-network",
-										"10.9.29.0",
+										"172.16.2.0",
 										""
 									]
 								}
@@ -1696,7 +1697,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/10.9.11.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/172.16.0.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1710,7 +1711,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"10.9.11.0",
+								"172.16.0.0",
 								""
 							]
 						}
