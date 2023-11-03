@@ -233,7 +233,7 @@ INHERIT_GRANDPARENTS_PERMISSIONS = True
 # Plugins and configuration.
 IP_RESERVE_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4CustomReserve1", "Ipv4CustomReserve1")
 CLOUD_ASSIGN_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomAssign1", "CloudNetworkCustomAssign1")
-CLOUD_MAX_ACCOUNT_REGION = 2 # maximum number of regions for Account.
+CLOUD_MAX_ACCOUNT_REGION = 3 # maximum number of regions for Account.
 CLOUD_MAX_ACCOUNT_REGION_NETS = 2 # maximum number of networks for Account in a region.
 
 CLOUD_MODIFY_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomModify1", "CloudNetworkCustomModify1")
