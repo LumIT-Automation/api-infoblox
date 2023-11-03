@@ -28,7 +28,7 @@ class CloudNetworkCustomModify1(CloudNetworkModify):
     # Public methods
     ####################################################################################################################
 
-    def modifyNetwork(self, data: dict, *args, **kwargs) -> str:
+    def modifyNetwork(self, data: dict, *args, **kwargs) -> dict:
         try:
             data = self.__formatData(data)
             o = self.network.modify(data)
@@ -66,6 +66,16 @@ class CloudNetworkCustomModify1(CloudNetworkModify):
                 if accountId:
                     previousNetworks = self.__getAccountNetworks(accountId=accountId)
                     if previousNetworks:
+                        previousNetworksRegions = [ net.get("extattrs", {}).get("City", {}).get("value", "") for net in previousNetworks ]
+                        networkRegion = self.network.repr().get("extattrs", {}).get("City", {}).get("value", "")
+
+                        if previousNetworksRegions.count(networkRegion) >= settings.CLOUD_MAX_ACCOUNT_REGION_NETS:
+                            raise  CustomException(status=400, payload={"Infoblox": "The maximum number of networks for this Account ID in this region has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION_NETS)})
+
+                        previousNetworksRegions.append(networkRegion)
+                        if len(set(previousNetworksRegions)) >= settings.CLOUD_MAX_ACCOUNT_REGION:
+                            raise CustomException(status=400, payload={"Infoblox": "The maximum number of regions for this Account ID has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION)})
+
                         # Get the Account Name from the first occurrence.
                         accountName = previousNetworks[0].get("extattrs", {}).get("Account Name", {}).get("value", "")
                         if accountName:
