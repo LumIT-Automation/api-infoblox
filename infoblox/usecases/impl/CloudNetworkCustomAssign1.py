@@ -58,10 +58,15 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                 except Exception as e:
                     raise e
 
-                # CLOUD_ASSIGN_MAX_ACCOUNT_NETS is the maximum number of networks for Account ID in a region.
-                if hasattr(settings, "CLOUD_ASSIGN_MAX_ACCOUNT_NETS"):
-                    if settings.CLOUD_ASSIGN_MAX_ACCOUNT_NETS <= len([net for net in accountIdNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
-                        raise CustomException(status=400, payload={"Infoblox": "The maximum number of networks for this Account ID in this region has been reached."})
+                # CLOUD_MAX_ACCOUNT_REGION is the maximum number of regions for Account ID.
+                if hasattr(settings, "CLOUD_MAX_ACCOUNT_REGION"):
+                    if settings.CLOUD_MAX_ACCOUNT_REGION < len(set( [ net.get("extattrs", {}).get("City", {}).get("value", "") for net in accountIdNetworks ] )):
+                        raise CustomException(status=400, payload={"Infoblox": "The maximum number of regions for this Account ID has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION)})
+
+                # CLOUD_MAX_ACCOUNT_REGION_NETS is the maximum number of networks for Account ID in a region.
+                if hasattr(settings, "CLOUD_MAX_ACCOUNT_REGION_NETS"):
+                    if settings.CLOUD_MAX_ACCOUNT_REGION_NETS <= len([net for net in accountIdNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
+                        raise CustomException(status=400, payload={"Infoblox": "The maximum number of networks for this Account ID in this region has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION_NETS)})
 
             return self.__pickContainer(data)
         except Exception as e:
@@ -123,10 +128,19 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
 
     def __assign(self, container: str, data: dict) -> str:
+        subnetMaskCidr = 24
+
         try:
             if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_assign_put", assetId=self.assetId, container=container) or self.user["authDisabled"]:
+                if "subnetMaskCidr" in data:
+                    if data["subnetMaskCidr"] == 24 or data["subnetMaskCidr"] == 23:
+                        subnetMaskCidr = data["subnetMaskCidr"]
+                        del data["subnetMaskCidr"]
+                    else:
+                        raise CustomException(status=400, payload={"Infoblox": "Bad subnet mask given: can be 23 or 24."})
+
                 n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
-                        subnetMaskCidr=24,
+                        subnetMaskCidr=subnetMaskCidr,
                         data=data
                     )
 
