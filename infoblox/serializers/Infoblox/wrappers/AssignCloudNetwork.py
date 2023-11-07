@@ -14,14 +14,25 @@ class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
                 class InfobloxNetworkInnerExtattrsValueStringSerializer(serializers.Serializer):
                     value = serializers.CharField(max_length=255)
 
+                class InfobloxNetworkInnerExtattrsValueAccountIDSerializer(serializers.Serializer):
+                    class IntegerStringRegexSerializer(serializers.RegexField):
+                        def __init__(self, *args, **kwargs):
+                            regex = '^[0-9]{12}$'
+                            super().__init__(regex=regex, *args, **kwargs)
+
+                    value = IntegerStringRegexSerializer(required=True)
+
+
+                self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueAccountIDSerializer(required=True)
                 self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
-                self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
                 self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
+
 
         network = InfobloxNetworkValueStringSerializer(required=True)
         subnetMaskCidr = serializers.IntegerField(required=False)
         extattrs = InfobloxNetworkInnerExtattrsSerializer(required=True)
         comment = serializers.CharField(max_length=255, allow_blank=True, required=False)
+
 
     provider = serializers.CharField(max_length=255, required=True)
     region = serializers.CharField(max_length=255, required=False, allow_blank=True)
