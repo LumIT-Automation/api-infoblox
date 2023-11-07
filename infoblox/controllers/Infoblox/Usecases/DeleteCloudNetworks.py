@@ -4,7 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.DeletecloudNetworkFactory import DeleteCloudNetworksFactory
+from infoblox.usecases.DeleteCloudNetworkFactory import DeleteCloudNetworksFactory
 
 from infoblox.controllers.CustomController import CustomController
 

@@ -4,9 +4,9 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.AssignCloudNetworkFactory import AssignCloudNetworkFactory
+from infoblox.usecases.ModifyCloudNetworkAccountFactory import ModifyCloudNetworkAccountFactory
 
-from infoblox.serializers.Infoblox.wrappers.AssignCloudNetwork import InfobloxAssignCloudNetworkSerializer as Serializer
+from infoblox.serializers.Infoblox.wrappers.ModifyCloudNetworkAccount import InfobloxCloudNetworkAccountSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -14,34 +14,30 @@ from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Log import Log
 
 
-class InfobloxAssignCloudNetworkController(CustomController):
+class InfobloxModifyCloudNetworksAccountController(CustomController):
     @staticmethod
-    def put(request: Request, assetId: int) -> Response:
+    def put(request: Request, assetId: int, accountId: str) -> Response:
         response = dict()
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="cloud_network_assign_put", assetId=assetId) or user["authDisabled"]:
-                Log.actionLog("assign network in container use case", user)
+            if Permission.hasUserPermission(groups=user["groups"], action="cloud_networks_modify_account_put", assetId=assetId) or user["authDisabled"]:
+                Log.actionLog("modify cloud networks account use case", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
                 serializer = Serializer(data=request.data["data"])
                 if serializer.is_valid():
                     data = serializer.validated_data
-
-                    lock = Lock("networkContainer", locals())
+                    lock = Lock("network", locals())
                     if lock.isUnlocked():
                         lock.lock()
+                        response["data"] = ModifyCloudNetworkAccountFactory(assetId, accountId, user)().modifyAccount(data)
 
-                        response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data.get("region", ""), user)().assignNetwork(
-                            data["network_data"]
-                        )
-
-                        httpStatus = status.HTTP_201_CREATED
+                        httpStatus = status.HTTP_200_OK
                         lock.release()
 
                         # Run registered plugins.
-                        CustomController.plugins("assign_network")
+                        CustomController.plugins("modify_network_account")
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:
@@ -56,7 +52,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("networkContainer", locals()).release()
+            Lock("network", locals()).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
