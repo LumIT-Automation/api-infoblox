@@ -4,7 +4,8 @@ from .controllers import Root
 from .controllers.Asset import Asset, Assets
 from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerConditions
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
-from .controllers.Infoblox import AssignCloudNetwork, ModifyCloudNetwork, DeleteCloudNetworks, CloudNetworkExtAttrs, DismissCloudNetworks
+from .controllers.Infoblox.Usecases import DismissCloudNetworks, AssignCloudNetwork, ModifyCloudNetwork, \
+    CloudNetworkExtAttrs, DeleteCloudNetworks
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
