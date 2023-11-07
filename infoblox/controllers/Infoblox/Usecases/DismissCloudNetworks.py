@@ -4,7 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.DismisscloudNetworksFactory import DismissCloudNetworksFactory
+from infoblox.usecases.DismissCloudNetworksFactory import DismissCloudNetworksFactory
 
 from infoblox.serializers.Infoblox.wrappers.DismissNetworks import InfobloxDismissNetworksSerializer as Serializer
 

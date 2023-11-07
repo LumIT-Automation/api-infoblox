@@ -1229,6 +1229,56 @@
 							"response": []
 						},
 						{
+							"name": "modify-cloud-network-account",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "Bearer {{jwttoken}}"
+									},
+									{
+										"key": "If-None-Match",
+										"value": "851847cbe30d3d64e74703cac5fa8992",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"Account ID\": {\n            \"value\": \"333333333333\"\n        },\n        \"Account Name\": {\n            \"value\": \"stoca\"\n        },\n        \"Reference\": {\n            \"value\": \"parolaio\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/modify-account-cloud-network/555555555555/",
+									"protocol": "http",
+									"host": [
+										"10",
+										"0",
+										"111",
+										"21"
+									],
+									"path": [
+										"api",
+										"v1",
+										"infoblox",
+										"1",
+										"modify-account-cloud-network",
+										"555555555555",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "list-cloud-extattrs (providers)",
 							"request": {
 								"auth": {
@@ -1401,7 +1451,7 @@
 									}
 								],
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/1/delete-cloud-network/172.16.1.0/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/delete-cloud-network/172.16.2.0/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -1415,7 +1465,7 @@
 										"infoblox",
 										"1",
 										"delete-cloud-network",
-										"172.16.1.0",
+										"172.16.2.0",
 										""
 									]
 								}
@@ -1697,7 +1747,7 @@
 							}
 						],
 						"url": {
-							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/172.16.0.0/",
+							"raw": "http://10.0.111.21/api/v1/infoblox/1/network/172.16.2.0/",
 							"protocol": "http",
 							"host": [
 								"10",
@@ -1711,7 +1761,7 @@
 								"infoblox",
 								"1",
 								"network",
-								"172.16.0.0",
+								"172.16.2.0",
 								""
 							]
 						}
