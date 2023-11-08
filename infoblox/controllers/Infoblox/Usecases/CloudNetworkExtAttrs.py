@@ -18,8 +18,9 @@ from infoblox.helpers.Log import Log
 class InfobloxCloudNetworkExtAttrsController(CustomController):
     @staticmethod
     def get(request: Request, assetId: int, extattr: str) -> Response:
-        data = {"data": {}}
+        data = {"data": ""}
         etagCondition = { "responseEtag": "" }
+        httpStatus = None
         user = CustomController.loggedUser(request)
 
         fk = list()
@@ -49,20 +50,24 @@ class InfobloxCloudNetworkExtAttrsController(CustomController):
                         else:
                             raise CustomException(status=403, payload={"Infoblox": "Wrong extattr param."})
 
-                        serializer = Serializer(data=data["data"])
+                        serializer = Serializer(data=data)
                         if serializer.is_valid():
-                            data["data"]["items"] = serializer.validated_data["data"]
+                            data["data"] = serializer.validated_data["data"]
                             data["href"] = request.get_full_path()
-
-                        # Check the response's ETag validity (against client request).
-                        conditional = Conditional(request)
-                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                        Log.log(etagCondition, '_')
-                        if etagCondition["state"] == "fresh":
-                            data = None
-                            httpStatus = status.HTTP_304_NOT_MODIFIED
                         else:
-                            httpStatus = status.HTTP_200_OK
+                            httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."}}
+                            Log.log("Upstream data incorrect: " + str(serializer.errors))
+                            
+                        # Check the response's ETag validity (against client request).
+                        if httpStatus != status.HTTP_500_INTERNAL_SERVER_ERROR:
+                            conditional = Conditional(request)
+                            etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                            Log.log(etagCondition, '_')
+                            if etagCondition["state"] == "fresh":
+                                data = None
+                                httpStatus = status.HTTP_304_NOT_MODIFIED
+                            else:
+                                httpStatus = status.HTTP_200_OK
                     lock.release()
                 else:
                     data = None
