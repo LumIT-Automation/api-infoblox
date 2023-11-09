@@ -10,9 +10,10 @@ class InfobloxCloudExtAttrSerializer(serializers.Serializer):
                     regex = '^[0-9]{12}$'
                     super().__init__(regex=regex, *args, **kwargs)
 
-            self.fields["Account ID"] = IntegerStringRegexSerializer(required=False)
-            self.fields["Account Name"] = serializers.CharField(max_length=64, required=False)
+            # self.fields["Account ID"] = IntegerStringRegexSerializer(required=False)
+            self.fields["Account ID"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
+            self.fields["Account Name"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
             self.fields["Country"] = serializers.CharField(max_length=64, required=False)
-            self.fields["Reference"] = serializers.CharField(max_length=64, required=False)
+            self.fields["Reference"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
 
     data = InfobloxCloudExtAttrInnerSerializer(many=True, required=False)
