@@ -102,6 +102,15 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
         out = ""
         status = 0
 
+        if "subnetMaskCidr" in data:
+            if data["subnetMaskCidr"] == 24 or data["subnetMaskCidr"] == 23:
+                subnetMaskCidr = data["subnetMaskCidr"]
+                del data["subnetMaskCidr"]
+            else:
+                raise CustomException(status=400, payload={"Infoblox": "Bad subnet mask given: can be 23 or 24."})
+        else:
+            subnetMaskCidr = 24
+
         try:
             containers = self.__getEligibleContainers()
             if containers:
@@ -109,7 +118,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                     networkContainer = container["network"]
                     try:
                         Log.log(f"Trying {networkContainer}...")
-                        return self.__assign(networkContainer, data)
+                        return self.__assign(networkContainer, data, subnetMaskCidr)
                     except CustomException as c:
                         out = c.payload.get("Infoblox", str(c.payload)) # this message is overwritten if there are other containers to which ask for the network.
                         status = c.status
@@ -127,18 +136,9 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
 
 
-    def __assign(self, container: str, data: dict) -> str:
-        subnetMaskCidr = 24
-
+    def __assign(self, container: str, data: dict, subnetMaskCidr: int) -> str:
         try:
             if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_assign_put", assetId=self.assetId, container=container) or self.user["authDisabled"]:
-                if "subnetMaskCidr" in data:
-                    if data["subnetMaskCidr"] == 24 or data["subnetMaskCidr"] == 23:
-                        subnetMaskCidr = data["subnetMaskCidr"]
-                        del data["subnetMaskCidr"]
-                    else:
-                        raise CustomException(status=400, payload={"Infoblox": "Bad subnet mask given: can be 23 or 24."})
-
                 n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
                         subnetMaskCidr=subnetMaskCidr,
                         data=data
