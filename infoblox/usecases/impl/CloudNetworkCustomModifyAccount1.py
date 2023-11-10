@@ -132,7 +132,7 @@ class CloudNetworkCustomModifyAccount1(CloudNetworkModifyAccount):
                 if hasattr(settings, "CLOUD_MAX_ACCOUNT_REGION_NETS"):
                     regionsNetworks = [ net.get("extattrs", {}).get("City", {}).get("value", "") for net in totalNetworks ]
                     for region in set(regionsNetworks):
-                        if settings.CLOUD_MAX_ACCOUNT_REGION_NETS <= regionsNetworks.count(region):
+                        if settings.CLOUD_MAX_ACCOUNT_REGION_NETS < regionsNetworks.count(region):
                             raise CustomException(
                                 status=400,
                                 payload={
