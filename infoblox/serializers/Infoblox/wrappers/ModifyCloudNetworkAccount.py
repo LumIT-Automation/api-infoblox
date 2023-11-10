@@ -16,5 +16,5 @@ class InfobloxCloudNetworkAccountSerializer(serializers.Serializer):
 
 
         self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueAccountIDSerializer(required=True)
-        self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
-        self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
+        self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
+        self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
