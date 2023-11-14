@@ -60,7 +60,8 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
                 # CLOUD_MAX_ACCOUNT_REGION is the maximum number of regions for Account ID.
                 if hasattr(settings, "CLOUD_MAX_ACCOUNT_REGION"):
-                    if settings.CLOUD_MAX_ACCOUNT_REGION <= len(set( [ net.get("extattrs", {}).get("City", {}).get("value", "") for net in accountIdNetworks ] )):
+                    accountNetworksRegions = set( [ net.get("extattrs", {}).get("City", {}).get("value", "") for net in accountIdNetworks ] )
+                    if settings.CLOUD_MAX_ACCOUNT_REGION < len(accountNetworksRegions) or ( settings.CLOUD_MAX_ACCOUNT_REGION == len(accountNetworksRegions) and self.region not in accountNetworksRegions):
                         raise CustomException(status=400, payload={"Infoblox": "The maximum number of regions for this Account ID has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION)})
 
                 # CLOUD_MAX_ACCOUNT_REGION_NETS is the maximum number of networks for Account ID in a region.
