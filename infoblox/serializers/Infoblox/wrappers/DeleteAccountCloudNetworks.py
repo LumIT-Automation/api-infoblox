@@ -23,6 +23,6 @@ class InfobloxDismissCloudNetworkSerializer(serializers.Serializer):
     Region = serializers.CharField(max_length=64, required=False)
 
 
-class InfobloxDismissNetworksSerializer(serializers.Serializer):
+class InfobloxDeleteAccountCloudNetworksSerializer(serializers.Serializer):
     provider = serializers.CharField(max_length=255, required=True)
     network_data = InfobloxDismissCloudNetworkSerializer(required=True)

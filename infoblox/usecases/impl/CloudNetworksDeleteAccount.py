@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class CloudNetworkDismiss(metaclass=ABCMeta):
+class DeleteAccountCloudNetworks(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, assetId: int, provider: str, user: dict, *args, **kwargs):
         pass
@@ -9,5 +9,5 @@ class CloudNetworkDismiss(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def dismissNetworks(self, data: dict, *args, **kwargs) -> dict:
+    def deleteNetworks(self, data: dict, *args, **kwargs) -> dict:
         pass

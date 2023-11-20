@@ -4,9 +4,9 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.DismissCloudNetworksFactory import DismissCloudNetworksFactory
+from infoblox.usecases.DeleteAccountCloudNetworksFactory import DeleteAccountCloudNetworksFactory
 
-from infoblox.serializers.Infoblox.wrappers.DismissNetworks import InfobloxDismissNetworksSerializer as Serializer
+from infoblox.serializers.Infoblox.wrappers.DeleteAccountCloudNetworks import InfobloxDeleteAccountCloudNetworksSerializer as Serializer
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -14,7 +14,7 @@ from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Log import Log
 
 
-class InfobloxDismissCloudNetworksController(CustomController):
+class InfobloxDeleteAccountCloudNetworksController(CustomController):
     @staticmethod
     def put(request: Request, assetId: int) -> Response:
         response = dict()
@@ -33,7 +33,7 @@ class InfobloxDismissCloudNetworksController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        response["data"] = DismissCloudNetworksFactory(assetId, data["provider"], user)().dismissNetworks(data["network_data"])
+                        response["data"] = DeleteAccountCloudNetworksFactory(assetId, data["provider"], user)().deleteNetworks(data["network_data"])
 
                         httpStatus = status.HTTP_200_OK
                         lock.release()

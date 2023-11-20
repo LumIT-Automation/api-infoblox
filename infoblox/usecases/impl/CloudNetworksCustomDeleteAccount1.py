@@ -1,4 +1,4 @@
-from infoblox.usecases.impl.CloudNetworkDismiss import CloudNetworkDismiss
+from infoblox.usecases.impl.CloudNetworksDeleteAccount import DeleteAccountCloudNetworks
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
@@ -7,7 +7,7 @@ from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
+class DeleteAccountCloudNetworks1(DeleteAccountCloudNetworks):
     def __init__(self, assetId: int, provider: str, user: dict, *args, **kwargs):
         super().__init__(assetId, provider, user, *args, **kwargs)
 
@@ -21,7 +21,7 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
     # Public methods
     ####################################################################################################################
 
-    def dismissNetworks(self, data: dict, *args, **kwargs) -> list:
+    def deleteNetworks(self, data: dict, *args, **kwargs) -> list:
         status = []
 
         networks = self.__getNetworks(data)
@@ -72,7 +72,7 @@ class CloudNetworkCustomDismiss1(CloudNetworkDismiss):
                 filter.update({"*City": data["Region"]})
             if "Account ID" in data and data["Account ID"]:
                 filter.update({"*Account ID": data["Account ID"]})
-            elif "Account Name" in data and data["Account Name"]:
+            if "Account Name" in data and data["Account Name"]:
                 filter.update({"*Account Name": data["Account Name"]})
 
         if filter:

@@ -239,7 +239,7 @@ CLOUD_MAX_ACCOUNT_REGION_NETS = 2 # maximum number of networks for Account in a 
 CLOUD_MODIFY_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomModify1", "CloudNetworkCustomModify1")
 CLOUD_NETWORK_DELETE_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDelete1", "CloudNetworkCustomDelete1")
 CLOUD_EXTATTR_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomExtAttr1", "CloudNetworkCustomExtAttr1")
-CLOUD_DISMISS_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomDismiss1", "CloudNetworkCustomDismiss1")
+CLOUD_NETWORK_ACCOUNT_DELETE_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworksCustomDeleteAccount1", " DeleteAccountCloudNetworks1")
 CLOUD_MODIFY_ACCOUNT_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomModifyAccount1", "CloudNetworkCustomModifyAccount1")
 
 PLUGINS = [

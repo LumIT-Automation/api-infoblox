@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f38aed7f-7412-40fa-8673-4ba17baa2ed3",
+		"_postman_id": "45c771d2-b157-4fa0-8115-0219ef5c2e1d",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "30146130"
@@ -1081,7 +1081,7 @@
 					"name": "Use cases",
 					"item": [
 						{
-							"name": "dismiss-cloud-networks",
+							"name": "delete-account-cloud-networks",
 							"request": {
 								"auth": {
 									"type": "noauth"
@@ -1109,7 +1109,7 @@
 									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"network_data\": {\n            \"Region\": \"aws-eu-west-1\",\n            \"Account ID\": \"555555555555\",\n            \"Account Name\": \"ppp\"\n        }\n    }\n}"
 								},
 								"url": {
-									"raw": "http://10.0.111.21/api/v1/infoblox/1/dismiss-cloud-networks/",
+									"raw": "http://10.0.111.21/api/v1/infoblox/1/delete-account-cloud-networks/",
 									"protocol": "http",
 									"host": [
 										"10",
@@ -1122,7 +1122,7 @@
 										"v1",
 										"infoblox",
 										"1",
-										"dismiss-cloud-networks",
+										"delete-account-cloud-networks",
 										""
 									]
 								}

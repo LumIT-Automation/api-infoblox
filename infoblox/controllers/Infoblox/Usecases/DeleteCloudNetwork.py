@@ -4,7 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Permission.Permission import Permission
 
-from infoblox.usecases.DeleteCloudNetworkFactory import DeleteCloudNetworksFactory
+from infoblox.usecases.DeleteCloudNetworkFactory import DeleteCloudNetworkFactory
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -12,7 +12,7 @@ from infoblox.helpers.Lock import Lock
 from infoblox.helpers.Log import Log
 
 
-class InfobloxDeleteCloudNetworksController(CustomController):
+class InfobloxDeleteCloudNetworkController(CustomController):
     @staticmethod
     def delete(request: Request, assetId: int, networkAddress: str) -> Response:
         response = None
@@ -28,7 +28,7 @@ class InfobloxDeleteCloudNetworksController(CustomController):
                 if lock.isUnlocked():
                     lock.lock()
 
-                    DeleteCloudNetworksFactory(assetId, networkAddress, user)().delete()
+                    DeleteCloudNetworkFactory(assetId, networkAddress, user)().delete()
                     httpStatus = status.HTTP_200_OK
                     lock.release()
 
