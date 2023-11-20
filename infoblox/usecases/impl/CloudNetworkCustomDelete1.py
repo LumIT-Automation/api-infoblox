@@ -4,6 +4,7 @@ from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.helpers.Exception import CustomException
+from infoblox.helpers.Mail import Mail
 from infoblox.helpers.Log import Log
 
 
@@ -29,9 +30,14 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
 
             if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network) or self.user["authDisabled"]:
                 from infoblox.controllers.CustomController import CustomController
+                accountId = network.repr().get("extattrs", {}).get("Account ID", {}).get("value", "")
                 network.delete()
                 hid = self.__historyLog(network.network, 'deleted')
                 CustomController.plugins(controller="delete-cloud-networks_delete", requestType="network.delete", requestStatus="success", network=network.network, user=self.user, historyId=hid)
+
+                # If there are no networks left for this Account ID, email the admin group.
+                if not self.__getAccountIdNetworks(accountId):
+                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
 
@@ -41,6 +47,17 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
     ####################################################################################################################
     # Private methods
     ####################################################################################################################
+
+    def __getAccountIdNetworks(self, accountId: str):
+        try:
+            return Network.listData(self.assetId, {
+                "*Account ID": accountId
+            })
+
+        except Exception as e:
+            raise e
+
+
 
     def __historyLog(self, network, status) -> int:
         historyId = 0
