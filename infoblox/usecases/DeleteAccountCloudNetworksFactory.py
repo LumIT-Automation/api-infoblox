@@ -5,7 +5,7 @@ from django.conf import settings
 from infoblox.helpers.Exception import CustomException
 
 
-class DismissCloudNetworksFactory:
+class DeleteAccountCloudNetworksFactory:
     def __init__(self, assetId: int, provider: str, user: dict):
         self.assetId: int = int(assetId)
         self.provider: str = provider
@@ -15,9 +15,9 @@ class DismissCloudNetworksFactory:
 
     def __call__(self, *args, **kwargs):
         try:
-            module = import_module(settings.CLOUD_DISMISS_IMPLEMENTATION[0])
+            module = import_module(settings.CLOUD_NETWORK_ACCOUNT_DELETE_IMPLEMENTATION[0])
             Implementation = eval(
-                "module."+settings.CLOUD_DISMISS_IMPLEMENTATION[1]
+                "module."+settings.CLOUD_NETWORK_ACCOUNT_DELETE_IMPLEMENTATION[1]
             )
 
             return Implementation(self.assetId, self.provider, self.user)

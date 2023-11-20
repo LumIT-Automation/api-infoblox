@@ -5,7 +5,7 @@ from django.conf import settings
 from infoblox.helpers.Exception import CustomException
 
 
-class DeleteCloudNetworksFactory:
+class DeleteCloudNetworkFactory:
     def __init__(self, assetId: int, networkAddress: str, user: dict):
         self.assetId: int = int(assetId)
         self.networkAddress = networkAddress
