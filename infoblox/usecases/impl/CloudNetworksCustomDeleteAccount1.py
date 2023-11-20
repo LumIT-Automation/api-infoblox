@@ -4,6 +4,7 @@ from infoblox.models.History.History import History
 from infoblox.models.Permission.Permission import Permission
 
 from infoblox.helpers.Exception import CustomException
+from infoblox.helpers.Mail import Mail
 from infoblox.helpers.Log import Log
 
 
@@ -49,6 +50,14 @@ class DeleteAccountCloudNetworks1(DeleteAccountCloudNetworks):
                     hid = self.__historyLog(net["network"], e.__str__())
                     CustomController.plugins(controller="dismiss-cloud-network_put", requestType="network.dismiss", requestStatus="Exception: "+ e.__str__(), network=net["network"], user=self.user, historyId=hid)
 
+            try:
+                accountId = networks[0].get("extattrs", {}).get("Account ID", {}).get("value", "")
+                # If there are no networks left for this Account ID, email the admin group.
+                if not self.__getAccountIdNetworks(accountId):
+                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
+            except Exception as e:
+                pass
+
             return status
         else:
             raise CustomException(status=400, payload={"Infoblox": "No network with specified parameters was found."})
@@ -86,6 +95,17 @@ class DeleteAccountCloudNetworks1(DeleteAccountCloudNetworks):
         try:
             # Eligible networks.
             return Network.listData(self.assetId, filter)
+        except Exception as e:
+            raise e
+
+
+
+    def __getAccountIdNetworks(self, accountId: str):
+        try:
+            return Network.listData(self.assetId, {
+                "*Account ID": accountId
+            })
+
         except Exception as e:
             raise e
 
