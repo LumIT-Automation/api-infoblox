@@ -21,8 +21,8 @@ class InfobloxDeleteAccountCloudNetworksController(CustomController):
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="dismiss_cloud_network_put", assetId=assetId) or user["authDisabled"]:
-                Log.actionLog("dismiss cloud networks", user)
+            if Permission.hasUserPermission(groups=user["groups"], action="delete_account_cloud_network_put", assetId=assetId) or user["authDisabled"]:
+                Log.actionLog("delete account cloud networks", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
                 serializer = Serializer(data=request.data["data"])
@@ -39,7 +39,7 @@ class InfobloxDeleteAccountCloudNetworksController(CustomController):
                         lock.release()
 
                         # Run registered plugins.
-                        CustomController.plugins("dismiss_network")
+                        CustomController.plugins("delete_account_cloud_network")
                     else:
                         httpStatus = status.HTTP_423_LOCKED
                 else:
