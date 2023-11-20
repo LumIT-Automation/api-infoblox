@@ -69,7 +69,7 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (34, 'cloud_networks_modify_account_put', 'object', NULL),
 (35, 'cloud_network_delete', 'object', NULL),
 (36, 'cloud_extattrs_get', 'object', NULL),
-(37, 'dismiss_cloud_network_put', 'object', NULL);
+(37, 'delete_account_cloud_network_put', 'object', NULL);
 
 
 --
