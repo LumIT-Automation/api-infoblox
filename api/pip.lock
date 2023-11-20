@@ -1,6 +1,6 @@
 asgiref==3.7.2
 async-timeout==4.0.3
-certifi==2023.7.22
+certifi==2023.11.17
 cffi==1.16.0
 charset-normalizer==2.0.12
 cryptography==36.0.2
