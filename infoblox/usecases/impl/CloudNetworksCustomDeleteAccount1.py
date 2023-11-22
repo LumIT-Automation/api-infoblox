@@ -52,9 +52,10 @@ class DeleteAccountCloudNetworks1(DeleteAccountCloudNetworks):
 
             try:
                 accountId = networks[0].get("extattrs", {}).get("Account ID", {}).get("value", "")
+                accountName = networks[0].get("extattrs", {}).get("Account Name", {}).get("value", "")
                 # If there are no networks left for this Account ID, email the admin group.
                 if not self.__getAccountIdNetworks(accountId):
-                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
+                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " with name " + accountName + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
             except Exception as e:
                 pass
 

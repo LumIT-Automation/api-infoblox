@@ -31,13 +31,15 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
             if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network) or self.user["authDisabled"]:
                 from infoblox.controllers.CustomController import CustomController
                 accountId = network.repr().get("extattrs", {}).get("Account ID", {}).get("value", "")
+                accountName = network.repr().get("extattrs", {}).get("Account Name", {}).get("value", "")
+
                 network.delete()
                 hid = self.__historyLog(network.network, 'deleted')
                 CustomController.plugins(controller="delete-cloud-networks_delete", requestType="network.delete", requestStatus="success", network=network.network, user=self.user, historyId=hid)
 
                 # If there are no networks left for this Account ID, email the admin group.
                 if not self.__getAccountIdNetworks(accountId):
-                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
+                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " with name " + accountName + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
 
