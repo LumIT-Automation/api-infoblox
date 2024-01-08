@@ -365,7 +365,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                         # Until <number> suitable addresses is found.
                         if j < number:
                             if "ip_address" in address and (("status" in address and address["status"] == "UNUSED") or ("usage" in address and address["usage"] == ["DNS"])):
-                                if rangeCondition or ("types" not in address or not address["types"]):
+                                if rangeCondition or ("types" not in address or not address["types"]) or \
+                                    ("types" in address and address["types"] == ["HOST"] and "usage" in address and address["usage"] == ["DNS"]):
                                     # Addresses not ending in 0 or 255.
                                     matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
                                     if matches:
