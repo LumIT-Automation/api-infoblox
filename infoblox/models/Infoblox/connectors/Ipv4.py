@@ -34,7 +34,8 @@ class Ipv4:
                 returnFields = "extattrs"
                 if "fixedaddress" in objRef:
                     returnFields = "network,network_view,extattrs,options,name,mac,comment,ipv4addr,use_options"
-
+                elif "lease" in objRef:
+                    returnFields = "network,network_view"
                 api = ApiSupplicant(
                     endpoint=endpoint,
                     params={
