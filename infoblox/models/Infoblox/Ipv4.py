@@ -161,6 +161,9 @@ class Ipv4:
     def __load(self) -> None:
         try:
             data = Connector.get(self.asset_id, self.ip_address)
+            if "lease_state" in data and "status" in data:
+                if data["lease_state"] == "FREE":
+                    data["status"] = "UNUSED"
             for k, v in data.items():
                 setattr(self, k, v)
         except Exception as e:
