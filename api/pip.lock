@@ -1,6 +1,6 @@
 asgiref==3.7.2
 async-timeout==4.0.3
-certifi==2023.11.17
+certifi==2024.2.2
 cffi==1.16.0
 charset-normalizer==2.0.12
 cryptography==36.0.2
@@ -12,11 +12,11 @@ func-timeout==4.3.5
 idna==3.6
 mysqlclient==2.1.1
 packaging==23.2
-pip==23.3.2
+pip==24.0
 pkg_resources==0.0.0
 pycparser==2.21
 PyJWT==2.5.0
-pytz==2023.3.post1
+pytz==2024.1
 redis==4.3.6
 requests==2.27.1
 setuptools==44.1.1
