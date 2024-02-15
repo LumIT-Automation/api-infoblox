@@ -22,6 +22,9 @@ ALTER TABLE asset ADD COLUMN protocol varchar(16) NOT NULL DEFAULT 'https' AFTER
 ALTER TABLE asset ADD COLUMN port int(11) NOT NULL DEFAULT 443 AFTER protocol;
 ALTER TABLE asset ADD COLUMN path varchar(255) NOT NULL DEFAULT '/' AFTER port;
 ALTER TABLE asset MODIFY `tlsverify` tinyint(4) NOT NULL DEFAULT 1 AFTER path;
+ALTER TABLE asset MODIFY `datacenter` varchar(255) NOT NULL DEFAULT '';
+ALTER TABLE asset MODIFY `environment` varchar(255) NOT NULL DEFAULT '';
+ALTER TABLE asset MODIFY `position` varchar(255) NOT NULL DEFAULT '';
 
 ALTER TABLE asset ADD UNIQUE fqdn (fqdn,protocol,port);
 ALTER TABLE log_object CHANGE COLUMN type type enum('ipv4','network','') DEFAULT NULL; # was enum('ipv4','') DEFAULT NULL
