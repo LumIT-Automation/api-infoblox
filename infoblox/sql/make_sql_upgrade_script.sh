@@ -46,15 +46,16 @@ if [ -z "$repoDir" ]; then
 fi
 
 api=infoblox
+schema=infoblox
 # db schema file in the git repo.
-sqlSchemaFile=${api}/sql/${api}.schema.sql
+sqlSchemaFile=${api}/sql/${schema}.schema.sql
 # db data file in the git repo.
-sqlDataFile=${api}/sql/${api}.data.sql
+sqlDataFile=${api}/sql/${schema}.data.sql
 # Tables that need data update.
 updateTables='privilege role_privilege role'
 
-sqlFileOld=${workDir}/${api}_old.sql
-sqlFileNew=${workDir}/${api}_new.sql
+sqlFileOld=${workDir}/${schema}_old.sql
+sqlFileNew=${workDir}/${schema}_new.sql
 
 dbUser=api
 dbPassword=password
@@ -91,7 +92,7 @@ newCommit=$(git log -1 --pretty=%H) # Get the full hash.
 newCommitShort=$(git rev-parse --short=11 $newCommit)
 cp $sqlSchemaFile $sqlFileNew
 
-outputSqlScript=${workDir}/dbUpdate_${api}_${oldCommitShort}-${newCommitShort}.sql
+outputSqlScript=${workDir}/dbUpdate_${schema}_${oldCommitShort}-${newCommitShort}.sql
 
 echo -e "\n/*\nOLD COMMIT: $oldCommit\nNEW COMMIT: $newCommit\n*/\n\n" > $outputSqlScript
 echo -e "/*\nSQL SCHEMA SECTION\n*/\n" >> $outputSqlScript
