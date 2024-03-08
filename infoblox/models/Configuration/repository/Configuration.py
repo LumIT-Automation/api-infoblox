@@ -36,7 +36,7 @@ class Configuration:
 
             return o
         except IndexError:
-            raise CustomException(status=400, payload={"database": "Non existent configuration type"})
+            return {"id": 0, "config_type": configType, "configuration": []}
         except Exception as e:
             raise CustomException(status=400, payload={"database": e.__str__()})
         finally:
