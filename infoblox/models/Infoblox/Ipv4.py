@@ -31,6 +31,7 @@ class Ipv4:
             "Reference": Value,
             "Name Server": Value
         }
+        self.lease_state = None
 
         self.__load()
 
@@ -42,6 +43,9 @@ class Ipv4:
 
     def repr(self) -> dict:
         try:
+            if self.lease_state and self.status:
+                if self.lease_state == "FREE":
+                    self.status = "UNUSED"
             return vars(self)
         except Exception as e:
             raise e
@@ -161,9 +165,6 @@ class Ipv4:
     def __load(self) -> None:
         try:
             data = Connector.get(self.asset_id, self.ip_address)
-            if "lease_state" in data and "status" in data:
-                if data["lease_state"] == "FREE":
-                    data["status"] = "UNUSED"
             for k, v in data.items():
                 setattr(self, k, v)
         except Exception as e:
