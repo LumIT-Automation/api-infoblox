@@ -2,6 +2,8 @@ from typing import List, Dict
 
 from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
+from infoblox.usecases.IpUnusedFactory import Ipv4UnusedFactory
+
 from infoblox.helpers.Exception import CustomException
 
 
@@ -43,9 +45,6 @@ class Ipv4:
 
     def repr(self) -> dict:
         try:
-            if self.lease_state and self.status:
-                if self.lease_state == "FREE":
-                    self.status = "UNUSED"
             return vars(self)
         except Exception as e:
             raise e
@@ -167,5 +166,12 @@ class Ipv4:
             data = Connector.get(self.asset_id, self.ip_address)
             for k, v in data.items():
                 setattr(self, k, v)
+
+            isUnusedIpv4Address = Ipv4UnusedFactory()
+            if isUnusedIpv4Address:
+                if isUnusedIpv4Address(ipAddressData=data):
+                    self.status = "UNUSED"
+        except NotImplementedError:
+            pass
         except Exception as e:
             raise e

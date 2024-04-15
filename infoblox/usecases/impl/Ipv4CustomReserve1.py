@@ -5,6 +5,7 @@ import ipaddress
 from datetime import datetime
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
+from infoblox.usecases.IpUnusedFactory import Ipv4UnusedFactory
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Infoblox.Network import Network
@@ -334,6 +335,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         try:
             networkCidr = oNetwork.network
             n, mask = networkCidr.split('/')
+            isUnusedIpv4Address = Ipv4UnusedFactory()
 
             ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
             if rangeFirstIp and rangeLastIp:
@@ -364,23 +366,12 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     for address in addresses:
                         # Until <number> suitable addresses is found.
                         if j < number:
-                            if "ip_address" in address and (("status" in address and address["status"] == "UNUSED") or ("usage" in address and address["usage"] == ["DNS"])):
-                                # For DNS usage the condition is on address["types"]: at least one value from ["HOST", "A", "PTR"]
-                                # and not any other value.
-                                if rangeCondition or ("types" not in address or not address["types"]) or \
-                                    "usage" in address and address["usage"] == ["DNS"] and \
-                                    ("types" in address and (
-                                            any(addrType for addrType in ["HOST", "A", "PTR"] if addrType in address["types"]) and
-                                            not [ addrType for addrType in address["types"] if addrType not in ["HOST", "A", "PTR"] ]
-                                        )
-                                    ):
-                                    # Addresses not ending in 0 or 255.
-                                    matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address["ip_address"])
-                                    if matches:
-                                        cleanAddress = str(matches.group(0)).strip()
-                                        cleanAddresses.append(cleanAddress)
-
-                                        j += 1
+                            if isUnusedIpv4Address(ipAddressData=address, ipOnARangeWanted=rangeCondition, scope="next-available"):
+                                # Addresses not ending in 0 or 255.
+                                matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address.get("ip_address", ""))
+                                if matches:
+                                    cleanAddresses.append(str(matches.group(0)).strip())
+                                    j += 1
 
         except Exception as e:
             raise e
