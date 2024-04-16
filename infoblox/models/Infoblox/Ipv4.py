@@ -167,9 +167,10 @@ class Ipv4:
             for k, v in data.items():
                 setattr(self, k, v)
 
-            isUnusedIpv4Address = Ipv4UnusedFactory()
+            from infoblox.helpers.Log import Log
+            isUnusedIpv4Address = Ipv4UnusedFactory()()
             if isUnusedIpv4Address:
-                if isUnusedIpv4Address(ipAddressData=data):
+                if isUnusedIpv4Address.isUnused(ipAddressData=data):
                     self.status = "UNUSED"
         except NotImplementedError:
             pass
