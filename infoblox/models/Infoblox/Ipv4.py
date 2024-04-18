@@ -163,15 +163,23 @@ class Ipv4:
 
     def __load(self) -> None:
         try:
+            from infoblox.helpers.Log import Log
+
+
             data = Connector.get(self.asset_id, self.ip_address)
+
+            isUnusedIpv4Address = Ipv4UnusedFactory()()
+            data = isUnusedIpv4Address.patchData(data=data)
+
             for k, v in data.items():
                 setattr(self, k, v)
 
-            from infoblox.helpers.Log import Log
-            isUnusedIpv4Address = Ipv4UnusedFactory()()
             if isUnusedIpv4Address:
                 if isUnusedIpv4Address.isUnused(ipAddressData=data):
                     self.status = "UNUSED"
+
+
+
         except NotImplementedError:
             pass
         except Exception as e:

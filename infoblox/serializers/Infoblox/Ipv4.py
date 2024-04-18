@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class InfobloxIpv4ExtattrsValueSerializer(serializers.Serializer):
-    value = serializers.CharField(max_length=255)
+    value = serializers.CharField(max_length=255, allow_blank=True)
 
 class InfobloxIpv4Serializer(serializers.Serializer):
     class InfobloxIpv4ExtattrsInnerSerializer(serializers.Serializer):

@@ -13,3 +13,9 @@ class Ipv4Unused(metaclass=ABCMeta):
     @abstractmethod
     def isUnused(ipAddressData: dict, ipOnARange: bool, scope: str) -> bool:
         pass
+
+
+
+    @abstractmethod
+    def patchData(data: dict) -> dict:
+        pass

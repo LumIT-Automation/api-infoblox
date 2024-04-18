@@ -46,3 +46,29 @@ class  Ipv4CustomUnused1(Ipv4Unused):
             return unused
         except Exception as e:
             raise e
+
+
+
+    @staticmethod
+    def patchData(data: dict) -> dict:
+        data = data
+
+        try:
+            if "RESERVED_RANGE" in data.get("types", []):
+                objects = data.get("objects", [])
+                for obj in objects:
+                    if "fixedaddress" in obj.get("_ref", ""):
+                        referenceList = obj.get("extattrs", {}).get("Reference", {}).get("value", "").split(", ")
+                        if len(referenceList) >= 3:
+                            data["extattrs"]["Reference"] = {"value": referenceList[0]}
+                            obj["extattrs"]["Reference"]["value"] = ", ".join(referenceList[1:])
+            else:
+                if "Reference" in data.get("extattrs", {}):
+                    data["extattrs"]["Reference"] = {"value": ""}
+
+            return data
+        except Exception as e:
+            raise e
+
+
+
