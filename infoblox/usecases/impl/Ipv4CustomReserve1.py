@@ -377,8 +377,6 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         except Exception as e:
             raise e
 
-        Log.log(cleanAddresses, 'CCCCCCCCCCCCCCCCCC')
-        raise Exception
         return cleanAddresses
 
 
