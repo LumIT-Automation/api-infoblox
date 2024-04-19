@@ -1,14 +1,14 @@
 import re
 from django.conf import settings
 
-from infoblox.usecases.impl.Ipv4Unused import Ipv4Unused
+from infoblox.usecases.impl.Ipv4PatchData import Ipv4PatchData
 
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
-class  Ipv4CustomUnused1(Ipv4Unused):
+class  Ipv4PatchDataCustom1(Ipv4PatchData):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -19,12 +19,13 @@ class  Ipv4CustomUnused1(Ipv4Unused):
     ####################################################################################################################
 
     @staticmethod
-    def isUnused(ipAddressData: dict, ipOnARange: bool = False, scope: str = "status") -> bool:
+    def isIpv4Unused(ipAddressData: dict, scope: str = "status") -> bool:
         unused = False
 
         try:
+            # Both "status" and "next-available" scope.
             if "ip_address" and "status" in ipAddressData:
-                if ipOnARange and ipAddressData["status"] == "UNUSED" and "types" in ipAddressData and  ipAddressData["types"] == ["RESERVED_RANGE"]:
+                if ipAddressData["status"] == "UNUSED" and "types" in ipAddressData and  ipAddressData["types"] == ["RESERVED_RANGE"]: # range condition.
                     unused = True
                 elif (ipAddressData["status"] == "UNUSED" or ("usage" in ipAddressData and ipAddressData["usage"] == ["DNS"])):
                     # For DNS usage the condition is on ipAddressData["types"]: at least one value from ["HOST", "A", "PTR"]
@@ -50,10 +51,13 @@ class  Ipv4CustomUnused1(Ipv4Unused):
 
 
     @staticmethod
-    def patchData(data: dict) -> dict:
+    def patchInfoData(data: dict) -> dict:
         data = data
 
         try:
+            if  Ipv4PatchDataCustom1.isIpv4Unused(ipAddressData=data, scope="status"):
+                data["status"] = "UNUSED"
+
             if "RESERVED_RANGE" in data.get("types", []):
                 objects = data.get("objects", [])
                 for obj in objects:

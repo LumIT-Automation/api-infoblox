@@ -3,7 +3,7 @@ from typing import Dict, List
 from abc import ABCMeta, abstractmethod
 
 
-class Ipv4Unused(metaclass=ABCMeta):
+class Ipv4PatchData(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
@@ -11,11 +11,11 @@ class Ipv4Unused(metaclass=ABCMeta):
 
 
     @abstractmethod
-    def isUnused(ipAddressData: dict, ipOnARange: bool, scope: str) -> bool:
+    def isIpv4Unused(ipAddressData: dict, scope: str) -> bool:
         pass
 
 
 
     @abstractmethod
-    def patchData(data: dict) -> dict:
+    def patchInfoData(data: dict) -> dict:
         pass

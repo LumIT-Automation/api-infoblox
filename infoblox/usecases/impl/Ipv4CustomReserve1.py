@@ -5,7 +5,7 @@ import ipaddress
 from datetime import datetime
 
 from infoblox.usecases.impl.Ipv4Reserve import Ipv4Reserve
-from infoblox.usecases.IpUnusedFactory import Ipv4UnusedFactory
+from infoblox.usecases.Ipv4PatchDataFactory import Ipv4PatchDataFactory
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Infoblox.Network import Network
@@ -335,7 +335,7 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         try:
             networkCidr = oNetwork.network
             n, mask = networkCidr.split('/')
-            isUnusedIpv4Address = Ipv4UnusedFactory()()
+            customizedIpv4Data = Ipv4PatchDataFactory()()
 
             ipaddressNetworkObj = ipaddress.ip_network(networkCidr)
             if rangeFirstIp and rangeLastIp:
@@ -366,7 +366,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
                     for address in addresses:
                         # Until <number> suitable addresses is found.
                         if j < number:
-                            if isUnusedIpv4Address.isUnused(ipAddressData=address, ipOnARange=rangeCondition, scope="next-available"):
+                            # This method can gather the range condition from the address data.
+                            if customizedIpv4Data.isIpv4Unused(ipAddressData=address, scope="next-available"):
                                 # Addresses not ending in 0 or 255.
                                 matches = re.search(r"^((?!(^\d+.\d+.\d+.(0+|255)$)).)*$", address.get("ip_address", ""))
                                 if matches:
@@ -376,6 +377,8 @@ class Ipv4CustomReserve1(Ipv4Reserve):
         except Exception as e:
             raise e
 
+        Log.log(cleanAddresses, 'CCCCCCCCCCCCCCCCCC')
+        raise Exception
         return cleanAddresses
 
 

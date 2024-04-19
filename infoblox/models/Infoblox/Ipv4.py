@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from infoblox.models.Infoblox.connectors.Ipv4 import Ipv4 as Connector
 
-from infoblox.usecases.IpUnusedFactory import Ipv4UnusedFactory
+from infoblox.usecases.Ipv4PatchDataFactory import Ipv4PatchDataFactory
 
 from infoblox.helpers.Exception import CustomException
 
@@ -163,24 +163,16 @@ class Ipv4:
 
     def __load(self) -> None:
         try:
-            from infoblox.helpers.Log import Log
-
-
             data = Connector.get(self.asset_id, self.ip_address)
 
-            isUnusedIpv4Address = Ipv4UnusedFactory()()
-            data = isUnusedIpv4Address.patchData(data=data)
+            try:
+                customizedIpv4Data = Ipv4PatchDataFactory()()
+                data = customizedIpv4Data.patchInfoData(data=data)
+            except NotImplementedError:
+                pass
 
             for k, v in data.items():
                 setattr(self, k, v)
 
-            if isUnusedIpv4Address:
-                if isUnusedIpv4Address.isUnused(ipAddressData=data):
-                    self.status = "UNUSED"
-
-
-
-        except NotImplementedError:
-            pass
         except Exception as e:
             raise e
