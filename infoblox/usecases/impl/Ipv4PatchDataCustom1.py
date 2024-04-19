@@ -64,7 +64,7 @@ class  Ipv4PatchDataCustom1(Ipv4PatchData):
                     if "fixedaddress" in obj.get("_ref", ""):
                         referenceList = obj.get("extattrs", {}).get("Reference", {}).get("value", "").split(", ")
                         if len(referenceList) >= 3:
-                            data["extattrs"]["Reference"] = {"value": referenceList[0]}
+                            data["extattrs"]["Reference"]["value"] = data["extattrs"]["Reference"]["value"] + ", " + referenceList[0]
                             obj["extattrs"]["Reference"]["value"] = ", ".join(referenceList[1:])
             else:
                 if "Reference" in data.get("extattrs", {}):
