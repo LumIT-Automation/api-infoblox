@@ -164,12 +164,8 @@ class Ipv4:
     def __load(self) -> None:
         try:
             data = Connector.get(self.asset_id, self.ip_address)
-
-            try:
-                customizedIpv4Data = Ipv4PatchDataFactory()()
-                data = customizedIpv4Data.patchInfoData(data=data)
-            except NotImplementedError:
-                pass
+            customizedIpv4Data = Ipv4PatchDataFactory()()
+            data = customizedIpv4Data.patchInfoData(data=data)
 
             for k, v in data.items():
                 setattr(self, k, v)

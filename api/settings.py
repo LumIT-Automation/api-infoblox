@@ -241,7 +241,10 @@ CLOUD_NETWORK_DELETE_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCusto
 CLOUD_EXTATTR_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomExtAttr1", "CloudNetworkCustomExtAttr1")
 CLOUD_NETWORK_ACCOUNT_DELETE_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworksCustomDeleteAccount1", " DeleteAccountCloudNetworks1")
 CLOUD_MODIFY_ACCOUNT_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCustomModifyAccount1", "CloudNetworkCustomModifyAccount1")
+
+# IPV4_PATCH_DATA_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4PatchDataDefault", "Ipv4PatchDataDefault")
 IPV4_PATCH_DATA_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4PatchDataCustom1", "Ipv4PatchDataCustom1")
+
 
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'

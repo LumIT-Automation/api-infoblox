@@ -1,11 +1,5 @@
-import re
-from django.conf import settings
-
 from infoblox.usecases.impl.Ipv4PatchData import Ipv4PatchData
 
-
-from infoblox.helpers.Exception import CustomException
-from infoblox.helpers.Log import Log
 
 
 class  Ipv4PatchDataCustom1(Ipv4PatchData):
