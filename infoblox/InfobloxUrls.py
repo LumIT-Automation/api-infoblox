@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .controllers import Root
+from .controllers import Root, RawTxtController
 from .controllers.Asset import Asset, Assets
 from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerConditions
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
@@ -21,6 +21,8 @@ urlpatterns = [
     path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
 
     path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+
+    path('doc/<str:fileName>/', RawTxtController.InfobloxRawTxtController.as_view(), name='txt'),
 
     path('configuration/<str:configType>/', Configuration.ConfigurationController.as_view(), name='configuration'),
 

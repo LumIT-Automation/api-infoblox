@@ -244,7 +244,7 @@ CLOUD_MODIFY_ACCOUNT_IMPLEMENTATION = ("infoblox.usecases.impl.CloudNetworkCusto
 
 # IPV4_PATCH_DATA_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4PatchDataDefault", "Ipv4PatchDataDefault")
 IPV4_PATCH_DATA_IMPLEMENTATION = ("infoblox.usecases.impl.Ipv4PatchDataCustom1", "Ipv4PatchDataCustom1")
-
+DOC_TXT_DIR = "/var/www/api/doc/"
 
 PLUGINS = [
     'infoblox.plugins.CiscoSpark'

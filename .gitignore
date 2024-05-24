@@ -4,3 +4,4 @@
 */__pycache__
 api/plugins_conf/ciscospark.py
 infoblox/sql/infoblox.data-development.sql
+doc/swagger.yaml
