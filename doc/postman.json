@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "66644600-0367-437a-8fec-21d7dcffc3b0",
+		"_postman_id": "29c32061-474d-4c9e-971e-1b1cc3986c51",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -492,13 +492,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{infobloxBaseUrl}}/infoblox/roles",
+							"raw": "{{infobloxBaseUrl}}/infoblox/roles/",
 							"host": [
 								"{{infobloxBaseUrl}}"
 							],
 							"path": [
 								"infoblox",
-								"roles"
+								"roles",
+								""
 							]
 						}
 					},
