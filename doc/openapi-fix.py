@@ -142,7 +142,7 @@ reId = re.compile('<int:([A-Za-z0-9]*[Ii]d)>/')
 reSegmentId = re.compile('<int:([A-Za-z0-9]*[Ii]d)>')
 for url in urls:
     strMatch = reStr.sub('[A-Za-z0-9,.=_-]+/', url)
-    urlMatch = '/infoblox/' + reId.sub('[0-9]+/', strMatch)
+    urlMatch = '/infoblox/' + reId.sub('[0-9]+/', strMatch) + '$'
 
     # Now we have the right regexp built from the urlFile to match an url in the inputFile.
     for idx in range(len(lines)):
@@ -215,7 +215,7 @@ blocksIndexes = getBlocksIndexes(lines) # the remove operation have shifted the 
 # for each removed block strip the url, find the url in lines[] and append all others row at the good block.
 for badBlock in reverseSortedBadBlocks:
     for goodBlock in blocksIndexes:
-        if badBlock["block"][0].strip() == goodBlock["url"].strip(): # the first line of a block is the url.
+        if badBlock["block"][0].rstrip() == goodBlock["url"].rstrip(): # the first line of a block is the url.
             insertSubList(lines, goodBlock["idxs"][1]+1, badBlock["block"][1:])
             goodBlock["idxs"] = (goodBlock["idxs"][0], goodBlock["idxs"][1] + len(badBlock["block"]) - 1) # needed for > 1 inserts in the same block.
 
