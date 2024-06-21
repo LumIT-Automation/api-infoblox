@@ -137,7 +137,7 @@ class Permission:
 
     @staticmethod
     def addFacade(identityGroupIdentifier: str, role: str, networkInfo: dict) -> None:
-        networkAssetId = networkInfo.get("assetId", "")
+        networkAssetId = int(networkInfo.get("assetId", ""))
         networkName = networkInfo.get("name", "")
 
         try:
@@ -173,7 +173,7 @@ class Permission:
 
     @staticmethod
     def modifyFacade(permissionId: int, identityGroupIdentifier: str, role: str, networkInfo: dict) -> None:
-        networkAssetId = networkInfo.get("assetId", "")
+        networkAssetId = int(networkInfo.get("assetId", ""))
         networkName = networkInfo.get("name", "")
 
         try:

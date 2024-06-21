@@ -93,6 +93,18 @@ CREATE TABLE `group_role_network` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
+--
+-- Struttura della tabella `group_workflow_network`
+--
+
+CREATE TABLE `group_workflow_network` (
+  `id` int(255) NOT NULL,
+  `id_group` int(11) NOT NULL,
+  `id_workflow` int(11) NOT NULL,
+  `id_network` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
 
 --
 -- Struttura della tabella `identity_group`
@@ -211,6 +223,29 @@ CREATE TABLE `role_privilege` (
   `id_privilege` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `workflow`
+--
+
+CREATE TABLE `workflow` (
+  `id` int(11) NOT NULL,
+  `workflow` varchar(64) NOT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `workflow_privilege`
+--
+
+CREATE TABLE `workflow_privilege` (
+  `id_workflow` int(11) NOT NULL,
+  `id_privilege` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Indici per le tabelle scaricate
 --
@@ -254,6 +289,15 @@ ALTER TABLE `group_role_network`
   ADD KEY `id_role` (`id_role`),
   ADD KEY `grp_network` (`id_network`),
   ADD KEY `id` (`id`);
+
+--
+-- Indici per le tabelle `group_workflow_network`
+--
+ALTER TABLE `group_workflow_network`
+  ADD PRIMARY KEY (`id_group`,`id_workflow`,`id_network`),
+  ADD KEY `id_workflow` (`id_workflow`),
+  ADD KEY `gwp_network` (`id_network`),
+  ADD UNIQUE KEY `id` (`id`);
 
 --
 -- Indici per le tabelle `identity_group`
@@ -320,6 +364,20 @@ ALTER TABLE `role_privilege`
   ADD KEY `rp_privilege` (`id_privilege`);
 
 --
+-- Indici per le tabelle `workflow`
+--
+ALTER TABLE `workflow`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `workflow` (`workflow`);
+
+--
+-- Indici per le tabelle `workflow_privilege`
+--
+ALTER TABLE `workflow_privilege`
+  ADD PRIMARY KEY (`id_workflow`,`id_privilege`),
+  ADD KEY `wp_privilege` (`id_privilege`);
+
+--
 -- AUTO_INCREMENT per le tabelle scaricate
 --
 
@@ -352,6 +410,12 @@ ALTER TABLE `trigger_condition`
 -- AUTO_INCREMENT per la tabella `group_role_network`
 --
 ALTER TABLE `group_role_network`
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT per la tabella `group_workflow_network`
+--
+ALTER TABLE `group_workflow_network`
   MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
@@ -403,6 +467,12 @@ ALTER TABLE `role`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT per la tabella `workflow`
+--
+ALTER TABLE `workflow`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- Limiti per le tabelle scaricate
 --
 
@@ -428,6 +498,14 @@ ALTER TABLE `group_role_network`
   ADD CONSTRAINT `grp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Limiti per la tabella `group_workflow_network`
+--
+ALTER TABLE `group_workflow_network`
+  ADD CONSTRAINT `gwp_group` FOREIGN KEY (`id_group`) REFERENCES `identity_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `gwp_network` FOREIGN KEY (`id_network`) REFERENCES `network` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `gwp_workflow` FOREIGN KEY (`id_workflow`) REFERENCES `workflow` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Limiti per la tabella `log`
 --
 ALTER TABLE `log`
@@ -445,6 +523,14 @@ ALTER TABLE `network`
 ALTER TABLE `role_privilege`
   ADD CONSTRAINT `rp_privilege` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `rp_role` FOREIGN KEY (`id_role`) REFERENCES `role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+--
+-- Limiti per la tabella `workflow_privilege`
+--
+ALTER TABLE `workflow_privilege`
+  ADD CONSTRAINT `wp_privilege` FOREIGN KEY (`id_privilege`) REFERENCES `privilege` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `wp_workflow` FOREIGN KEY (`id_workflow`) REFERENCES `workflow` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 --
