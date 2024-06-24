@@ -439,18 +439,18 @@ class PermissionPrivilege:
                     args.append(workflow)
 
                 c.execute(
-                    "SELECT workflow.workflow, "
+                    "SELECT IFNULL(workflow.workflow, '') AS workflow, "
 
-                    "GROUP_CONCAT( "
+                    "IFNULL(GROUP_CONCAT( "
                         "DISTINCT CONCAT(`network`.id_asset,'::',`network`.`network`) "
                         "ORDER BY `network`.id_asset "
                         "SEPARATOR ',' "
-                    ") AS assetId_network "
+                    "), '') AS assetId_network "
 
                     "FROM identity_group "
                     "LEFT JOIN group_workflow_network ON group_workflow_network.id_group = identity_group.id "
                     "LEFT JOIN workflow ON workflow.id = group_workflow_network.id_workflow "
-                    "LEFT JOIN `netwok` ON `network`.id = group_workflow_network.id_network "
+                    "LEFT JOIN `network` ON `network`.id = group_workflow_network.id_network "
                     "WHERE (" + groupWhere[:-4] + ") " +
                     workflowWhere +
                     "GROUP BY workflow.workflow",
@@ -460,15 +460,16 @@ class PermissionPrivilege:
                 items: List[Dict] = DBHelper.asDict(c)
                 for item in items:
                     flow = item.get("workflow", "")
-                    o[flow] = []
-                    el = item.get("assetId_network", "")
-                    assetId_network = el.split(",")
-                    for an in assetId_network:
-                        [ a, n ] = an.split("::")
-                        o[flow].append({
-                            "asseId": a,
-                            "network": n
-                        })
+                    if flow:
+                        o[flow] = []
+                        el = item.get("assetId_network", "")
+                        assetId_network = el.split(",")
+                        for an in assetId_network:
+                            [ a, n ] = an.split("::")
+                            o[flow].append({
+                                "asseId": a,
+                                "network": n
+                            })
 
                 return o
             except Exception as e:

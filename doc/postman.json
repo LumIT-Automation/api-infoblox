@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "29c32061-474d-4c9e-971e-1b1cc3986c51",
+		"_postman_id": "961e7094-734a-458d-a8b8-bfb567446b21",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -173,6 +173,74 @@
 							"path": [
 								"infoblox",
 								"authorizations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workflow authorizations",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/workflow-authorizations/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"workflow-authorizations",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workflows privileges",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/workflows-privileges/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"workflows-privileges",
 								""
 							]
 						}

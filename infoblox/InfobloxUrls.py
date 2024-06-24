@@ -6,7 +6,7 @@ from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerCon
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
 from .controllers.Infoblox.Usecases import DeleteAccountCloudNetworks, AssignCloudNetwork, ModifyCloudNetwork, \
     CloudNetworkExtAttrs, DeleteCloudNetwork, ModifyCloudNetworksAccount
-from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions
+from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions, WorkflowAuthorizations, Workflows
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
 
@@ -21,6 +21,10 @@ urlpatterns = [
     path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
 
     path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+
+    path('workflow-authorizations/', WorkflowAuthorizations.WorkflowAuthorizationsController.as_view(), name='workflow-authorizations'),
+    path('workflows-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflows-privileges'),
+    path('workflow-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflow-privileges'),
 
     path('doc/<str:fileName>/', RawTxtController.InfobloxRawTxtController.as_view(), name='txt'),
 
