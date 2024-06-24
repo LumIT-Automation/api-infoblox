@@ -119,7 +119,7 @@ class Permission:
             if gr.lower() == "automation.local":
                 return  {
                     "assetId": 0,
-                    "partition": "any"
+                    "network": "any"
                 }
 
         try:

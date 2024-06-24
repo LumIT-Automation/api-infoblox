@@ -381,7 +381,7 @@ class PermissionPrivilege:
                 # Put all the args of the query in a list.
                 if assetId:
                     args.append(assetId)
-                    assetWhere = "AND `partition`.id_asset = %s "
+                    assetWhere = "AND `network`.id_asset = %s "
 
                 if networks and any(net != "" for net in networks):
                     orNets = ""
