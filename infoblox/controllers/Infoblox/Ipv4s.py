@@ -23,6 +23,8 @@ class InfobloxIpv4sController(CustomController):
     def post(request: Request, assetId: int) -> Response:
         response = dict()
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
         permissionContainer = ""
         permissionNetwork = ""
 
@@ -43,33 +45,36 @@ class InfobloxIpv4sController(CustomController):
                 if ipv4CustomReserve.networkLogic == "network":
                     permissionNetwork = permissionCheckNetwork
 
-                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork) or user["authDisabled"]:
-                    # If the user cannot request an ip in a range, cleanup the range data and rebuild ipv4CustomReserve. @todo: improve.
-                    if reqType == "post.next-available" and "range_first_ip" in data:
-                        if not user["authDisabled"] and not Permission.hasUserPermission(groups=user["groups"], action="range_get", assetId=assetId, container=permissionContainer, network=permissionNetwork):
-                            del data["range_first_ip"]
-                            if "range_last_ip" in data:
-                                del data["range_last_ip"]
-
-                            ipv4CustomReserve = ReserveFactory(assetId, reqType, data, user["username"])()
-
-                    Log.actionLog("Ipv4 addition", user)
-                    Log.actionLog("User data: "+str(request.data), user)
-
-                    lock = Lock("network", locals(), userNetwork=permissionCheckNetwork) # lock permissionCheckNetwork.
-                    if lock.isUnlocked():
-                        lock.lock()
-
-                        response["data"], actualNetwork, mask, gateway, historyId = ipv4CustomReserve.reserve()
-
-                        httpStatus = status.HTTP_201_CREATED
-                        lock.release()
-
-                        # Run registered plugins.
-                        CustomController.plugins("ipv4s_post", requestType=reqType, data=data, response=response, network=actualNetwork, gateway=gateway, mask=mask, historyId=historyId, user=user)
+                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork, isWorkflow=bool(workflowId)) or user["authDisabled"]:
+                    if workflowId and checkWorkflowPermission:
+                        httpStatus = status.HTTP_204_NO_CONTENT
                     else:
-                        httpStatus = status.HTTP_423_LOCKED
-                        Log.actionLog("Ipv4 locked: "+str(lock), user)
+                        # If the user cannot request an ip in a range, cleanup the range data and rebuild ipv4CustomReserve. @todo: improve.
+                        if reqType == "post.next-available" and "range_first_ip" in data:
+                            if not user["authDisabled"] and not Permission.hasUserPermission(groups=user["groups"], action="range_get", assetId=assetId, container=permissionContainer, network=permissionNetwork):
+                                del data["range_first_ip"]
+                                if "range_last_ip" in data:
+                                    del data["range_last_ip"]
+
+                                ipv4CustomReserve = ReserveFactory(assetId, reqType, data, user["username"])()
+
+                        Log.actionLog("Ipv4 addition", user)
+                        Log.actionLog("User data: "+str(request.data), user)
+
+                        lock = Lock("network", locals(), userNetwork=permissionCheckNetwork) # lock permissionCheckNetwork.
+                        if lock.isUnlocked():
+                            lock.lock()
+
+                            response["data"], actualNetwork, mask, gateway, historyId = ipv4CustomReserve.reserve()
+
+                            httpStatus = status.HTTP_201_CREATED
+                            lock.release()
+
+                            # Run registered plugins.
+                            CustomController.plugins("ipv4s_post", requestType=reqType, data=data, response=response, network=actualNetwork, gateway=gateway, mask=mask, historyId=historyId, user=user)
+                        else:
+                            httpStatus = status.HTTP_423_LOCKED
+                            Log.actionLog("Ipv4 locked: "+str(lock), user)
                 else:
                     response = None
                     httpStatus = status.HTTP_403_FORBIDDEN
