@@ -112,24 +112,6 @@ class Permission:
 
 
     @staticmethod
-    def workflowPermissionsList(groups: list, workflow: str = "") -> dict:
-
-        # Superadmin's group.
-        for gr in groups:
-            if gr.lower() == "automation.local":
-                return  {
-                    "assetId": 0,
-                    "network": "any"
-                }
-
-        try:
-            return PermissionPrivilegeRepository.workflowAuthorizationsList(groups=groups, workflow=workflow)
-        except Exception as e:
-            raise e
-
-
-
-    @staticmethod
     def permissionsDataList() -> list:
         try:
             return Repository.list()

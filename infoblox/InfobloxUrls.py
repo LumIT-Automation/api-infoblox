@@ -6,7 +6,7 @@ from .controllers.Trigger import Trigger, Triggers, TriggerCondition, TriggerCon
 from .controllers.Infoblox import NetworksTree, NetworkContainers, NetworkContainerNetworks, Network, Networks, Ipv4, Ipv4s, Vlans, Vlan, Ranges, Range
 from .controllers.Infoblox.Usecases import DeleteAccountCloudNetworks, AssignCloudNetwork, ModifyCloudNetwork, \
     CloudNetworkExtAttrs, DeleteCloudNetwork, ModifyCloudNetworksAccount
-from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions, WorkflowAuthorizations, Workflows
+from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions, AuthorizationsWorkflow, Workflows, PermissionsWorkflow, PermissionWorkflow
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
 
@@ -20,11 +20,25 @@ urlpatterns = [
     path('permissions/', Permissions.PermissionsController.as_view(), name='permissions'),
     path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
 
-    path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+    path('workflows/', Workflows.WorkflowsController.as_view(), name='workflows'),
+    path('permissions-workflow/', PermissionsWorkflow.PermissionsWorkflowController.as_view(), name='permissions-workflow'),
+    path('permission-workflow/<int:permissionId>/', PermissionWorkflow.PermissionWorkflowController.as_view(), name='permission-workflow'),
 
-    path('workflow-authorizations/', WorkflowAuthorizations.WorkflowAuthorizationsController.as_view(), name='workflow-authorizations'),
-    path('workflows-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflows-privileges'),
-    path('workflow-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflow-privileges'),
+    #path('workflows-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflows-privileges'),
+    #path('workflow-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflow-privileges'),
+
+    path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+    path('workflow-authorizations/', AuthorizationsWorkflow.AuthorizationsWorkflowController.as_view(), name='workflow-authorizations'),
+
+
+    #path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
+
+    #path('workflows/', Workflows.WorkflowsController.as_view(), name='workflows'),
+    #path('permissions-workflow/', PermissionsWorkflow.PermissionsWorkflowController.as_view(), name='permissions-workflow'),
+    #path('permission-workflow/<int:permissionId>/', PermissionWorkflow.PermissionWorkflowController.as_view(), name='permission-workflow'),
+
+    #path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
+
 
     path('doc/<str:fileName>/', RawTxtController.InfobloxRawTxtController.as_view(), name='txt'),
 

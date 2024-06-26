@@ -2,13 +2,13 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.PermissionWorkflow import PermissionWorkflow
 from infoblox.controllers.CustomController import CustomController
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
 
-class WorkflowAuthorizationsController(CustomController):
+class AuthorizationsWorkflowController(CustomController):
     @staticmethod
     # Enlist caller's permissions (depending on groups user belongs to).
     def get(request: Request) -> Response:
@@ -22,7 +22,7 @@ class WorkflowAuthorizationsController(CustomController):
 
                 data = {
                     "data": {
-                        "items": Permission.workflowPermissionsList(user["groups"], workflow)
+                        "items": PermissionWorkflow.workflowAuthorizationsList(user["groups"], workflow)
                     },
                     "href": request.get_full_path()
                 }
