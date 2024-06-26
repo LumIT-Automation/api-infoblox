@@ -78,7 +78,7 @@ class PermissionWorkflowPrivilege:
 
 
     @staticmethod
-    def countUserWorkflowPermissions(groups: list, workflow: str, assetId: int = 0, networkName: str = "") -> int:
+    def countUserWorkflowPermissions(groups: list, workflow: str, assetId: int = 0, networks: list = None) -> int:
         if workflow and groups:
             assetWhere = ""
             networkWhere = ""
@@ -96,9 +96,14 @@ class PermissionWorkflowPrivilege:
                     args.append(assetId)
                     assetWhere = "AND `network`.id_asset = %s "
 
-                if networkName:
-                    args.append(networkName)
-                    networkWhere = "AND (`network`.`network` = %s OR `network`.`network` = 'any') " # if "any" appears in the query results so far -> pass.
+                if networks and any(net != "" for net in networks):
+                    orNets = ""
+                    for n in networks:
+                        if n:
+                            orNets += 'OR `network`.`network` = %s '
+                            args.append(n)
+
+                    networkWhere = "AND (`network`.`network` = 'any' " + orNets + " ) " # if "any" appears in the query results so far -> pass.
 
                 args.append(workflow)
 

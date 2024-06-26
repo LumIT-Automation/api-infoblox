@@ -5,6 +5,7 @@ from rest_framework import status
 from infoblox.usecases.ReserveFactory import ReserveFactory
 
 from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer as Serializer
 
@@ -45,7 +46,7 @@ class InfobloxIpv4sController(CustomController):
                 if ipv4CustomReserve.networkLogic == "network":
                     permissionNetwork = permissionCheckNetwork
 
-                if Permission.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork, isWorkflow=bool(workflowId)) or user["authDisabled"]:
+                if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="ipv4s_post", assetId=assetId, container=permissionContainer, network=permissionNetwork, isWorkflow=bool(workflowId)) or user["authDisabled"]:
                     if workflowId and checkWorkflowPermission:
                         httpStatus = status.HTTP_204_NO_CONTENT
                     else:

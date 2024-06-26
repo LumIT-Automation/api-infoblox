@@ -4,6 +4,7 @@ from rest_framework import status
 
 from infoblox.models.Infoblox.Vlan import Vlan
 from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.serializers.Infoblox.Vlans import InfobloxVlansSerializer as Serializer
 
@@ -29,7 +30,7 @@ class InfobloxVlansController(CustomController):
         filters = dict()
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="vlans_get", assetId=assetId, isWorkflow=bool(workflowId)) or user["authDisabled"]:
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="vlans_get", assetId=assetId, isWorkflow=bool(workflowId)) or user["authDisabled"]:
                 if workflowId and checkWorkflowPermission:
                     httpStatus = status.HTTP_204_NO_CONTENT
                 else:

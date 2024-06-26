@@ -1,6 +1,13 @@
+from typing import Union
+
+from django.conf import settings
+
+from infoblox.models.Permission.IdentityGroup import IdentityGroup
 from infoblox.models.Permission.Workflow import Workflow
 from infoblox.models.Permission.Network import Network
-from infoblox.models.Permission.IdentityGroup import IdentityGroup
+
+from infoblox.models.Infoblox.NetworkContainer import NetworkContainer as NetworkContainerModel
+from infoblox.models.Infoblox.Network import Network as NetworkModel
 
 from infoblox.models.Permission.repository.PermissionWorkflow import PermissionWorkflow as Repository
 from infoblox.models.Permission.repository.PermissionWorkflowPrivilege import PermissionWorkflowPrivilege as PermissionPrivilegeRepository
@@ -42,8 +49,13 @@ class PermissionWorkflow:
     # Public static methods
     ####################################################################################################################
 
+
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, network: str = "") -> bool:
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, container: str = "", network: Union[str, NetworkModel] = None, containers: list = None, networks: list = None) -> bool:
+        networks = networks or []
+        containers = containers or []
+        permissionNetworks = []
+
         # Authorizations' list allowed for any (authenticated) user.
         if action == "authorizations_get":
             return True
@@ -56,12 +68,39 @@ class PermissionWorkflow:
                         return True
                     else:
                         return False
+
+            if network or container:
+                if network:
+                    if isinstance(network, NetworkModel):
+                        permissionNetworks.append(network.network)
+                        container = network.network_container
+
+                    if isinstance(network, str):
+                        if "/" not in network: # if not already in CIDR notation.
+                            network = NetworkModel(assetId, network).network
+
+                        if not networks:
+                            n = NetworkModel(assetId, network)
+                            permissionNetworks.append(n.network)
+                            container = n.network_container
+                        else:
+                            permissionNetworks.append(network)
+                            container = [net for net in networks if net["network"] == network][0]["network_container"]
+
+                permissionNetworks.append(container) # [network, container] if network // [container] if container.
+
+                if settings.INHERIT_GRANDPARENTS_PERMISSIONS:
+                    if not containers:
+                        containers = NetworkContainerModel.listData(assetId, silent=True)
+
+                    permissionNetworks.extend(NetworkContainerModel.genealogy(network=container, networkContainerList=containers))
+
             return bool(
-                PermissionPrivilegeRepository.countUserWorkflowPermissions(groups, action, assetId, network)
+                PermissionPrivilegeRepository.countUserWorkflowPermissions(groups, action, assetId, permissionNetworks) # check in all permissionNetworks.
             )
 
         except Exception as e:
-            raise e
+                raise e
 
 
 

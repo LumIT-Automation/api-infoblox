@@ -14,7 +14,6 @@ from infoblox.models.Permission.repository.PermissionPrivilege import Permission
 from infoblox.models.Permission.Privilege import Privilege
 
 from infoblox.helpers.Exception import CustomException
-from infoblox.helpers.Log import Log
 
 
 class Permission:
@@ -50,24 +49,17 @@ class Permission:
     # Public static methods
     ####################################################################################################################
 
+
     @staticmethod
-    def hasUserPermission(groups: list, action: str, assetId: int = 0, container: str = "", network: Union[str, NetworkModel] = None, containers: list = None, networks: list = None, isWorkflow: bool = False) -> bool:
+    def hasUserPermission(groups: list, action: str, assetId: int = 0, container: str = "", network: Union[str, NetworkModel] = None, containers: list = None, networks: list = None) -> bool:
         networks = networks or []
         containers = containers or []
+
         permissionNetworks = []
 
         # Superadmin's group.
         for gr in groups:
             if gr.lower() == "automation.local":
-                if isWorkflow:
-                    try:
-                        if action in [p["privilege"] for p in Privilege.listQuick()]: # check if the given action exists.
-                            return True
-                        else:
-                            return False
-                    except Exception as e:
-                        raise e
-
                 return True
 
         try:
@@ -97,15 +89,11 @@ class Permission:
 
                     permissionNetworks.extend(NetworkContainerModel.genealogy(network=container, networkContainerList=containers))
 
-            if isWorkflow:
-                return bool(
-                    PermissionPrivilegeRepository.countUserWorkflowPermissions(groups, action, assetId, permissionNetworks) # check in all permissionNetworks.
-                )
-            else:
-                return bool(
-                    PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, permissionNetworks) # check in all permissionNetworks.
-                )
+            # User permissions for all permissionNetworks.
+            if PermissionPrivilegeRepository.countUserPermissions(groups, action, assetId, permissionNetworks):
+                return True
 
+            return False
         except Exception as e:
                 raise e
 
