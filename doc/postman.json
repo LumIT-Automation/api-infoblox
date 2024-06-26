@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "961e7094-734a-458d-a8b8-bfb567446b21",
+		"_postman_id": "c3ed4dad-742b-4c60-9639-cd2b94b3dee4",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -214,40 +214,6 @@
 					"response": []
 				},
 				{
-					"name": "workflows privileges",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"type": "text",
-								"value": "Bearer {{jwttoken}}"
-							},
-							{
-								"key": "If-None-Match",
-								"value": "c485212f298abe5f8b867ca42617292a",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"url": {
-							"raw": "{{infobloxBaseUrl}}/infoblox/workflows-privileges/",
-							"host": [
-								"{{infobloxBaseUrl}}"
-							],
-							"path": [
-								"infoblox",
-								"workflows-privileges",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "permissions",
 					"request": {
 						"auth": {
@@ -397,6 +363,162 @@
 								"infoblox",
 								"permission",
 								"6",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permissions workflow",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/permissions-workflow/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"permissions-workflow",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permissions workflow",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupReadOnly\",\n        \"identity_group_identifier\": \"cn=groupReadOnly,cn=users,dc=lab,dc=local\",\n        \"workflow\": \"flow_test2\",\n        \"network\": {\n            \"name\": \"10.8.0.0/17\",\n            \"id_asset\": 1\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/permissions-workflow/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"permissions-workflow",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permission workflow",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"identity_group_name\": \"groupReadOnly\",\n        \"identity_group_identifier\": \"cn=groupReadOnly,cn=users,dc=lab,dc=local\",\n        \"workflow\": \"flow_test2\",\n        \"network\": {\n            \"name\": \"any\",\n            \"id_asset\": 1\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/permission-workflow/6/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"permission-workflow",
+								"6",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permission workflow",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/permission-workflow/5/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"permission-workflow",
+								"5",
 								""
 							]
 						}
@@ -608,6 +730,40 @@
 									"key": "related",
 									"value": "privileges"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workflows",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/workflows/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"workflows",
+								""
 							]
 						}
 					},
