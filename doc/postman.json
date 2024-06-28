@@ -2674,7 +2674,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{infobloxBaseUrl}}/infoblox/1/ipv4/10.8.3.35/",
+							"raw": "{{infobloxBaseUrl}}/infoblox/1/ipv4/192.168.100.7/",
 							"host": [
 								"{{infobloxBaseUrl}}"
 							],
@@ -2682,7 +2682,7 @@
 								"infoblox",
 								"1",
 								"ipv4",
-								"10.8.3.35",
+								"192.168.100.7",
 								""
 							]
 						}
