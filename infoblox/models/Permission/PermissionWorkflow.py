@@ -119,9 +119,13 @@ class PermissionWorkflow:
         # Superadmin's group.
         for gr in groups:
             if gr.lower() == "automation.local":
-                return  {
-                    "assetId": 0,
-                    "network": "any"
+                return {
+                    "any": [
+                        {
+                            "assetId": 0,
+                            "network": "any"
+                        }
+                    ]
                 }
 
         try:
