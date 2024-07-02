@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 from infoblox.models.Permission.Permission import Permission
 from infoblox.models.History.History import History
 
@@ -24,6 +25,8 @@ class InfobloxIpv4Controller(CustomController):
     @HistoryLog
     def get(request: Request, assetId: int, ipv4address: str) -> Response:
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
         data = dict()
         etagCondition = { "responseEtag": "" }
         userNetwork = "Unauthorized"
@@ -38,41 +41,44 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, network=networkCidr):
-                Log.actionLog("Get ipv4s address information: "+ipv4address, user)
-
-                lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
-                if lock.isUnlocked():
-                    lock.lock()
-
-                    serializer = Serializer(data=ipv4.repr())
-                    if serializer.is_valid():
-                        data["data"] = serializer.validated_data
-                        data["href"] = request.get_full_path()
-
-                        # Check the response's ETag validity (against client request).
-                        conditional = Conditional(request)
-                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                        if etagCondition["state"] == "fresh":
-                            data = None
-                            httpStatus = status.HTTP_304_NOT_MODIFIED
-                        else:
-                            httpStatus = status.HTTP_200_OK
-                    else:
-                        httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
-                        data = {
-                            "infoblox": "Upstream data mismatch."
-                        }
-
-                        Log.log("Upstream data incorrect: "+str(serializer.errors))
-
-                    lock.release()
-
-                    # Run registered plugins.
-                    CustomController.plugins("ipv4_get", data=data, ipv4Address=ipv4address, user=user)
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="ipv4_get", assetId=assetId, network=networkCidr, isWorkflow=bool(workflowId)):
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    data = None
-                    httpStatus = status.HTTP_423_LOCKED
+                    Log.actionLog("Get ipv4s address information: "+ipv4address, user)
+
+                    lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        serializer = Serializer(data=ipv4.repr())
+                        if serializer.is_valid():
+                            data["data"] = serializer.validated_data
+                            data["href"] = request.get_full_path()
+
+                            # Check the response's ETag validity (against client request).
+                            conditional = Conditional(request)
+                            etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                            if etagCondition["state"] == "fresh":
+                                data = None
+                                httpStatus = status.HTTP_304_NOT_MODIFIED
+                            else:
+                                httpStatus = status.HTTP_200_OK
+                        else:
+                            httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
+                            data = {
+                                "infoblox": "Upstream data mismatch."
+                            }
+
+                            Log.log("Upstream data incorrect: "+str(serializer.errors))
+
+                        lock.release()
+
+                        # Run registered plugins.
+                        CustomController.plugins("ipv4_get", data=data, ipv4Address=ipv4address, user=user)
+                    else:
+                        data = None
+                        httpStatus = status.HTTP_423_LOCKED
             else:
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
