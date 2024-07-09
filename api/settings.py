@@ -224,7 +224,7 @@ SIMPLE_JWT = {
 API_SUPPLICANT_HTTP_PROXY = ""
 API_SUPPLICANT_NETWORK_TIMEOUT = 60 # seconds.
 
-LOCK_MAX_VALIDITY = 3000 # seconds.
+LOCK_MAX_VALIDITY = 30 # seconds.
 
 # If set to False only the permissions on the father are checked (exclude upper tree).
 # If set to True some overhead is added.
