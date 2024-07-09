@@ -9,6 +9,7 @@ from .controllers.Infoblox.Usecases import DeleteAccountCloudNetworks, AssignClo
 from .controllers.Permission import Authorizations, IdentityGroups, IdentityGroup, Roles, Permission, Permissions, AuthorizationsWorkflow, Workflows, PermissionsWorkflow, PermissionWorkflow
 from .controllers.Configuration import Configuration
 from .controllers.History import History, ActionHistory
+from .controllers.Helpers import Locks
 
 
 urlpatterns = [
@@ -24,21 +25,8 @@ urlpatterns = [
     path('permissions-workflow/', PermissionsWorkflow.PermissionsWorkflowController.as_view(), name='permissions-workflow'),
     path('permission-workflow/<int:permissionId>/', PermissionWorkflow.PermissionWorkflowController.as_view(), name='permission-workflow'),
 
-    #path('workflows-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflows-privileges'),
-    #path('workflow-privileges/', Workflows.WorkflowsPrivilegesController.as_view(), name='workflow-privileges'),
-
     path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
     path('workflow-authorizations/', AuthorizationsWorkflow.AuthorizationsWorkflowController.as_view(), name='workflow-authorizations'),
-
-
-    #path('permission/<int:permissionId>/', Permission.PermissionController.as_view(), name='permission'),
-
-    #path('workflows/', Workflows.WorkflowsController.as_view(), name='workflows'),
-    #path('permissions-workflow/', PermissionsWorkflow.PermissionsWorkflowController.as_view(), name='permissions-workflow'),
-    #path('permission-workflow/<int:permissionId>/', PermissionWorkflow.PermissionWorkflowController.as_view(), name='permission-workflow'),
-
-    #path('authorizations/', Authorizations.AuthorizationsController.as_view(), name='authorizations'),
-
 
     path('doc/<str:fileName>/', RawTxtController.InfobloxRawTxtController.as_view(), name='txt'),
 
@@ -72,7 +60,10 @@ urlpatterns = [
     path('<int:assetId>/delete-account-cloud-networks/', DeleteAccountCloudNetworks.InfobloxDeleteAccountCloudNetworksController.as_view(), name='infoblox-delete-account-cloud-networks'),
     path('<int:assetId>/list-cloud-extattrs/<str:extattr>/', CloudNetworkExtAttrs.InfobloxCloudNetworkExtAttrsController.as_view(), name='infoblox-cloud-extattrs'),
 
+    # Locks
+    path('locks/', Locks.InfobloxWorkflowLocksController.as_view(), name='infoblox-workflow-locks'),
+
     # Log history.
-    path('history/', History.HistoryLogsController.as_view(), name='f5-log-history'),
-    path('action-history/', ActionHistory.ActionHistoryLogsController.as_view(), name='f5-log-action-history'),
+    path('history/', History.HistoryLogsController.as_view(), name='infoblox-log-history'),
+    path('action-history/', ActionHistory.ActionHistoryLogsController.as_view(), name='infoblox-log-action-history'),
 ]

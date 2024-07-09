@@ -70,7 +70,8 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (35, 'cloud_network_delete', 'object', NULL),
 (36, 'cloud_extattrs_get', 'object', NULL),
 (37, 'delete_account_cloud_network_put', 'object', NULL),
-(38, 'workflows_privileges_get', 'global', NULL);
+(38, 'workflows_privileges_get', 'global', NULL),
+(39, 'locks_delete', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -80,8 +81,7 @@ INSERT INTO `role` (`id`, `role`, `description`) VALUES
 (1, 'admin', 'admin'),
 (2, 'staff', 'read / write, excluding assets'),
 (3, 'readonly', 'readonly'),
-(4, 'workflow', 'workflow system user'),
-(5, 'powerstaff', 'read / write, excluding assets');
+(4, 'powerstaff', 'read / write, excluding assets');
 
 --
 -- Dump dei dati per la tabella `role_privilege`
@@ -123,6 +123,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 36),
 (1, 37),
 (1, 38),
+(1, 39),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -149,8 +150,6 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 5),
 (4, 6),
 (4, 7),
-(4, 8),
-(4, 9),
 (4, 10),
 (4, 11),
 (4, 12),
@@ -167,34 +166,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 35),
 (4, 36),
 (4, 37),
-(5, 3),
-(5, 5),
-(5, 6),
-(5, 7),
-(5, 10),
-(5, 11),
-(5, 12),
-(5, 13),
-(5, 14),
-(5, 22),
-(5, 23),
-(5, 24),
-(5, 25),
-(5, 26),
-(5, 27),
-(5, 33),
-(5, 34),
-(5, 35),
-(5, 36),
-(5, 37),
-(5, 38);
-
-
--- Dump dei dati per la tabella `identity_group`
--- (Workflow system group)
-
-INSERT INTO `identity_group` (`id`, `name`, `identity_group_identifier`) VALUES
-(1, 'workflow.local', 'workflow.local');
+(4, 38);
 
 
 COMMIT;

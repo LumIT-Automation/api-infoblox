@@ -7,7 +7,7 @@ from infoblox.helpers.Log import Log
 
 
 class Lock:
-    def __init__(self, objectClass: any, o: dict, userNetwork: str = "", objectName: str = "", *args, **kwargs):
+    def __init__(self, objectClass: any, o: dict, userNetwork: str = "", objectName: str = "", workflowId: str = "", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.assetId = ""
@@ -15,6 +15,11 @@ class Lock:
         self.request = ""
         self.objectClass = objectClass
         self.objectName = objectName
+
+        if workflowId:
+            self.workflowId = "_" + workflowId
+        else:
+            self.workflowId = ""
 
         if "assetId" in o:
             self.assetId = str(o["assetId"])
@@ -99,7 +104,7 @@ class Lock:
                             # network:POST:1:
                             # network:POST:1:10.8.1.0
                             for netName in ["", self.networkName]:
-                                entry = oc+":"+str(method)+":"+self.assetId+":"+netName
+                                entry = oc+":"+str(method)+":"+self.assetId+":"+netName+"*" # add the glob to possibly match the workflowId suffix.
 
                                 # <httpMethod>: {
                                 #    "POST": "x",
@@ -159,7 +164,7 @@ class Lock:
             if httpMethod:
                 for oc in self.objectClass:
                     # @todo: a Redis cache transaction lock is needed here.
-                    entry = oc+":"+str(httpMethod)+":"+self.assetId+":"+self.networkName
+                    entry = oc+":"+str(httpMethod)+":"+self.assetId+":"+self.networkName+self.workflowId
                     c = cache.get(entry)
 
                     # If some locked objectName already set, add the current one.
@@ -185,7 +190,7 @@ class Lock:
             httpMethod = self.__httpMethod() # request HTTP method.
             if httpMethod:
                 for oc in self.objectClass:
-                    entry = oc+":"+str(httpMethod)+":"+self.assetId+":"+self.networkName
+                    entry = oc+":"+str(httpMethod)+":"+self.assetId+":"+self.networkName+self.workflowId
                     c = cache.get(entry)
 
                     if "lock" in c:
@@ -202,6 +207,35 @@ class Lock:
                             Log.log("Lock released for "+entry+"; now it values: "+str(cache.get(entry)))
         except Exception:
             pass
+
+
+
+    ####################################################################################################################
+    # Public static methods
+    ####################################################################################################################
+
+    @staticmethod
+    def listWorkflowLocks(workflowId:str) -> list:
+        try:
+            if workflowId:
+                globEntries = "*_" + workflowId
+                return cache.keys(globEntries)
+            else:
+                return []
+        except Exception as e:
+            raise e
+
+
+
+    @staticmethod
+    def releaseWorkflow(workflowId: str) -> None:
+        try:
+            entriesList = Lock.listWorkflowLocks(workflowId)
+            globEntries = "*_" + workflowId
+            cache.delete_pattern(globEntries)
+            Log.log("Lock entries released: " + str(entriesList) + " - workflow: " + workflowId + ".")
+        except Exception as e:
+            raise e
 
 
 

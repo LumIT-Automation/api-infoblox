@@ -62,14 +62,15 @@ class InfobloxIpv4sController(CustomController):
                         Log.actionLog("Ipv4 addition", user)
                         Log.actionLog("User data: "+str(request.data), user)
 
-                        lock = Lock("network", locals(), userNetwork=permissionCheckNetwork) # lock permissionCheckNetwork.
+                        lock = Lock("network", locals(), userNetwork=permissionCheckNetwork, workflowId=workflowId) # lock permissionCheckNetwork.
                         if lock.isUnlocked():
                             lock.lock()
 
                             response["data"], actualNetwork, mask, gateway, historyId = ipv4CustomReserve.reserve()
 
                             httpStatus = status.HTTP_201_CREATED
-                            lock.release()
+                            if not workflowId:
+                                lock.release()
 
                             # Run registered plugins.
                             CustomController.plugins("ipv4s_post", requestType=reqType, data=data, response=response, network=actualNetwork, gateway=gateway, mask=mask, historyId=historyId, user=user)
@@ -89,7 +90,7 @@ class InfobloxIpv4sController(CustomController):
 
                 Log.log("User data incorrect: "+str(response))
         except Exception as e:
-            if "permissionCheckNetwork" in locals():
+            if "permissionCheckNetwork" in locals() and not workflowId:
                 Lock("network", locals(), userNetwork=locals()["permissionCheckNetwork"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)

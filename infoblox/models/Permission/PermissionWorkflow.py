@@ -11,7 +11,6 @@ from infoblox.models.Infoblox.Network import Network as NetworkModel
 
 from infoblox.models.Permission.repository.PermissionWorkflow import PermissionWorkflow as Repository
 from infoblox.models.Permission.repository.PermissionWorkflowPrivilege import PermissionWorkflowPrivilege as PermissionPrivilegeRepository
-from infoblox.models.Permission.Privilege import Privilege
 
 from infoblox.helpers.Exception import CustomException
 
@@ -63,11 +62,7 @@ class PermissionWorkflow:
         try:
             for gr in groups:
                 if gr.lower() == "automation.local":
-                    # Check if the given action exists.
-                    if action in [ p["privilege"] for p in Privilege.listQuick()]:
-                        return True
-                    else:
-                        return False
+                    return True
 
             if network or container:
                 if network:
