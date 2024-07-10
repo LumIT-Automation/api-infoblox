@@ -72,7 +72,8 @@ class InfobloxIpv4Controller(CustomController):
 
                             Log.log("Upstream data incorrect: "+str(serializer.errors))
 
-                        lock.release()
+                        if not workflowId:
+                            lock.release()
 
                         # Run registered plugins.
                         CustomController.plugins("ipv4_get", data=data, ipv4Address=ipv4address, user=user)
@@ -84,7 +85,7 @@ class InfobloxIpv4Controller(CustomController):
                 httpStatus = status.HTTP_403_FORBIDDEN
 
         except Exception as e:
-            if "userNetwork" in locals():
+            if "userNetwork" in locals() and not workflowId:
                 Lock("network", locals(), userNetwork=locals()["userNetwork"], objectName=locals()["ipv4address"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
