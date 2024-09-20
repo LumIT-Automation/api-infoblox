@@ -52,7 +52,7 @@ class InfobloxIpv4sController(CustomController):
                     else:
                         # If the user cannot request an ip in a range, cleanup the range data and rebuild ipv4CustomReserve. @todo: improve.
                         if reqType == "post.next-available" and "range_first_ip" in data:
-                            if not user["authDisabled"] and not Permission.hasUserPermission(groups=user["groups"], action="range_get", assetId=assetId, container=permissionContainer, network=permissionNetwork):
+                            if not user["authDisabled"] and not CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="range_get", assetId=assetId, container=permissionContainer, network=permissionNetwork):
                                 del data["range_first_ip"]
                                 if "range_last_ip" in data:
                                     del data["range_last_ip"]
