@@ -2,7 +2,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
-from infoblox.models.Permission.Permission import Permission
 from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.usecases.AssignCloudNetworkFactory import AssignCloudNetworkFactory
