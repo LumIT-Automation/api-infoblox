@@ -28,6 +28,7 @@ class InfobloxNetworksController(CustomController):
         user = CustomController.loggedUser(request)
         workflowId = request.headers.get("workflowId", "")  # a correlation id.
         checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
+        escalatedByWorkflow = request.headers.get("escalatedByWorkflow", "")
 
         fk = list()
         fv = list()
@@ -53,10 +54,13 @@ class InfobloxNetworksController(CustomController):
 
                         networks = Network.listData(assetId, filters)
                         networkContainers = NetworkContainer.listData(assetId)
-                        # Filter networks' list basing on permissions.
-                        for n in networks:
-                            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, network=str(n["network"]), containers=networkContainers, networks=networks, isWorkflow=bool(workflowId)):
-                                allowedData["data"].append(n)
+                        if escalatedByWorkflow:
+                            allowedData["data"] = networks
+                        else:
+                            # Filter networks' list basing on permissions.
+                            for n in networks:
+                                if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, network=str(n["network"]), containers=networkContainers, networks=networks, isWorkflow=bool(workflowId)):
+                                    allowedData["data"].append(n)
 
                         serializer = Serializer(data=allowedData)
                         if serializer.is_valid():
