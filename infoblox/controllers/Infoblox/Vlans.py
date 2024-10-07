@@ -43,7 +43,7 @@ class InfobloxVlansController(CustomController):
                             fv.append(v)
                         filters = dict(zip(fk, fv))
 
-                    lock = Lock("vlan", locals())
+                    lock = Lock("vlan", locals(), workflowId=workflowId)
                     if lock.isUnlocked():
                         lock.lock()
 

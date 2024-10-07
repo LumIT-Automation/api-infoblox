@@ -48,7 +48,7 @@ class InfobloxNetworksController(CustomController):
                             fv.append(v)
                         filters = dict(zip(fk, fv))
 
-                    lock = Lock("network", locals())
+                    lock = Lock("network", locals(), workflowId=workflowId)
                     if lock.isUnlocked():
                         lock.lock()
 
@@ -128,7 +128,7 @@ class InfobloxNetworksController(CustomController):
                     if serializer.is_valid():
                         data = serializer.validated_data
 
-                        lock = Lock("network", locals(), data["network"])
+                        lock = Lock("network", locals(), data["network"], workflowId=workflowId)
                         if lock.isUnlocked():
                             lock.lock()
 

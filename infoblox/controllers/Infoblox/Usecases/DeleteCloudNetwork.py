@@ -29,7 +29,7 @@ class InfobloxDeleteCloudNetworkController(CustomController):
                 else:
                     Log.actionLog("Cloud network deletion use case", user)
 
-                    lock = Lock("network", locals(), networkAddress)
+                    lock = Lock("network", locals(), networkAddress, workflowId=workflowId)
                     if lock.isUnlocked():
                         lock.lock()
 

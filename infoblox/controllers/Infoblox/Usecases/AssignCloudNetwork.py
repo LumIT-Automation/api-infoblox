@@ -34,7 +34,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
                     if serializer.is_valid():
                         data = serializer.validated_data
 
-                        lock = Lock("networkContainer", locals())
+                        lock = Lock("networkContainer", locals(), workflowId=workflowId)
                         if lock.isUnlocked():
                             lock.lock()
 

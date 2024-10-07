@@ -47,7 +47,7 @@ class InfobloxIpv4Controller(CustomController):
                 else:
                     Log.actionLog("Get ipv4s address information: "+ipv4address, user)
 
-                    lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address) # must use an additional parameter for calculated network.
+                    lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address, workflowId=workflowId) # must use an additional parameter for calculated network.
                     if lock.isUnlocked():
                         lock.lock()
 
