@@ -82,7 +82,8 @@ class InfobloxVlansController(CustomController):
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("vlan", locals()).release()
+            if not workflowId:
+                Lock("vlan", locals()).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
