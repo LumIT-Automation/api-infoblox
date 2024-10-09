@@ -1,20 +1,20 @@
 from infoblox.usecases.impl.CloudNetworkDelete import CloudNetworkDelete
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.History.History import History
-from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Mail import Mail
-from infoblox.helpers.Log import Log
 
 
 class CloudNetworkCustomDelete1(CloudNetworkDelete):
-    def __init__(self, assetId: int, networkAddress: str, user: dict, *args, **kwargs):
+    def __init__(self, assetId: int, networkAddress: str, user: dict, isWorkflow: bool = False, *args, **kwargs):
         super().__init__(assetId, networkAddress, user, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.networkAddress = networkAddress
         self.user = user
+        self.isWorkflow = isWorkflow
 
 
 
@@ -28,7 +28,7 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
             if not network.repr().get("extattrs", {}).get("Environment", {}).get("value", "") == "Cloud":
                 raise CustomException(status=400, payload={"Infoblox": "This is not a Cloud Network."})
 
-            if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network) or self.user["authDisabled"]:
+            if CheckPermissionFacade.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network, isWorkflow=self.isWorkflow) or self.user["authDisabled"]:
                 from infoblox.controllers.CustomController import CustomController
                 accountId = network.repr().get("extattrs", {}).get("Account ID", {}).get("value", "")
                 accountName = network.repr().get("extattrs", {}).get("Account Name", {}).get("value", "")

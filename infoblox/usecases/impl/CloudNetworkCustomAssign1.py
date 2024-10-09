@@ -5,20 +5,21 @@ from infoblox.usecases.impl.CloudNetworkAssign import CloudNetworkAssign
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.History.History import History
-from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.helpers.Exception import CustomException
 from infoblox.helpers.Log import Log
 
 
 class CloudNetworkCustomAssign1(CloudNetworkAssign):
-    def __init__(self, assetId: int, provider: str, region: str, user: dict, *args, **kwargs):
-        super().__init__(assetId, provider, region, user, *args, **kwargs)
+    def __init__(self, assetId: int, provider: str, region: str, user: dict, isWorkflow: bool = False, *args, **kwargs):
+        super().__init__(assetId, provider, region, user, isWorkflow, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.provider: str = provider
         self.region: str = region
         self.user = user
+        self.isWorkflow = isWorkflow
         self.containers = None
 
 
@@ -139,7 +140,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
     def __assign(self, container: str, data: dict, subnetMaskCidr: int) -> str:
         try:
-            if Permission.hasUserPermission(groups=self.user["groups"], action="cloud_network_assign_put", assetId=self.assetId, container=container) or self.user["authDisabled"]:
+            if CheckPermissionFacade.hasUserPermission(groups=self.user["groups"], action="cloud_network_assign_put", assetId=self.assetId, container=container, isWorkflow=self.isWorkflow) or self.user["authDisabled"]:
                 n = NetworkContainer(self.assetId, container).addNextAvailableNetwork(
                         subnetMaskCidr=subnetMaskCidr,
                         data=data

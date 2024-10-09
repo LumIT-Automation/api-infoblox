@@ -6,13 +6,12 @@ from infoblox.helpers.Exception import CustomException
 
 
 class AssignCloudNetworkFactory:
-    def __init__(self, assetId: int, provider: str, region: str, user: dict):
+    def __init__(self, assetId: int, provider: str, region: str, user: dict, isWorkflow: bool = False):
         self.assetId: int = int(assetId)
         self.provider: str = provider
         self.region: str = region
         self.user = user
-
-
+        self.isWorkflow = isWorkflow
 
     def __call__(self, *args, **kwargs):
         try:
@@ -21,7 +20,7 @@ class AssignCloudNetworkFactory:
                 "module."+settings.CLOUD_ASSIGN_IMPLEMENTATION[1]
             )
 
-            return Implementation(self.assetId, self.provider, self.region, self.user)
+            return Implementation(self.assetId, self.provider, self.region, self.user, self.isWorkflow)
         except CustomException as c:
             raise c
         except Exception:

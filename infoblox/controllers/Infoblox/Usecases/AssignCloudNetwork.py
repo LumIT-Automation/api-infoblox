@@ -38,7 +38,7 @@ class InfobloxAssignCloudNetworkController(CustomController):
                         if lock.isUnlocked():
                             lock.lock()
 
-                            response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data.get("region", ""), user)().assignNetwork(
+                            response["data"] = AssignCloudNetworkFactory(assetId, data["provider"], data.get("region", ""), user, isWorkflow=bool(workflowId))().assignNetwork(
                                 data["network_data"]
                             )
 
