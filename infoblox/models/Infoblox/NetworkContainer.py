@@ -1,6 +1,5 @@
 import json
 from typing import Dict
-from django.core.cache import cache
 
 from infoblox.helpers.Exception import CustomException
 
