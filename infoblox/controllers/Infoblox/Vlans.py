@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Vlan import Vlan
-from infoblox.models.Permission.Permission import Permission
 from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.serializers.Infoblox.Vlans import InfobloxVlansSerializer as Serializer
@@ -71,7 +70,8 @@ class InfobloxVlansController(CustomController):
 
                             Log.log("Upstream data incorrect: "+str(serializer.errors))
 
-                        lock.release()
+                        if not workflowId:
+                            lock.release()
 
                         # Run registered plugins.
                         CustomController.plugins("vlans_get")

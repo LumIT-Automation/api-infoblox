@@ -6,7 +6,6 @@ from rest_framework import status
 
 from infoblox.models.Infoblox.Ipv4 import Ipv4
 from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
-from infoblox.models.Permission.Permission import Permission
 from infoblox.models.History.History import History
 
 from infoblox.serializers.Infoblox.Ipv4 import InfobloxIpv4Serializer as Serializer
@@ -101,6 +100,8 @@ class InfobloxIpv4Controller(CustomController):
     @staticmethod
     def delete(request: Request, assetId: int, ipv4address: str) -> Response:
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
         userNetwork = ""
         networkCidr = "/"
         networkContainerCidr = "/" # container of userNetwork, if any.
@@ -113,30 +114,34 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, network=networkCidr):
-                Log.actionLog("Delete ipv4s address: "+ipv4address, user)
-
-                lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
-                if lock.isUnlocked():
-                    lock.lock()
-
-                    ipv4.release(fixedaddressOnly=True)
-                    httpStatus = status.HTTP_200_OK
-
-                    lock.release()
-
-                    historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
-                    Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
-
-                    # Run registered plugins.
-                    CustomController.plugins("ipv4_delete", ipv4Address=ipv4address, user=user)
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="ipv4_delete", assetId=assetId, network=networkCidr, isWorkflow=bool(workflowId)):
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    httpStatus = status.HTTP_423_LOCKED
-                    Log.actionLog("Ipv4 locked: "+str(lock), user)
+                    Log.actionLog("Delete ipv4s address: "+ipv4address, user)
+
+                    lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address, workflowId=workflowId)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        ipv4.release(fixedaddressOnly=True)
+                        httpStatus = status.HTTP_200_OK
+
+                        if not workflowId:
+                            lock.release()
+
+                        historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_delete", "deleted", ipv4address)
+                        Mail.send(user, "ALERT_JSM", "IPv4 address "+ipv4address+" has been deleted by "+user["username"]+"."+"\r\nGroup: IT Network Management.") # @todo: move away.
+
+                        # Run registered plugins.
+                        CustomController.plugins("ipv4_delete", ipv4Address=ipv4address, user=user)
+                    else:
+                        httpStatus = status.HTTP_423_LOCKED
+                        Log.actionLog("Ipv4 locked: "+str(lock), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            if "userNetwork" in locals():
+            if "userNetwork" in locals() and not workflowId:
                 Lock("network", locals(), userNetwork=locals()["userNetwork"], objectName=locals()["ipv4address"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
@@ -152,6 +157,8 @@ class InfobloxIpv4Controller(CustomController):
     def patch(request: Request, assetId: int, ipv4address: str) -> Response:
         response = None
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
         userNetwork = ""
         networkCidr = "/"
         networkContainerCidr = "/" # container of userNetwork, if any.
@@ -164,42 +171,46 @@ class InfobloxIpv4Controller(CustomController):
             except Exception:
                 pass
 
-            if Permission.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, network=networkCidr):
-                Log.actionLog("Modify ipv4s address: "+ipv4address, user)
-                Log.actionLog("User data: "+str(request.data), user)
-
-                serializer = Serializer(data=request.data["data"], partial=True)
-                if serializer.is_valid():
-                    data = serializer.validated_data
-
-                    lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address)
-                    if lock.isUnlocked():
-                        lock.lock()
-
-                        ipv4.modify(data) # address pass: data will be modified, using this for the logs.
-
-                        httpStatus = status.HTTP_200_OK
-                        lock.release()
-
-                        historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
-
-                        # Run registered plugins.
-                        CustomController.plugins("ipv4_patch", ipv4Address=ipv4address, user=user)
-                    else:
-                        httpStatus = status.HTTP_423_LOCKED
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="ipv4_patch", assetId=assetId, network=networkCidr, isWorkflow=bool(workflowId)):
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    httpStatus = status.HTTP_400_BAD_REQUEST
-                    response = {
-                        "infoblox": {
-                            "error": str(serializer.errors)
-                        }
-                    }
+                    Log.actionLog("Modify ipv4s address: "+ipv4address, user)
+                    Log.actionLog("User data: "+str(request.data), user)
 
-                    Log.actionLog("User data incorrect: "+str(response), user)
+                    serializer = Serializer(data=request.data["data"], partial=True)
+                    if serializer.is_valid():
+                        data = serializer.validated_data
+
+                        lock = Lock("network", locals(), userNetwork=userNetwork, objectName=ipv4address, workflowId=workflowId)
+                        if lock.isUnlocked():
+                            lock.lock()
+
+                            ipv4.modify(data) # address pass: data will be modified, using this for the logs.
+
+                            httpStatus = status.HTTP_200_OK
+                            if not workflowId:
+                                lock.release()
+
+                            historyId = InfobloxIpv4Controller.__historyLog(assetId, user["username"], "ipv4_patch: " + json.dumps(data), "modified", ipv4address)
+
+                            # Run registered plugins.
+                            CustomController.plugins("ipv4_patch", ipv4Address=ipv4address, user=user)
+                        else:
+                            httpStatus = status.HTTP_423_LOCKED
+                    else:
+                        httpStatus = status.HTTP_400_BAD_REQUEST
+                        response = {
+                            "infoblox": {
+                                "error": str(serializer.errors)
+                            }
+                        }
+
+                        Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            if "userNetwork" in locals():
+            if "userNetwork" in locals() and not workflowId:
                 Lock("network", locals(), userNetwork=locals()["userNetwork"], objectName=locals()["ipv4address"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)

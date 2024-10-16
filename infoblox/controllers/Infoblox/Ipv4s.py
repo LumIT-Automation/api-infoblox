@@ -4,7 +4,6 @@ from rest_framework import status
 
 from infoblox.usecases.ReserveFactory import ReserveFactory
 
-from infoblox.models.Permission.Permission import Permission
 from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.serializers.Infoblox.Ipv4s import InfobloxIpv4sSerializer as Serializer

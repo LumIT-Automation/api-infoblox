@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from infoblox.models.Infoblox.Network import Network
-from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 from infoblox.models.History.History import History
 
 from infoblox.serializers.Infoblox.Network import InfobloxNetworkSerializer
@@ -31,78 +31,84 @@ class InfobloxNetworkController(CustomController):
         etagCondition = { "responseEtag": "" }
         httpStatus = None
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
 
         try:
             n = Network(assetId, networkAddress)
-            if Permission.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, network=n) or user["authDisabled"]:
-                Log.actionLog("Network information", user)
-
-                # If asked for, get related IPs.
-                if "related" in request.GET:
-                    rList = request.GET.getlist('related')
-                    if "ip" in rList:
-                        showIp = True
-                    if "range" in rList:
-                        showRange = True
-
-                lock = Lock("network", locals(), networkAddress)
-                if lock.isUnlocked():
-                    lock.lock()
-
-                    serializer = InfobloxNetworkSerializer(data=n.repr())
-                    if serializer.is_valid():
-                        data["data"] = serializer.validated_data
-                        data["href"] = request.get_full_path()
-
-                        if showIp:
-                            Log.actionLog("Ask also ip data information", user)
-                            ipv4Info["data"]["items"] = n.ipv4sData()
-                            serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
-                            if serializerIpv4.is_valid():
-                                data["data"].update({
-                                    "ipv4Info": serializerIpv4.validated_data["data"]["items"]
-                                })
-                            else:
-                                httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
-                                Log.log("Upstream data incorrect: " + str(serializer.errors))
-
-                        if showRange and Permission.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n) or user["authDisabled"]:
-                            Log.actionLog("Ask also ranges information", user)
-                            rangeInfo["data"] = n.rangesData()
-                            serializerRange = InfobloxRangesSerializer(data=rangeInfo)
-                            if serializerRange.is_valid():
-                                data["data"].update({
-                                    "rangeInfo": serializerRange.validated_data["data"]
-                                })
-                            else:
-                                httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
-                                Log.log("Upstream data incorrect: " + str(serializer.errors))
-                    else:
-                        httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
-                        Log.log("Upstream data incorrect: "+str(serializer.errors))
-
-                    # Check the response's ETag validity (against client request).
-                    if httpStatus != status.HTTP_500_INTERNAL_SERVER_ERROR:
-                        conditional = Conditional(request)
-                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                        if etagCondition["state"] == "fresh":
-                            data = None
-                            httpStatus = status.HTTP_304_NOT_MODIFIED
-                        else:
-                            httpStatus = status.HTTP_200_OK
-
-                    lock.release()
-
-                    # Run registered plugins.
-                    CustomController.plugins("network_get")
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="network_get", assetId=assetId, network=n, isWorkflow=bool(workflowId)) or user["authDisabled"]:
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    data = None
-                    httpStatus = status.HTTP_423_LOCKED
+                    Log.actionLog("Network information", user)
+
+                    # If asked for, get related IPs.
+                    if "related" in request.GET:
+                        rList = request.GET.getlist('related')
+                        if "ip" in rList:
+                            showIp = True
+                        if "range" in rList:
+                            showRange = True
+
+                    lock = Lock("network", locals(), networkAddress, workflowId=workflowId)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        serializer = InfobloxNetworkSerializer(data=n.repr())
+                        if serializer.is_valid():
+                            data["data"] = serializer.validated_data
+                            data["href"] = request.get_full_path()
+
+                            if showIp:
+                                Log.actionLog("Ask also ip data information", user)
+                                ipv4Info["data"]["items"] = n.ipv4sData()
+                                serializerIpv4 = InfobloxIpv4sSerializer(data=ipv4Info, reqType="get")
+                                if serializerIpv4.is_valid():
+                                    data["data"].update({
+                                        "ipv4Info": serializerIpv4.validated_data["data"]["items"]
+                                    })
+                                else:
+                                    httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                    Log.log("Upstream data incorrect: " + str(serializer.errors))
+
+                            if showRange and CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="ranges_get", assetId=assetId, network=n, isWorkflow=bool(workflowId)) or user["authDisabled"]:
+                                Log.actionLog("Ask also ranges information", user)
+                                rangeInfo["data"] = n.rangesData()
+                                serializerRange = InfobloxRangesSerializer(data=rangeInfo)
+                                if serializerRange.is_valid():
+                                    data["data"].update({
+                                        "rangeInfo": serializerRange.validated_data["data"]
+                                    })
+                                else:
+                                    httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                                    Log.log("Upstream data incorrect: " + str(serializer.errors))
+                        else:
+                            httpStatus, data = status.HTTP_500_INTERNAL_SERVER_ERROR, {"Infoblox": {"error": "Infoblox upstream data mismatch."} }
+                            Log.log("Upstream data incorrect: "+str(serializer.errors))
+
+                        # Check the response's ETag validity (against client request).
+                        if httpStatus != status.HTTP_500_INTERNAL_SERVER_ERROR:
+                            conditional = Conditional(request)
+                            etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                            if etagCondition["state"] == "fresh":
+                                data = None
+                                httpStatus = status.HTTP_304_NOT_MODIFIED
+                            else:
+                                httpStatus = status.HTTP_200_OK
+
+                        if not workflowId:
+                            lock.release()
+
+                        # Run registered plugins.
+                        CustomController.plugins("network_get")
+                    else:
+                        data = None
+                        httpStatus = status.HTTP_423_LOCKED
             else:
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            if "networkAddress" in locals():
+            if "networkAddress" in locals() and not workflowId:
                 Lock("network", locals(), locals()["networkAddress"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
@@ -122,24 +128,30 @@ class InfobloxNetworkController(CustomController):
         data = dict()
 
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, network=networkAddress) or user["authDisabled"]:
-                Log.actionLog("Network deletion", user)
-
-                lock = Lock("network", locals(), networkAddress)
-                if lock.isUnlocked():
-                    lock.lock()
-
-                    Network(assetId, networkAddress).delete()
-                    httpStatus = status.HTTP_200_OK
-                    lock.release()
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="network_delete", assetId=assetId, network=networkAddress, isWorkflow=workflowId) or user["authDisabled"]:
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    httpStatus = status.HTTP_423_LOCKED
+                    Log.actionLog("Network deletion", user)
+
+                    lock = Lock("network", locals(), networkAddress, workflowId=workflowId)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        Network(assetId, networkAddress).delete()
+                        httpStatus = status.HTTP_200_OK
+                        if not workflowId:
+                            lock.release()
+                    else:
+                        httpStatus = status.HTTP_423_LOCKED
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            if "networkAddress" in locals():
+            if "networkAddress" in locals() and not workflowId:
                 Lock("network", locals(), locals()["networkAddress"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
@@ -158,39 +170,45 @@ class InfobloxNetworkController(CustomController):
         data = dict()
 
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, network=networkAddress) or user["authDisabled"]:
-                Log.actionLog("Modify network", user)
-                Log.actionLog("User data: "+str(request.data), user)
-
-                serializer = InfobloxNetworkSerializer(data=request.data["data"], partial=True)
-                if serializer.is_valid():
-                    data = serializer.validated_data
-
-                    lock = Lock("network", locals(), networkAddress)
-                    if lock.isUnlocked():
-                        lock.lock()
-
-                        n = Network(assetId, networkAddress).modify(data)
-                        httpStatus = status.HTTP_200_OK
-                        lock.release()
-                        InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress, n["network"])
-                    else:
-                        httpStatus = status.HTTP_423_LOCKED
+            if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="network_patch", assetId=assetId, network=networkAddress, isWorkflow=workflowId) or user["authDisabled"]:
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    httpStatus = status.HTTP_400_BAD_REQUEST
-                    response = {
-                        "infoblox": {
-                            "error": str(serializer.errors)
-                        }
-                    }
+                    Log.actionLog("Modify network", user)
+                    Log.actionLog("User data: "+str(request.data), user)
 
-                    Log.actionLog("User data incorrect: "+str(response), user)
+                    serializer = InfobloxNetworkSerializer(data=request.data["data"], partial=True)
+                    if serializer.is_valid():
+                        data = serializer.validated_data
+
+                        lock = Lock("network", locals(), networkAddress, workflowId=workflowId)
+                        if lock.isUnlocked():
+                            lock.lock()
+
+                            n = Network(assetId, networkAddress).modify(data)
+                            httpStatus = status.HTTP_200_OK
+                            if not workflowId:
+                                lock.release()
+                            InfobloxNetworkController.__historyLog(assetId, user["username"], "network_patch: " + json.dumps(data), "modified", networkAddress, n["network"])
+                        else:
+                            httpStatus = status.HTTP_423_LOCKED
+                    else:
+                        httpStatus = status.HTTP_400_BAD_REQUEST
+                        response = {
+                            "infoblox": {
+                                "error": str(serializer.errors)
+                            }
+                        }
+
+                        Log.actionLog("User data incorrect: "+str(response), user)
             else:
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            if "networkAddress" in locals():
+            if "networkAddress" in locals() and not workflowId:
                 Lock("network", locals(), locals()["networkAddress"]).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)

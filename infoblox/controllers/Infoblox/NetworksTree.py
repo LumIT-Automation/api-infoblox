@@ -8,7 +8,7 @@ from rest_framework import status
 from infoblox.models.Infoblox.Tree import Tree
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.Infoblox.NetworkContainer import NetworkContainer
-from infoblox.models.Permission.Permission import Permission
+from infoblox.models.Permission.CheckPermissionFacade import CheckPermissionFacade
 
 from infoblox.controllers.CustomController import CustomController
 
@@ -31,6 +31,8 @@ class InfobloxNetworksTreeController(CustomController):
         }
         etagCondition = { "responseEtag": "" }
         user = CustomController.loggedUser(request)
+        workflowId = request.headers.get("workflowId", "") # a correlation id.
+        checkWorkflowPermission = request.headers.get("checkWorkflowPermission", "")
 
         def __allowedTree(el: dict, father: str, tree: dict, networkList: list, networkContainterList: list) -> None: # -> tree.
             if not el["children"]:
@@ -48,7 +50,7 @@ class InfobloxNetworksTreeController(CustomController):
 
 
                 # Add only allowed leaves to the tree data structure.
-                if Permission.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, container=permissionContainer, network=permissionNetwork, containers=networkContainterList, networks=nList) or user["authDisabled"]:
+                if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action=action, assetId=assetId, container=permissionContainer, network=permissionNetwork, containers=networkContainterList, networks=nList, isWorkflow=bool(workflowId)) or user["authDisabled"]:
                     el["key"] = hashlib.sha256(el["_ref"].encode('utf-8')).hexdigest()
                     el["children"] = []
 
@@ -75,7 +77,7 @@ class InfobloxNetworksTreeController(CustomController):
                             }
 
                             # If not branch allowed, clear information but maintain structure.
-                            if not (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, container=el["network"], containers=networkContainterList) or user["authDisabled"] or el["network"] == "/"):
+                            if not (CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, container=el["network"], containers=networkContainterList, isWorkflow=bool(workflowId)) or user["authDisabled"] or el["network"] == "/"):
                                 nc["title"] = ""
                                 nc["extattrs"] = dict()
 
@@ -115,66 +117,71 @@ class InfobloxNetworksTreeController(CustomController):
                         pass
 
         try:
-            if (Permission.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId) and Permission.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId)) or user["authDisabled"]:
-                Log.actionLog("Tree", user)
-
-                lock = Lock("tree", locals())
-                if lock.isUnlocked():
-                    lock.lock()
-
-                    # Get the tree and check here user's permissions.
-                    networksList = Network.listData(assetId)
-                    networkContainersList = NetworkContainer.listData(assetId)
-                    netList = copy.deepcopy(networksList)
-                    itemData = Tree.tree(assetId, netWorkContainersList=networkContainersList, networksList=netList)
-
-                    __allowedTree(itemData["/"], "", tree, networksList, networkContainersList) # tree modified: by reference.
-
-                    o["/"]["children"] = tree["/"]
-
-                    # Cleanup tree: remove empty leaves, one level per run.
-                    while True:
-                        tree = {
-                            "clean": True
-                        }
-                        __cleanupTree(o["/"], "", tree)
-
-                        o = {
-                            "/": {
-                                "title": "/",
-                                "key": "networkcontainer/",
-                                "children": list()
-                            }
-                        }
-                        o["/"]["children"] = tree["networkcontainer/"]
-
-                        if tree["clean"]:
-                            break
-
-                    data["data"] = o
-                    data["href"] = request.get_full_path()
-
-                    # Check the response's ETag validity (against client request).
-                    conditional = Conditional(request)
-                    etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
-                    if etagCondition["state"] == "fresh":
-                        data = None
-                        httpStatus = status.HTTP_304_NOT_MODIFIED
-                    else:
-                        httpStatus = status.HTTP_200_OK
-
-                    lock.release()
-
-                    # Run registered plugins.
-                    CustomController.plugins("network_containers_get")
+            if (CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="network_containers_get", assetId=assetId, isWorkflow=bool(workflowId)) and CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="networks_get", assetId=assetId, isWorkflow=bool(workflowId))) or user["authDisabled"]:
+                if workflowId and checkWorkflowPermission:
+                    httpStatus = status.HTTP_204_NO_CONTENT
                 else:
-                    data = None
-                    httpStatus = status.HTTP_423_LOCKED
+                    Log.actionLog("Tree", user)
+
+                    lock = Lock("tree", locals(), workflowId=workflowId)
+                    if lock.isUnlocked():
+                        lock.lock()
+
+                        # Get the tree and check here user's permissions.
+                        networksList = Network.listData(assetId)
+                        networkContainersList = NetworkContainer.listData(assetId)
+                        netList = copy.deepcopy(networksList)
+                        itemData = Tree.tree(assetId, netWorkContainersList=networkContainersList, networksList=netList)
+
+                        __allowedTree(itemData["/"], "", tree, networksList, networkContainersList) # tree modified: by reference.
+
+                        o["/"]["children"] = tree["/"]
+
+                        # Cleanup tree: remove empty leaves, one level per run.
+                        while True:
+                            tree = {
+                                "clean": True
+                            }
+                            __cleanupTree(o["/"], "", tree)
+
+                            o = {
+                                "/": {
+                                    "title": "/",
+                                    "key": "networkcontainer/",
+                                    "children": list()
+                                }
+                            }
+                            o["/"]["children"] = tree["networkcontainer/"]
+
+                            if tree["clean"]:
+                                break
+
+                        data["data"] = o
+                        data["href"] = request.get_full_path()
+
+                        # Check the response's ETag validity (against client request).
+                        conditional = Conditional(request)
+                        etagCondition = conditional.responseEtagFreshnessAgainstRequest(data["data"])
+                        if etagCondition["state"] == "fresh":
+                            data = None
+                            httpStatus = status.HTTP_304_NOT_MODIFIED
+                        else:
+                            httpStatus = status.HTTP_200_OK
+
+                        if not workflowId:
+                            lock.release()
+
+                        # Run registered plugins.
+                        CustomController.plugins("network_containers_get")
+                    else:
+                        data = None
+                        httpStatus = status.HTTP_423_LOCKED
             else:
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
         except Exception as e:
-            Lock("tree", locals()).release()
+            if not workflowId:
+                Lock("tree", locals()).release()
 
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
