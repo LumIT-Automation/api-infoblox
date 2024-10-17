@@ -11,7 +11,6 @@ from infoblox.models.Infoblox.Network import Network as NetworkModel
 
 from infoblox.models.Permission.repository.Permission import Permission as Repository
 from infoblox.models.Permission.repository.PermissionPrivilege import PermissionPrivilege as PermissionPrivilegeRepository
-from infoblox.models.Permission.Privilege import Privilege
 
 from infoblox.helpers.Exception import CustomException
 
@@ -38,7 +37,7 @@ class Permission:
 
     def delete(self) -> None:
         try:
-            Repository.delete(self.id)
+            Repository(permissionId=self.id).delete()
             del self
         except Exception as e:
             raise e
@@ -102,7 +101,7 @@ class Permission:
     @staticmethod
     def permissionsDataList() -> list:
         try:
-            return Repository.list()
+            return Repository().list()
         except Exception as e:
             raise e
 
@@ -214,7 +213,7 @@ class Permission:
 
     def __load(self) -> None:
         try:
-            info = Repository.get(self.id)
+            info = Repository(permissionId=self.id).get()
 
             self.identityGroup = IdentityGroup(id=info["id_group"])
             self.role = Role(id=info["id_role"])
@@ -226,10 +225,9 @@ class Permission:
 
     def __modify(self, identityGroup: IdentityGroup, role: Role, network: Network) -> None:
         try:
-            Repository.modify(
-                self.id,
+            Repository(permissionId=self.id).modify(
                 identityGroupId=identityGroup.id,
-                roleId=role.id,
+                privilegesListId=role.id,
                 networkId=network.id
             )
 
@@ -243,12 +241,11 @@ class Permission:
     # Private static methods
     ####################################################################################################################
 
-    @staticmethod
     def __add(identityGroup: IdentityGroup, role: Role, network: Network) -> None:
         try:
-            Repository.add(
+            Repository().add(
                 identityGroupId=identityGroup.id,
-                roleId=role.id,
+                privilegesListId=role.id,
                 networkId=network.id
             )
         except Exception as e:

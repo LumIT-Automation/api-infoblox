@@ -37,7 +37,7 @@ class PermissionWorkflow:
 
     def delete(self) -> None:
         try:
-            Repository.delete(self.id)
+            Repository(permissionId=self.id).delete()
             del self
         except Exception as e:
             raise e
@@ -102,7 +102,7 @@ class PermissionWorkflow:
     @staticmethod
     def workflowPermissionsDataList() -> list:
         try:
-            return Repository.list()
+            return Repository().list()
         except Exception as e:
             raise e
 
@@ -196,7 +196,7 @@ class PermissionWorkflow:
 
     def __load(self) -> None:
         try:
-            info = Repository.get(self.id)
+            info = Repository(permissionId=self.id).get()
 
             self.identityGroup = IdentityGroup(id=info["id_group"])
             self.workflow = Workflow(id=info["id_workflow"])
@@ -208,10 +208,9 @@ class PermissionWorkflow:
 
     def __modify(self, identityGroup: IdentityGroup, workflow: Workflow, network: Network) -> None:
         try:
-            Repository.modify(
-                self.id,
+            Repository(permissionId=self.id).modify(
                 identityGroupId=identityGroup.id,
-                workflowId=workflow.id,
+                privilegesListId=workflow.id,
                 networkId=network.id
             )
 
@@ -228,9 +227,9 @@ class PermissionWorkflow:
     @staticmethod
     def __add(identityGroup: IdentityGroup, workflow: Workflow, network: Network) -> None:
         try:
-            Repository.add(
+            Repository().add(
                 identityGroupId=identityGroup.id,
-                workflowId=workflow.id,
+                privilegesListId=workflow.id,
                 networkId=network.id
             )
         except Exception as e:
