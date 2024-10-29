@@ -82,11 +82,12 @@ class Permission:
     LEFT JOIN `network` ON `network`.id = group_role_network.id_network 
     WHERE role.role IS NOT NULL
     """
-    def list(self) -> list:
+    def list(self, filters: dict = None) -> list:
+        filters = filters or {}
         c = connection.cursor()
 
         try:
-            c.execute(
+            query = (
                 f"SELECT {self.permissionTable}.id, "
                     "identity_group.name AS identity_group_name, "
                     "identity_group.identity_group_identifier AS identity_group_identifier, "
@@ -97,7 +98,14 @@ class Permission:
                 f"LEFT JOIN {self.permissionTable} ON {self.permissionTable}.id_group = identity_group.id "
                 f"LEFT JOIN {self.privilegesList} ON {self.privilegesList}.id = {self.permissionTable}.id_{self.privilegesList} "
                 f"LEFT JOIN `network` ON `network`.id = {self.permissionTable}.id_network "
-                f"WHERE {self.privilegesList}.{self.privilegesList} IS NOT NULL")
+                f"WHERE {self.privilegesList}.{self.privilegesList} IS NOT NULL"
+            )
+            if filter:
+                for column in filters.keys():
+                    if column in [ "identity_group_identifier", "network", self.privilegesList, "id_asset" ]:
+                        query += f" AND {column} = '{filters[column]}'"
+
+            c.execute(query)
             l = DBHelper.asDict(c)
 
             for el in l:

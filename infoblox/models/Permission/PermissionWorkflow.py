@@ -100,9 +100,11 @@ class PermissionWorkflow:
 
 
     @staticmethod
-    def workflowPermissionsDataList() -> list:
+    def workflowPermissionsDataList(filters: dict = None) -> list:
+        filters = filters or {}
+
         try:
-            return Repository().list()
+            return Repository().list(filters = filters)
         except Exception as e:
             raise e
 

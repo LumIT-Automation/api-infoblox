@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c3ed4dad-742b-4c60-9639-cd2b94b3dee4",
+		"_postman_id": "e685a548-03c1-41dd-8797-7127c4f33934",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -398,6 +398,58 @@
 								"infoblox",
 								"permissions-workflow",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "permissions workflow (filters)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{jwttoken}}"
+							},
+							{
+								"key": "If-None-Match",
+								"value": "c485212f298abe5f8b867ca42617292a",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/permissions-workflow/?fby=identity_group_identifier&fval=cn=groupstaff,cn=users,dc=lab,dc=local&fby=workflow&fval=flow_test1",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"permissions-workflow",
+								""
+							],
+							"query": [
+								{
+									"key": "fby",
+									"value": "identity_group_identifier"
+								},
+								{
+									"key": "fval",
+									"value": "cn=groupstaff,cn=users,dc=lab,dc=local"
+								},
+								{
+									"key": "fby",
+									"value": "workflow"
+								},
+								{
+									"key": "fval",
+									"value": "flow_test1"
+								}
 							]
 						}
 					},
