@@ -103,7 +103,7 @@ class Permission:
             if filter:
                 for column in filters.keys():
                     if column in [ "identity_group_identifier", "network", self.privilegesList, "id_asset" ]:
-                        query += f" AND {column} = '{filters[column]}'"
+                        query += f" AND UPPER({column}) = UPPER('{filters[column]}')"
 
             c.execute(query)
             l = DBHelper.asDict(c)
