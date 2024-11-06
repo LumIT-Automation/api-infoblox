@@ -75,11 +75,13 @@ class Permission:
         identity_group.identity_group_identifier AS identity_group_identifier, 
         role.role AS role, 
         `network`.id_asset AS network_asset, 
-        `network`.`network` AS network_name 
+        `network`.`network` AS network_name,
+        "asset.fqdn AS asset_name "
     FROM identity_group 
     LEFT JOIN group_role_network ON group_role_network.id_group = identity_group.id 
     LEFT JOIN role ON role.id = group_role_network.id_role 
-    LEFT JOIN `network` ON `network`.id = group_role_network.id_network 
+    LEFT JOIN `network` ON `network`.id = group_role_network.id_network
+    INNER JOIN asset ON asset.id = `network`.id_asset
     WHERE role.role IS NOT NULL
     """
     def list(self, filters: dict = None) -> list:
@@ -93,11 +95,13 @@ class Permission:
                     "identity_group.identity_group_identifier AS identity_group_identifier, "
                     f"{self.privilegesList}.{self.privilegesList}, " 
                     "`network`.id_asset AS network_asset, "
-                    "`network`.`network` AS network_name "
+                    "`network`.`network` AS network_name, "
+                    "asset.fqdn AS asset_name "
                 "FROM identity_group "
                 f"LEFT JOIN {self.permissionTable} ON {self.permissionTable}.id_group = identity_group.id "
                 f"LEFT JOIN {self.privilegesList} ON {self.privilegesList}.id = {self.permissionTable}.id_{self.privilegesList} "
                 f"LEFT JOIN `network` ON `network`.id = {self.permissionTable}.id_network "
+                "INNER JOIN asset ON asset.id = `network`.id_asset "
                 f"WHERE {self.privilegesList}.{self.privilegesList} IS NOT NULL"
             )
             if filter:
@@ -111,11 +115,13 @@ class Permission:
             for el in l:
                 el["network"] = {
                     "id_asset": el["network_asset"],
-                    "name": el["network_name"]
+                    "name": el["network_name"],
+                    "asset_name": el["asset_name"]
                 }
 
                 del(el["network_asset"])
                 del(el["network_name"])
+                del (el["asset_name"])
 
             return l
         except Exception as e:
