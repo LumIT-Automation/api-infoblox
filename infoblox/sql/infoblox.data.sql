@@ -71,7 +71,8 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (36, 'cloud_extattrs_get', 'object', NULL),
 (37, 'delete_account_cloud_network_put', 'object', NULL),
 (38, 'workflows_privileges_get', 'global', NULL),
-(39, 'locks_delete', 'global', NULL);
+(39, 'locks_delete', 'global', NULL),
+(40, 'file_txt_get', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -124,6 +125,7 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 37),
 (1, 38),
 (1, 39),
+(1, 40),
 (2, 3),
 (2, 5),
 (2, 6),

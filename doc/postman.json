@@ -1,10 +1,67 @@
 {
 	"info": {
-		"_postman_id": "e685a548-03c1-41dd-8797-7127c4f33934",
+		"_postman_id": "e20e5f7d-1bc0-483f-9516-1aac0689a120",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "Api doc",
+			"item": [
+				{
+					"name": "postman",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/doc/postman.json/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"doc",
+								"postman.json",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "swagger",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/doc/swagger.yaml/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"doc",
+								"swagger.yaml",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
 		{
 			"name": "Assets",
 			"item": [
