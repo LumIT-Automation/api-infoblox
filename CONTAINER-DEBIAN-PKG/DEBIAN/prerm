@@ -4,7 +4,7 @@ printf "\n* Container prerm...\n"
 printf "\n* Cleanup...\n"
 
 if podman ps | awk '{print $2}' | grep -Eq '\blocalhost/api-infoblox(:|$)'; then
-    podman stop -t 5 api-infoblox &
+    podman stop -t 15 api-infoblox &
     wait $! # Wait for the shutdown process of the container.
 fi
 

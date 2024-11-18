@@ -5,7 +5,7 @@ function start() {
 }
 
 function stop() {
-    podman stop api-infoblox
+    podman stop -t 15 api-infoblox
 }
 
 function restart() {
