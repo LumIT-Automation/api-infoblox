@@ -7,30 +7,28 @@ from infoblox.models.Permission.Permission import Permission
 
 from infoblox.controllers.CustomController import CustomController
 
+from infoblox.serializers.Configuration.Configurations import ConfigurationsSerializer
 from infoblox.serializers.Configuration.Configuration import ConfigurationSerializer
 
 from infoblox.helpers.Conditional import Conditional
 from infoblox.helpers.Log import Log
 
 
-class ConfigurationController(CustomController):
-
+class ConfigurationsController(CustomController):
     @staticmethod
-    def get(request: Request, configId: int) -> Response:
+    def get(request: Request) -> Response:
         data = dict()
         etagCondition = {"responseEtag": ""}
+
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="configuration_get") or user["authDisabled"]:
-                Log.actionLog("Configuration information", user)
+            if Permission.hasUserPermission(groups=user["groups"], action="configurations_get") or user["authDisabled"]:
+                Log.actionLog("Configurations list", user)
 
-                serializer = ConfigurationSerializer(
-                    data=Configuration(configId).repr()
-                )
-
+                serializer = ConfigurationsSerializer(data={"items": Configuration.list()})  # serializer needs an "items" key.
                 if serializer.is_valid():
-                    data["data"] = serializer.validated_data
+                    data["data"] = serializer.validated_data["items"]
                     data["href"] = request.get_full_path()
 
                     # Check the response's ETag validity (against client request).
@@ -44,15 +42,14 @@ class ConfigurationController(CustomController):
                 else:
                     httpStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
                     data = {
-                        "Infoblox": {
-                            "error": "Infoblox upstream data mismatch."
-                        }
+                        "Infoblox": "upstream data mismatch."
                     }
 
-                    Log.log("Upstream data incorrect: " + str(serializer.errors))
+                    Log.log("Upstream data incorrect: "+str(serializer.errors))
             else:
                 data = None
                 httpStatus = status.HTTP_403_FORBIDDEN
+
         except Exception as e:
             data, httpStatus, headers = CustomController.exceptionHandler(e)
             return Response(data, status=httpStatus, headers=headers)
@@ -65,42 +62,21 @@ class ConfigurationController(CustomController):
 
 
     @staticmethod
-    def delete(request: Request, configId: int) -> Response:
-        user = CustomController.loggedUser(request)
-
-        try:
-            if Permission.hasUserPermission(groups=user["groups"], action="configuration_delete") or user["authDisabled"]:
-                Log.actionLog("Configuration deletion", user)
-
-                Configuration(id=configId).delete()
-
-                httpStatus = status.HTTP_200_OK
-            else:
-                httpStatus = status.HTTP_403_FORBIDDEN
-        except Exception as e:
-            data, httpStatus, headers = CustomController.exceptionHandler(e)
-            return Response(data, status=httpStatus, headers=headers)
-
-        return Response(None, status=httpStatus, headers={
-            "Cache-Control": "no-cache"
-        })
-
-
-
-    @staticmethod
-    def patch(request: Request, configId: int) -> Response:
+    def post(request: Request) -> Response:
         response = None
         user = CustomController.loggedUser(request)
 
         try:
-            if Permission.hasUserPermission(groups=user["groups"], action="configuration_patch") or user["authDisabled"]:
-                Log.actionLog("Configuration modification", user)
+            if Permission.hasUserPermission(groups=user["groups"], action="configurations_post") or user["authDisabled"]:
+                Log.actionLog("Configuration addition", user)
                 Log.actionLog("User data: "+str(request.data), user)
 
-                serializer = ConfigurationSerializer(data=request.data["data"], partial=True)
+                serializer = ConfigurationSerializer(data=request.data["data"])
                 if serializer.is_valid():
-                    response = Configuration(id=configId).modify(data=serializer.validated_data)
-                    httpStatus = status.HTTP_200_OK
+                    data = serializer.validated_data
+                    response = {"data": Configuration.add(data)}
+
+                    httpStatus = status.HTTP_201_CREATED
                 else:
                     httpStatus = status.HTTP_400_BAD_REQUEST
                     response = {

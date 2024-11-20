@@ -56,6 +56,10 @@ class Permission:
 
         permissionNetworks = []
 
+        # Authorizations' list allowed for any (authenticated) user.
+        if action == "authorizations_get" or action == "configurations_get" or action == "configuration_get":
+            return True
+
         # Superadmin's group.
         for gr in groups:
             if gr.lower() == "automation.local":

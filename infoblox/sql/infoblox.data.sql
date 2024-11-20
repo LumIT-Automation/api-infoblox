@@ -57,7 +57,7 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (22, 'vlans_get', 'asset', NULL),
 (23, 'vlan_get', 'asset', NULL),
 (24, 'cloud_network_assign_put', 'asset', NULL),
-(25, 'configuration_put', 'global', NULL),
+(25, 'configurations_post', 'global', NULL),
 (26, 'ranges_get', 'asset', NULL),
 (27, 'range_get', 'asset', NULL),
 (28, 'triggers_post', 'global', NULL),
@@ -72,7 +72,9 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (37, 'delete_account_cloud_network_put', 'object', NULL),
 (38, 'workflows_privileges_get', 'global', NULL),
 (39, 'locks_delete', 'global', NULL),
-(40, 'file_txt_get', 'global', NULL);
+(40, 'file_txt_get', 'global', NULL),
+(41, 'configuration_delete', 'global', NULL),
+(42, 'configuration_patch', 'global', NULL);
 
 --
 -- Dump dei dati per la tabella `role`
@@ -126,6 +128,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 38),
 (1, 39),
 (1, 40),
+(1, 41),
+(1, 42),
 (2, 3),
 (2, 5),
 (2, 6),
