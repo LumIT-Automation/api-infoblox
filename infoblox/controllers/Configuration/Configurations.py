@@ -17,7 +17,7 @@ from infoblox.helpers.Log import Log
 class ConfigurationsController(CustomController):
     @staticmethod
     def get(request: Request) -> Response:
-        data = dict()
+        data = {"data": {}}
         etagCondition = {"responseEtag": ""}
 
         user = CustomController.loggedUser(request)
@@ -28,7 +28,7 @@ class ConfigurationsController(CustomController):
 
                 serializer = ConfigurationsSerializer(data={"items": Configuration.list()})  # serializer needs an "items" key.
                 if serializer.is_valid():
-                    data["data"] = serializer.validated_data["items"]
+                    data["data"]["items"] = serializer.validated_data["items"]
                     data["href"] = request.get_full_path()
 
                     # Check the response's ETag validity (against client request).
