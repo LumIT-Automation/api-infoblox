@@ -1,7 +1,7 @@
 
 /*
 OLD COMMIT: bb04eb680db6b682a5d113c38318b3683575c9ca
-NEW COMMIT: 594971b5cd588452a55e2b5c039da401a72f7f73
+NEW COMMIT: d96033f573ae4e641dfc1e0634fffcc10bd2c392
 */
 
 
@@ -11,12 +11,14 @@ SQL SCHEMA SECTION
 
 ## mysqldiff 0.60
 ## 
-## Run on Tue Nov 19 14:35:01 2024
-## Options: host=10.0.111.21, debug=0, password=password, user=api
+## Run on Mon Dec  2 16:04:31 2024
+## Options: user=api, host=10.0.111.21, password=password, debug=0
 ##
 ## --- file: /tmp/infoblox_old.sql
 ## +++ file: /tmp/infoblox_new.sql
 
+ALTER TABLE configuration CHANGE configuration text NOT NULL DEFAULT '[]';
+ALTER TABLE configuration ADD UNIQUE c_type (config_type);
 CREATE TABLE group_workflow_network (
   id int(255) NOT NULL AUTO_INCREMENT,
   id_group int(11) NOT NULL,
@@ -56,14 +58,13 @@ CREATE TABLE workflow_privilege (
 DATA SECTION
 */
 
-DELETE FROM `role` where `role` = 'workflow';
-UPDATE `role` SET id = 4 where `role` = 'powerstaff';
-
 set foreign_key_checks = 0;
 
 
 truncate table privilege;
 truncate table role_privilege;
+truncate table role;
+
 
 INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VALUES
 (1, 'asset_patch', 'asset', NULL),
@@ -90,7 +91,7 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (22, 'vlans_get', 'asset', NULL),
 (23, 'vlan_get', 'asset', NULL),
 (24, 'cloud_network_assign_put', 'asset', NULL),
-(25, 'configuration_put', 'global', NULL),
+(25, 'configurations_post', 'global', NULL),
 (26, 'ranges_get', 'asset', NULL),
 (27, 'range_get', 'asset', NULL),
 (28, 'triggers_post', 'global', NULL),
@@ -105,7 +106,9 @@ INSERT INTO `privilege` (`id`, `privilege`, `privilege_type`, `description`) VAL
 (37, 'delete_account_cloud_network_put', 'object', NULL),
 (38, 'workflows_privileges_get', 'global', NULL),
 (39, 'locks_delete', 'global', NULL),
-(40, 'file_txt_get', 'global', NULL);
+(40, 'file_txt_get', 'global', NULL),
+(41, 'configuration_delete', 'global', NULL),
+(42, 'configuration_patch', 'global', NULL);
 
 INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 3),
@@ -145,6 +148,8 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (1, 38),
 (1, 39),
 (1, 40),
+(1, 41),
+(1, 42),
 (2, 3),
 (2, 5),
 (2, 6),
@@ -189,7 +194,11 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 37),
 (4, 38);
 
+INSERT INTO `role` (`id`, `role`, `description`) VALUES
+(1, 'admin', 'admin'),
+(2, 'staff', 'read / write, excluding assets'),
+(3, 'readonly', 'readonly'),
+(4, 'powerstaff', 'read / write, excluding assets');
+
+
 set foreign_key_checks = 1;
-
-
-
