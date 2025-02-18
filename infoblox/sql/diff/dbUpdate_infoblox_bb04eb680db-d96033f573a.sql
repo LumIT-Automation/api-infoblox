@@ -17,8 +17,19 @@ SQL SCHEMA SECTION
 ## --- file: /tmp/infoblox_old.sql
 ## +++ file: /tmp/infoblox_new.sql
 
-ALTER TABLE configuration CHANGE configuration text NOT NULL DEFAULT '[]';
+set foreign_key_checks = 0;
+
+ALTER TABLE configuration CHANGE configuration `value` text NOT NULL DEFAULT '[]';
 ALTER TABLE configuration ADD UNIQUE c_type (config_type);
+
+CREATE TABLE workflow (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  workflow varchar(64) NOT NULL,
+  description varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY workflow (workflow)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE group_workflow_network (
   id int(255) NOT NULL AUTO_INCREMENT,
   id_group int(11) NOT NULL,
@@ -31,14 +42,6 @@ CREATE TABLE group_workflow_network (
   CONSTRAINT gwp_group FOREIGN KEY (id_group) REFERENCES identity_group (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT gwp_network FOREIGN KEY (id_network) REFERENCES network (id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT gwp_workflow FOREIGN KEY (id_workflow) REFERENCES workflow (id) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE workflow (
-  id int(11) NOT NULL AUTO_INCREMENT,
-  workflow varchar(64) NOT NULL,
-  description varchar(255) DEFAULT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY workflow (workflow)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE workflow_privilege (
@@ -58,7 +61,6 @@ CREATE TABLE workflow_privilege (
 DATA SECTION
 */
 
-set foreign_key_checks = 0;
 
 
 truncate table privilege;
