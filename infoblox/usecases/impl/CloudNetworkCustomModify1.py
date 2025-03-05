@@ -1,4 +1,3 @@
-import re
 from django.conf import settings
 
 from infoblox.usecases.impl.CloudNetworkModify import CloudNetworkModify

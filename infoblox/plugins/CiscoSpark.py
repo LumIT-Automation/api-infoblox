@@ -1,6 +1,7 @@
 import re
 import json
 import requests
+from datetime import datetime
 
 from django.conf import settings
 
@@ -144,24 +145,13 @@ def run(controller: str, requestType: str = "", requestStatus: str = "", data: d
                 CiscoSpark.send(user, message)
 
 
-    elif controller == "delete-cloud-networks_delete":
-        Log.log("[Plugins] Running CiscoSpark plugin")
 
-        if requestStatus == "success" or requestStatus == "forbidden":
-            message = f"Network {network}: action {requestType} was requested from user "+user.get("username", "--")+f": {requestStatus}."
-        else:
-            message = f"Network {network}: action {requestType}"
-            pass
-        if historyId:
-            message += "Unique operation ID: " + str(historyId) + "\n"
-        CiscoSpark.send(user, message)
+def sendMessage(user, message):
+    try:
+        mex = message + "\nTimestamp: " + str(datetime.now())
+        CiscoSpark.send(user, mex)
+    except Exception:
+        pass
 
-    elif controller == "assign-cloud-network_put":
-        Log.log("[Plugins] Running CiscoSpark plugin")
 
-        if requestStatus == "success":
-            message = f"Network {network}: action {requestType} was requested from user " + user.get("username", "--") + f": {requestStatus}."
-            if historyId:
-                message += "Unique operation ID: " + str(historyId) + "\n"
-            CiscoSpark.send(user, message)
 

@@ -33,7 +33,7 @@ class InfobloxDeleteCloudNetworkController(CustomController):
                     if lock.isUnlocked():
                         lock.lock()
 
-                        DeleteCloudNetworkFactory(assetId, networkAddress, user, isWorkflow=bool(workflowId))().delete()
+                        DeleteCloudNetworkFactory(assetId, networkAddress, user, workflowId=workflowId, isWorkflow=bool(workflowId))().delete()
                         httpStatus = status.HTTP_200_OK
                         if not workflowId:
                             lock.release()

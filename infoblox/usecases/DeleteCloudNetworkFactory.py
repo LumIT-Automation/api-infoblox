@@ -6,10 +6,11 @@ from infoblox.helpers.Exception import CustomException
 
 
 class DeleteCloudNetworkFactory:
-    def __init__(self, assetId: int, networkAddress: str, user: dict, isWorkflow: bool = False):
+    def __init__(self, assetId: int, networkAddress: str, user: dict, workflowId: str = "", isWorkflow: bool = False):
         self.assetId: int = int(assetId)
         self.networkAddress = networkAddress
         self.user = user
+        self.workflowId = workflowId
         self.isWorkflow = isWorkflow
 
 
@@ -21,7 +22,7 @@ class DeleteCloudNetworkFactory:
                 "module."+settings.CLOUD_NETWORK_DELETE_IMPLEMENTATION[1]
             )
 
-            return Implementation(self.assetId, self.networkAddress, self.user, self.isWorkflow)
+            return Implementation(self.assetId, self.networkAddress, self.user, self.workflowId, self.isWorkflow)
         except CustomException as c:
             raise c
         except Exception:

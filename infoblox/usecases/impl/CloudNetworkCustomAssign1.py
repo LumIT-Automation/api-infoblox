@@ -1,4 +1,6 @@
+from importlib import import_module
 import re
+
 from django.conf import settings
 
 from infoblox.usecases.impl.CloudNetworkAssign import CloudNetworkAssign
@@ -12,16 +14,20 @@ from infoblox.helpers.Log import Log
 
 
 class CloudNetworkCustomAssign1(CloudNetworkAssign):
-    def __init__(self, assetId: int, provider: str, region: str, user: dict, isWorkflow: bool = False, *args, **kwargs):
-        super().__init__(assetId, provider, region, user, isWorkflow, *args, **kwargs)
+    def __init__(self, assetId: int, provider: str, region: str, user: dict, workflowId: str = "", isWorkflow: bool = False, *args, **kwargs):
+        super().__init__(assetId, provider, region, user, workflowId, isWorkflow, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.provider: str = provider
         self.region: str = region
         self.user = user
+        self.workflowId = workflowId
         self.isWorkflow = isWorkflow
         self.containers = None
-
+        self.report = {
+            "header": f"{self.workflowId}\nProvider: {self.provider}\nRegion: {self.region}",
+            "message": ""
+        }
 
 
     ####################################################################################################################
@@ -70,7 +76,9 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
                     if settings.CLOUD_MAX_ACCOUNT_REGION_NETS <= len([net for net in accountIdNetworks if net.get("extattrs", {}).get("City", {}).get("value", "") == self.region]):
                         raise CustomException(status=400, payload={"Infoblox": "The maximum number of networks for this Account ID in this region has been reached: " + str(settings.CLOUD_MAX_ACCOUNT_REGION_NETS)})
 
-            return self.__pickContainer(data)
+            out = self.__pickContainer(data)
+            self.__report()
+            return out
         except Exception as e:
             raise e
 
@@ -148,8 +156,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
 
                 network = re.findall(r'network/[A-Za-z0-9]+:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/[0-9][0-9]?)/default$', n)[0]
                 hid = self.__historyLog(network, 'created')
-                from infoblox.controllers.CustomController import CustomController
-                CustomController.plugins(controller="assign-cloud-network_put", requestType="network.assign", requestStatus="success", network=network, user=self.user, historyId=hid)
+                self.report["message"] += f"\nAssigned network {network}\nHistoryId: {hid}"
                 return n
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
@@ -180,3 +187,16 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
             return historyId
         except Exception:
             pass
+
+
+
+    def __report(self):
+        if self.report["message"]:
+            # Run registered plugins.
+            for plugin in settings.PLUGINS:
+                if plugin == "infoblox.plugins.CiscoSpark":
+                    try:
+                        p = import_module(plugin)
+                        p.sendMessage(user=self.user, message=self.report["header"] + self.report["message"])
+                    except Exception:
+                        pass

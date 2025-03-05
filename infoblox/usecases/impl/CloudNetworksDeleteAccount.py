@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 class DeleteAccountCloudNetworks(metaclass=ABCMeta):
     @abstractmethod
-    def __init__(self, assetId: int, provider: str, user: dict, *args, **kwargs):
+    def __init__(self, assetId: int, provider: str, user: dict, workflowId: str = "", isWorkflow: bool = False, *args, **kwargs):
         pass
 
 

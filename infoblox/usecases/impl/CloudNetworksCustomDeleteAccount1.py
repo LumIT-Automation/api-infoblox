@@ -9,12 +9,14 @@ from infoblox.helpers.Log import Log
 
 
 class DeleteAccountCloudNetworks1(DeleteAccountCloudNetworks):
-    def __init__(self, assetId: int, provider: str, user: dict, *args, **kwargs):
+    def __init__(self, assetId: int, provider: str, user: dict, workflowId: str = "",  isWorkflow: bool = False, *args, **kwargs):
         super().__init__(assetId, provider, user, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.provider: str = provider
         self.user = user
+        self.workflowId = workflowId
+        self.isWorkflow = isWorkflow
 
 
 

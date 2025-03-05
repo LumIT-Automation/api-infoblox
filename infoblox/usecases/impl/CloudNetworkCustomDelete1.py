@@ -1,3 +1,7 @@
+from importlib import import_module
+
+from django.conf import settings
+
 from infoblox.usecases.impl.CloudNetworkDelete import CloudNetworkDelete
 from infoblox.models.Infoblox.Network import Network
 from infoblox.models.History.History import History
@@ -8,13 +12,18 @@ from infoblox.helpers.Mail import Mail
 
 
 class CloudNetworkCustomDelete1(CloudNetworkDelete):
-    def __init__(self, assetId: int, networkAddress: str, user: dict, isWorkflow: bool = False, *args, **kwargs):
-        super().__init__(assetId, networkAddress, user, *args, **kwargs)
+    def __init__(self, assetId: int, networkAddress: str, user: dict, workflowId: str = "", isWorkflow: bool = False, *args, **kwargs):
+        super().__init__(assetId, networkAddress, user, workflowId, isWorkflow, *args, **kwargs)
 
         self.assetId: int = int(assetId)
         self.networkAddress = networkAddress
         self.user = user
+        self.workflowId = workflowId
         self.isWorkflow = isWorkflow
+        self.report = {
+            "header": f"{self.workflowId}\nNetwork: {self.networkAddress}",
+            "message": ""
+        }
 
 
 
@@ -29,20 +38,22 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
                 raise CustomException(status=400, payload={"Infoblox": "This is not a Cloud Network."})
 
             if CheckPermissionFacade.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network, isWorkflow=self.isWorkflow) or self.user["authDisabled"]:
-                from infoblox.controllers.CustomController import CustomController
                 accountId = network.repr().get("extattrs", {}).get("Account ID", {}).get("value", "")
                 accountName = network.repr().get("extattrs", {}).get("Account Name", {}).get("value", "")
 
                 network.delete()
                 hid = self.__historyLog(network.network, 'deleted')
-                CustomController.plugins(controller="delete-cloud-networks_delete", requestType="network.delete", requestStatus="success", network=network.network, user=self.user, historyId=hid)
-
+                self.report["message"] += f"\nDeleted network {network.network}\nHistoryId: {hid}"
                 # If there are no networks left for this Account ID, email the admin group.
                 if not self.__getAccountIdNetworks(accountId):
-                    Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " with name " + accountName + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
+                    try:
+                        Mail.send(self.user, "ALERT_JSM", "Account ID " + accountId + " with name " + accountName + " has been deleted by " + self.user["username"] + "." + "\r\nGroup: IT Network Management.")
+                    except Exception:
+                        pass
             else:
                 raise CustomException(status=403, payload={"Infoblox": "Forbidden."})
 
+            self.__report()
         except Exception as e:
             raise e
 
@@ -85,3 +96,16 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
             return historyId
         except Exception:
             pass
+
+
+
+    def __report(self):
+        if self.report["message"]:
+            # Run registered plugins.
+            for plugin in settings.PLUGINS:
+                if plugin == "infoblox.plugins.CiscoSpark":
+                    try:
+                        p = import_module(plugin)
+                        p.sendMessage(user=self.user, message=self.report["header"] + self.report["message"])
+                    except Exception:
+                        pass
