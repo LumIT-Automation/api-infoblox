@@ -45,6 +45,7 @@ class CloudNetworkCustomAssign1(CloudNetworkAssign):
             accountNameNetworks = Network.listData(self.assetId, {
                 "*Account Name": data.get("extattrs", {}).get("Account Name", {}).get("value", "-")
             })
+            self.report["header"] += "\nAccountName: " + data.get("extattrs", {}).get("Account Name", {}).get("value", "-") + "\nAccountId: " + data.get("extattrs", {}).get("Account ID", {}).get("value", "-")
 
             if accountIdNetworks:
                 try:

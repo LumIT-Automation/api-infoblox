@@ -30,6 +30,7 @@ class CiscoSpark:
         # On KO status codes, a CustomException is raised, with response status and body.
         try:
             Log.actionLog("[Plugins] Sending Spark notice", user)
+            Log.log(f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\nUsername: " + user.get("username", "") + str(message), 'MMMMMMMMMMMMMMMMMMMM')
 
             response = requests.post(
                 settings.CISCO_SPARK_URL+"/messages",
@@ -44,7 +45,7 @@ class CiscoSpark:
                 params=None,
                 data=json.dumps({
                     "roomId": settings.CISCO_SPARK_ROOM_ID,
-                    "text": f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\n"+str(message)
+                    "text": f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\nUsername: {user}\n" + str(message)
                 })
             )
 

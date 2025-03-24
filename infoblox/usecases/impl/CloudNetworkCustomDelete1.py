@@ -40,6 +40,7 @@ class CloudNetworkCustomDelete1(CloudNetworkDelete):
             if CheckPermissionFacade.hasUserPermission(groups=self.user["groups"], action="cloud_network_delete", assetId=self.assetId, network=network, isWorkflow=self.isWorkflow) or self.user["authDisabled"]:
                 accountId = network.repr().get("extattrs", {}).get("Account ID", {}).get("value", "")
                 accountName = network.repr().get("extattrs", {}).get("Account Name", {}).get("value", "")
+                self.report["header"] += f"\nAccountName: {accountName}\nAccountId: {accountId}"
 
                 network.delete()
                 hid = self.__historyLog(network.network, 'deleted')
