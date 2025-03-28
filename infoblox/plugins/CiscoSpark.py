@@ -44,7 +44,7 @@ class CiscoSpark:
                 params=None,
                 data=json.dumps({
                     "roomId": settings.CISCO_SPARK_ROOM_ID,
-                    "text": f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\nUsername: {user}\n" + str(message)
+                    "text": f"[Concerto Orchestration, Infoblox][{concertoEnvironment}]\nUsername: " + user.get("username", "") + "\n" + str(message)
                 })
             )
 
