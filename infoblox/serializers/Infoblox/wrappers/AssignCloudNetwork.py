@@ -15,13 +15,12 @@ class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
                     value = serializers.CharField(max_length=255)
 
                 class InfobloxNetworkInnerExtattrsValueAccountIDSerializer(serializers.Serializer):
-                    class IntegerStringRegexSerializer(serializers.RegexField):
+                    class IdStringRegexSerializer(serializers.RegexField):
                         def __init__(self, *args, **kwargs):
-                            regex = '^[0-9]{12}$'
+                            regex = '^[0-9]{12}$|^[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}$'
                             super().__init__(regex=regex, *args, **kwargs)
 
-                    value = IntegerStringRegexSerializer(required=True)
-
+                    value = IdStringRegexSerializer(required=True)
 
                 self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueAccountIDSerializer(required=True)
                 self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
