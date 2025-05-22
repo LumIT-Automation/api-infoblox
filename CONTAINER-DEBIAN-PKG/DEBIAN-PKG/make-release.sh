@@ -41,7 +41,7 @@ function System_run()
             System_venv
             System_fixDebVersion
             System_swaggerFile
-            System_version
+            System_about
 
             System_debCreate
             System_cleanup
@@ -279,7 +279,7 @@ function System_swaggerFile() {
 
 
 
-function System_version() {
+function System_about() {
     mkdir -p $workingFolderPath/var/www/api/doc
     echo "{\"Component\": \"$shortName\"," > $workingFolderPath/var/www/api/doc/about.txt
     echo "\"Version\": \"`cat DEBIAN-PKG/deb.release`\"," >> $workingFolderPath/var/www/api/doc/about.txt
