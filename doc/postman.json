@@ -72,14 +72,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{infobloxBaseUrl}}/infoblox/doc/about.txt/",
+							"raw": "{{infobloxBaseUrl}}/infoblox/doc/about.json/",
 							"host": [
 								"{{infobloxBaseUrl}}"
 							],
 							"path": [
 								"infoblox",
 								"doc",
-								"about.txt",
+								"about.json",
 								""
 							]
 						}

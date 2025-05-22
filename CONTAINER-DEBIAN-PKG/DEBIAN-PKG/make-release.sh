@@ -281,11 +281,11 @@ function System_swaggerFile() {
 
 function System_about() {
     mkdir -p $workingFolderPath/var/www/api/doc
-    echo "{\"Component\": \"$shortName\"," > $workingFolderPath/var/www/api/doc/about.txt
-    echo "\"Version\": \"`cat DEBIAN-PKG/deb.release`\"," >> $workingFolderPath/var/www/api/doc/about.txt
+    echo "{\"Component\": \"$shortName\"," > $workingFolderPath/var/www/api/doc/about.json
+    echo "\"Version\": \"`cat DEBIAN-PKG/deb.release`\"," >> $workingFolderPath/var/www/api/doc/about.json
 
     currentGitCommit=$(git log --pretty=oneline | head -1 | awk '{print $1}')
-    echo "\"Commit\": \"$currentGitCommit\"}" >> $workingFolderPath/var/www/api/doc/about.txt
+    echo "\"Commit\": \"$currentGitCommit\"}" >> $workingFolderPath/var/www/api/doc/about.json
 }
 
 
