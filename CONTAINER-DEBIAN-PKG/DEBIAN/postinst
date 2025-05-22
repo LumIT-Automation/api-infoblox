@@ -20,7 +20,7 @@ if [ "$1" == "configure" ]; then
     # api-infoblox folder will be bound to /var/lib/containers/storage/volumes/.
     # Until the package is not uninstalled+purged, infoblox volumes remain untouched -> newly installed package's configuration files are then rewritten with volume's ones (this is why some services are restarted).
     # Side effect is that new package's configuration directives are ignored, so the user must be informed ("Differences from stock config").
-    podman run --name api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /lib/systemd/systemd
+    podman run --name api-infoblox --hostname api-infoblox -v api-infoblox:/var/www/api/api -v api-infoblox-db:/var/lib/mysql -v api-infoblox-cacerts:/usr/local/share/ca-certificates -dt localhost/api-infoblox /lib/systemd/systemd
 
     podman exec api-infoblox chown -R www-data:www-data /var/www/api/api # within container.
     podman exec api-infoblox chown -R mysql:mysql /var/lib/mysql

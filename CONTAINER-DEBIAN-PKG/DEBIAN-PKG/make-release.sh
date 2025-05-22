@@ -15,6 +15,7 @@ function System()
 
     # Properties list.
     ACTION="$ACTION"
+    shortName=$shortName
 }
 
 # ##################################################################################################################################################
@@ -40,6 +41,7 @@ function System_run()
             System_venv
             System_fixDebVersion
             System_swaggerFile
+            System_version
 
             System_debCreate
             System_cleanup
@@ -270,9 +272,20 @@ function System_debianFilesSetup()
 
 
 function System_swaggerFile() {
-    mkdir $workingFolderPath/var/www/api/doc
+    mkdir -p $workingFolderPath/var/www/api/doc
     cp /var/www/api/doc/postman.json $workingFolderPath/var/www/api/doc/
     postman2openapi -f yaml /var/www/api/doc/postman.json > $workingFolderPath/var/www/api/doc/swagger.yaml
+}
+
+
+
+function System_version() {
+    mkdir -p $workingFolderPath/var/www/api/doc
+    echo "{\"Component\": \"$shortName\"," > $workingFolderPath/var/www/api/doc/about.txt
+    echo "\"Version\": \"`cat DEBIAN-PKG/deb.release`\"," >> $workingFolderPath/var/www/api/doc/about.txt
+
+    currentGitCommit=$(git log --pretty=oneline | head -1 | awk '{print $1}')
+    echo "\"Commit\": \"$currentGitCommit\"}" >> $workingFolderPath/var/www/api/doc/about.txt
 }
 
 

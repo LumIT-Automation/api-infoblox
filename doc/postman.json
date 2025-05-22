@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cdadf5b4-6220-4d58-8029-e59f3d7f1ed5",
+		"_postman_id": "3ca20553-b2ff-4d6a-b704-c79d5fdcc424",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -54,6 +54,32 @@
 								"infoblox",
 								"doc",
 								"swagger.yaml",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "about",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwttoken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{infobloxBaseUrl}}/infoblox/doc/about.txt/",
+							"host": [
+								"{{infobloxBaseUrl}}"
+							],
+							"path": [
+								"infoblox",
+								"doc",
+								"about.txt",
 								""
 							]
 						}
