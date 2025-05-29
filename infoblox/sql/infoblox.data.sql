@@ -175,6 +175,44 @@ INSERT INTO `role_privilege` (`id_role`, `id_privilege`) VALUES
 (4, 38);
 
 
+-- Dump dei dati per la tabella `workflow`
+--
+
+INSERT INTO `workflow` (`id`, `workflow`, `description`) VALUES
+(1, 'flow_test1', 'test'),
+(2, 'flow_test2', 'test'),
+(3, 'checkpoint_add_host', 'add checkpoint host workflow'),
+(4, 'checkpoint_remove_host', 'remove checkpoint host workflow'),
+(5, 'cloud_account', 'cloud account workflow');
+
+-- Dump dei dati per la tabella `workflow_privilege`
+--
+
+INSERT INTO `workflow_privilege` (`id_workflow`, `id_privilege`) VALUES
+(1, 7),
+(1, 11),
+(1, 12),
+(1, 39),
+(2, 5),
+(2, 6),
+(2, 7),
+(2, 39),
+(3, 3),
+(3, 11),
+(3, 39),
+(4, 3),
+(4, 11),
+(4, 39),
+(5, 3),
+(5, 5),
+(5, 6),
+(5, 10),
+(5, 24),
+(5, 35),
+(5, 36),
+(5, 39);
+
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
