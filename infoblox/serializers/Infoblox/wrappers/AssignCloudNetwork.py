@@ -25,6 +25,7 @@ class InfobloxAssignCloudNetworkSerializer(serializers.Serializer):
                 self.fields["Account ID"] = InfobloxNetworkInnerExtattrsValueAccountIDSerializer(required=True)
                 self.fields["Reference"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
                 self.fields["Account Name"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=True)
+                self.fields["Scope"] = InfobloxNetworkInnerExtattrsValueStringSerializer(required=False)
 
 
         network = InfobloxNetworkValueStringSerializer(required=True)
