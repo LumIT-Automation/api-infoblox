@@ -15,5 +15,6 @@ class InfobloxCloudExtAttrSerializer(serializers.Serializer):
             self.fields["Account Name"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
             self.fields["Country"] = serializers.CharField(max_length=64, required=False)
             self.fields["Reference"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
+            self.fields["Scope"] = serializers.CharField(max_length=64, required=False, allow_blank=True)
 
     data = InfobloxCloudExtAttrInnerSerializer(many=True, required=False)
