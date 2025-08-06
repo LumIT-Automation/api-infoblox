@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6129e898-3a4b-4083-8377-7c04e895fe74",
+		"_postman_id": "28ea7861-afb5-4020-8c1a-8a14cb190c71",
 		"name": "api-infoblox",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1406,7 +1406,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AWS\",\n        \"network_data\": {\n            \"Region\": \"aws-eu-west-1\",\n            \"Account ID\": \"555555555555\",\n            \"Account Name\": \"ppp\"\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AZURE\",\n        \"network_data\": {\n            \"Region\": \"azure-westeurope\",\n            \"Account ID\": \"112745678001\",\n            \"Account Name\": \"stoca\"\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "{{infobloxBaseUrl}}/infoblox/1/delete-account-cloud-networks/",
@@ -1449,7 +1449,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"provider\": \"AZURE\",\n        \"region\": \"azure-Netherlands\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"subnetMaskCidr\": 24,\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"555555555590\"\n                },\n                \"Account Name\": {\n                    \"value\": \"crif-plesiosauro\"\n                },\n                \"Reference\": {\n                    \"value\": \"quellola\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"provider\": \"AZURE\",\n        \"region\": \"azure-westeurope\",\n        \"network_data\": {\n            \"network\": \"next-available\",\n            \"subnetMaskCidr\": 24,\n            \"comment\": \"Nella vecchia fattoria ia ia oh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"112745678000\"\n                },\n                \"Account Name\": {\n                    \"value\": \"crif-aaaaaaa-uat\"\n                },\n                \"Reference\": {\n                    \"value\": \"aaa\"\n                },\n                \"Scope\": {\n                    \"value\": \"AGW\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
 									"raw": "{{infobloxBaseUrl}}/infoblox/1/assign-cloud-network/",
@@ -1535,10 +1535,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"region\": \"aws-eu-west-1\",\n        \"network_data\": {\n            \"comment\": \"Nella vecchia fattoria ia ia oooooooooooh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"888888888888\"\n                },\n                \"Account Name\": {\n                    \"value\": \"stoca\"\n                },\n                \"Reference\": {\n                    \"value\": \"parolaio\"\n                }\n            }\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"region\": \"azure-westeurope\",\n        \"network_data\": {\n            \"comment\": \"Nella vecchia fattoria ia ia oooooooooooh\",\n            \"extattrs\": {\n                \"Account ID\": {\n                    \"value\": \"112745678000\"\n                },\n                \"Account Name\": {\n                    \"value\": \"crif-aaaaaaa-uat\"\n                },\n                \"Reference\": {\n                    \"value\": \"aaa\"\n                },\n                \"Scope\": {\n                    \"value\": \"WORKLOAD\"\n                }\n            }\n        }\n    }\n}"
 								},
 								"url": {
-									"raw": "{{infobloxBaseUrl}}/infoblox/1/modify-cloud-network/172.16.1.0/",
+									"raw": "{{infobloxBaseUrl}}/infoblox/1/modify-cloud-network/173.16.0.0/",
 									"host": [
 										"{{infobloxBaseUrl}}"
 									],
@@ -1546,7 +1546,7 @@
 										"infoblox",
 										"1",
 										"modify-cloud-network",
-										"172.16.1.0",
+										"173.16.0.0",
 										""
 									]
 								}
@@ -1579,10 +1579,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"data\": {\n        \"Account ID\": {\n            \"value\": \"333333333333\"\n        },\n        \"Account Name\": {\n            \"value\": \"stoca\"\n        },\n        \"Reference\": {\n            \"value\": \"parolaio\"\n        }\n    }\n}"
+									"raw": "{\n    \"data\": {\n        \"Account ID\": {\n            \"value\": \"112745678001\"\n        },\n        \"Account Name\": {\n            \"value\": \"stoca\"\n        },\n        \"Reference\": {\n            \"value\": \"parolaio\"\n        }\n    }\n}"
 								},
 								"url": {
-									"raw": "{{infobloxBaseUrl}}/infoblox/1/modify-account-cloud-network/555555555555/",
+									"raw": "{{infobloxBaseUrl}}/infoblox/1/modify-account-cloud-network/112745678000/",
 									"host": [
 										"{{infobloxBaseUrl}}"
 									],
@@ -1590,7 +1590,7 @@
 										"infoblox",
 										"1",
 										"modify-account-cloud-network",
-										"555555555555",
+										"112745678000",
 										""
 									]
 								}
