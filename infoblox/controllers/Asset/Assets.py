@@ -35,7 +35,7 @@ class InfobloxAssetsController(CustomController):
 
                     # Filter assets' list basing on actual permissions.
                     for p in itemData:
-                        if Permission.hasUserPermission(groups=user["groups"], action="assets_get", assetId=p["id"]) or user["authDisabled"]:
+                        if CheckPermissionFacade.hasUserPermission(groups=user["groups"], action="assets_get", assetId=p["id"]) or user["authDisabled"]:
                             allowedData["items"].append(p)
 
                     serializer = AssetsSerializer(data=allowedData)
